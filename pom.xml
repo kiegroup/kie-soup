@@ -29,8 +29,8 @@
 
   <groupId>org.kie.soup</groupId>
   <artifactId>kie-soup-parent</artifactId>
-  <version>8.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <version>8.0.0-SNAPSHOT</version>
 
   <name>KIE Soup parent</name>
   <description>
@@ -526,17 +526,5 @@
   </build>
 
   <!-- TODO Add checkstyle reporting -->
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.kie.soup</groupId>
-        <artifactId>kie-soup-bom</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
 </project>
