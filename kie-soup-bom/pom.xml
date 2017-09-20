@@ -85,6 +85,39 @@
         Each module should declare it's direct dependencies and possibly overwrite scope/optional.
         Always declare the sources jar too and optionally the test-jar.
       -->
+      <dependency>
+        <groupId>org.kie.soup</groupId>
+        <artifactId>kie-soup-commons</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.soup</groupId>
+        <artifactId>kie-soup-commons</artifactId>
+        <version>${project.version}</version>
+        <classifier>sources</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.soup</groupId>
+        <artifactId>kie-soup-project-datamodel-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.soup</groupId>
+        <artifactId>kie-soup-project-datamodel-api</artifactId>
+        <version>${project.version}</version>
+        <classifier>sources</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.soup</groupId>
+        <artifactId>kie-soup-project-datamodel-commons</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.soup</groupId>
+        <artifactId>kie-soup-project-datamodel-commons</artifactId>
+        <version>${project.version}</version>
+        <classifier>sources</classifier>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

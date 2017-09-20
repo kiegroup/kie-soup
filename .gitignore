@@ -23,3 +23,7 @@ hs_err_pid*
 
 # Maven build directories
 **/target/
+
+#Eclipse Files
+**/.project
+**/.settings/

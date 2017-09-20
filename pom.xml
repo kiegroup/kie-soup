@@ -51,6 +51,7 @@
   </licenses>
 
   <properties>
+    <version.org.mvel>2.3.2.Final</version.org.mvel>
   </properties>
 
   <repositories>
@@ -94,6 +95,8 @@
 
   <modules>
     <module>kie-soup-bom</module>
+    <module>kie-soup-commons</module>
+    <module>kie-soup-project-datamodel</module>
   </modules>
 
   <build>
@@ -535,6 +538,11 @@
         <version>${project.version}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mvel</groupId>
+        <artifactId>mvel2</artifactId>
+        <version>${version.org.mvel}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
