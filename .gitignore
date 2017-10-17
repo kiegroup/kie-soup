@@ -24,7 +24,11 @@ hs_err_pid*
 # Maven build directories
 **/target/
 
-#Eclipse Files
-**/.project
-**/.settings/
-**/.classpath
+# Eclipse, Netbeans and IntelliJ files
+/.*
+/**/.*
+!.gitignore
+/nbproject
+*.ipr
+*.iws
+*.iml
