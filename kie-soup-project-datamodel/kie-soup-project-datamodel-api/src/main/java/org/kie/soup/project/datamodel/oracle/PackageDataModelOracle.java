@@ -19,7 +19,7 @@ package org.kie.soup.project.datamodel.oracle;
 import java.util.List;
 import java.util.Map;
 
-public interface PackageDataModelOracle extends ProjectDataModelOracle {
+public interface PackageDataModelOracle extends ModuleDataModelOracle {
 
     void setPackageName( String packageName );
 

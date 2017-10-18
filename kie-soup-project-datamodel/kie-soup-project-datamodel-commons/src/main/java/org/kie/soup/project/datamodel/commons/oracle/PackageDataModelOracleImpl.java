@@ -26,7 +26,7 @@ import org.kie.soup.project.datamodel.oracle.PackageDataModelOracle;
 /**
  * Default implementation of DataModelOracle
  */
-public class PackageDataModelOracleImpl extends ProjectDataModelOracleImpl implements PackageDataModelOracle {
+public class PackageDataModelOracleImpl extends ModuleDataModelOracleImpl implements PackageDataModelOracle {
 
     //Package for which this DMO relates
     private String packageName = "";
