@@ -16,31 +16,32 @@
  */
 package org.kie.soup.project.datamodel.commons.oracle;
 
-import static org.junit.Assert.*;
-import static org.kie.soup.project.datamodel.commons.oracle.ProjectDataModelOracleUtils.getFieldFullyQualifiedClassName;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
 import org.kie.soup.project.datamodel.oracle.FieldAccessorsAndMutators;
+import org.kie.soup.project.datamodel.oracle.ModelField;
 import org.kie.soup.project.datamodel.oracle.ModelField.FIELD_CLASS_TYPE;
 import org.kie.soup.project.datamodel.oracle.ModelField.FIELD_ORIGIN;
-import org.kie.soup.project.datamodel.oracle.ModelField;
-import org.kie.soup.project.datamodel.oracle.ProjectDataModelOracle;
+import org.kie.soup.project.datamodel.oracle.ModuleDataModelOracle;
 
-public class ProjectDataModelOracleUtilsTest {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.kie.soup.project.datamodel.commons.oracle.ModuleDataModelOracleUtils.getFieldFullyQualifiedClassName;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+public class ModuleDataModelOracleUtilsTest {
 
     @Test
     public void getFieldFullyQualifiedClassNameTest() {
 
-        ProjectDataModelOracle mockedDMO = mock(ProjectDataModelOracle.class);
-        Map<String, ModelField[]> projectModelFields = new HashMap<>();
+        ModuleDataModelOracle mockedDMO = mock(ModuleDataModelOracle.class);
+        Map<String, ModelField[]> moduleModelFields = new HashMap<>();
 
         // non-existent field for unknown class
-        when(mockedDMO.getProjectModelFields()).thenReturn(projectModelFields);
+        when(mockedDMO.getModuleModelFields()).thenReturn(moduleModelFields);
         String fullyQualifiedClassName = this.getClass().getName();
         String fieldName = "nonExistentField";
 
@@ -48,7 +49,7 @@ public class ProjectDataModelOracleUtilsTest {
         assertNull("Expected a null FQN field class name", fqnFieldClassName);
 
         // non-existent field for known class
-        projectModelFields.put(fullyQualifiedClassName, new ModelField[]{
+        moduleModelFields.put(fullyQualifiedClassName, new ModelField[]{
                 new ModelField("existentField",
                                String.class.getName(),
                                FIELD_CLASS_TYPE.REGULAR_CLASS,
@@ -56,7 +57,7 @@ public class ProjectDataModelOracleUtilsTest {
                                FieldAccessorsAndMutators.ACCESSOR,
                                null)// forgot what goes in here?
         });
-        when(mockedDMO.getProjectModelFields()).thenReturn(projectModelFields);
+        when(mockedDMO.getModuleModelFields()).thenReturn(moduleModelFields);
 
         fqnFieldClassName = getFieldFullyQualifiedClassName(mockedDMO, fullyQualifiedClassName, fieldName);
         assertNull("Expected a null FQN field class name", fqnFieldClassName);
@@ -64,7 +65,7 @@ public class ProjectDataModelOracleUtilsTest {
         // existent field for known class
         fieldName = "testField";
         String fieldType = "org.acme.test.field.type";
-        projectModelFields.put(fullyQualifiedClassName, new ModelField[]{
+        moduleModelFields.put(fullyQualifiedClassName, new ModelField[]{
                 new ModelField("existentField",
                                String.class.getName(),
                                FIELD_CLASS_TYPE.REGULAR_CLASS,
@@ -78,7 +79,7 @@ public class ProjectDataModelOracleUtilsTest {
                                FieldAccessorsAndMutators.ACCESSOR,
                                null) // forgot what goes in here?
         });
-        when(mockedDMO.getProjectModelFields()).thenReturn(projectModelFields);
+        when(mockedDMO.getModuleModelFields()).thenReturn(moduleModelFields);
 
         fqnFieldClassName = getFieldFullyQualifiedClassName(mockedDMO, fullyQualifiedClassName, fieldName);
         assertEquals("Expected a null FQN field class name", fieldType, fqnFieldClassName);
