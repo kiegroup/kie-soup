@@ -83,7 +83,7 @@ public class PackageDataModelOracleImpl extends ProjectDataModelOracleImpl imple
         packageElements
                 .forEach((k, v) -> {
                     @SuppressWarnings("rawtypes")
-                    List list = packageElements.computeIfAbsent(k, k1 -> new ArrayList<>());
+                    List list = this.packageElements.computeIfAbsent(k, k1 -> new ArrayList<>());
                     list.addAll(v);
                 });
     }
