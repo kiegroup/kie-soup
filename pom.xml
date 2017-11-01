@@ -97,6 +97,7 @@
     <module>kie-soup-bom</module>
     <module>kie-soup-commons</module>
     <module>kie-soup-project-datamodel</module>
+    <module>kie-soup-maven-utils</module>
   </modules>
 
   <build>
