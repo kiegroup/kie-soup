@@ -51,6 +51,11 @@
   </licenses>
 
   <properties>
+    <!-- Required since support for ELS 2.x. Keep in sync with kie-parent or remove when those
+          two versions are being updated on the IP BOM.-->
+    <version.com.fasterxml.jackson>2.6.2</version.com.fasterxml.jackson>
+    <version.org.elasticsearch>2.1.2</version.org.elasticsearch>
+    <version.com.googlecode.jsonsimple>1.1.1</version.com.googlecode.jsonsimple>
     <version.org.mvel>2.3.2.Final</version.org.mvel>
   </properties>
 
@@ -98,6 +103,7 @@
     <module>kie-soup-commons</module>
     <module>kie-soup-project-datamodel</module>
     <module>kie-soup-maven-utils</module>
+    <module>kie-soup-dataset</module>
   </modules>
 
   <build>
@@ -147,6 +153,10 @@
                 <rules>
                   <banDuplicateClasses>
                     <ignoreClasses>
+                      <!-- Ban 'org.elasticsearch:elasticsearch' internal classes, as the artifact contains
+                        some duplicated classes for Joda time ones and it has the joda artifact
+                        as transitive dependency as well. -->
+                      <ignoreClass>org.joda.time.*</ignoreClass>
                       <!-- Classes bundled in errai-javax-enterprise which are GWT friendly.
                            See https://github.com/errai/errai/blob/master/errai-javax-enterprise/README -->
                       <ignoreClass>javax.interceptor.InvocationContext</ignoreClass>
@@ -544,6 +554,74 @@
         <groupId>org.mvel</groupId>
         <artifactId>mvel2</artifactId>
         <version>${version.org.mvel}</version>
+      </dependency>
+      <!-- Elastic search and transitive dependencies for it. -->
+      <dependency>
+        <groupId>org.elasticsearch</groupId>
+        <artifactId>elasticsearch</artifactId>
+        <version>${version.org.elasticsearch}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-core</artifactId>
+        <version>${version.org.apache.lucene}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-queryparser</artifactId>
+        <version>${version.org.apache.lucene}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-smile</artifactId>
+        <version>${version.com.fasterxml.jackson}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-yaml</artifactId>
+        <version>${version.com.fasterxml.jackson}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-cbor</artifactId>
+        <version>${version.com.fasterxml.jackson}</version>
+      </dependency>
+      <!-- Required to run the ElasticSearch server when performing the unit test executions.
+          The ELS data provider requires groovy scripts enabled on the server.-->
+      <dependency>
+        <groupId>org.codehaus.groovy</groupId>
+        <artifactId>groovy-all</artifactId>
+        <classifier>indy</classifier>
+        <version>${version.org.codehaus.groovy}</version>
+      </dependency>
+      <!-- JSON parsing. -->
+      <dependency>
+        <groupId>com.googlecode.json-simple</groupId>
+        <artifactId>json-simple</artifactId>
+        <version>${version.com.googlecode.jsonsimple}</version>
+        <type>jar</type>
+      </dependency>
+      <dependency>
+        <groupId>com.googlecode.jtype</groupId>
+        <artifactId>jtype</artifactId>
+        <version>${version.com.googlecode.jtype}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>${version.org.apache.httpcomponents.httpclient}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>
