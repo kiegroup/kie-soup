@@ -55,6 +55,7 @@
           two versions are being updated on the IP BOM.-->
     <version.com.fasterxml.jackson>2.6.2</version.com.fasterxml.jackson>
     <version.org.elasticsearch>2.1.2</version.org.elasticsearch>
+    <version.io.netty>4.1.16.Final</version.io.netty>
     <version.com.googlecode.jsonsimple>1.1.1</version.com.googlecode.jsonsimple>
     <version.org.mvel>2.3.2.Final</version.org.mvel>
   </properties>
@@ -554,6 +555,11 @@
         <groupId>org.mvel</groupId>
         <artifactId>mvel2</artifactId>
         <version>${version.org.mvel}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-all</artifactId>
+        <version>${version.io.netty}</version>
       </dependency>
       <!-- Elastic search and transitive dependencies for it. -->
       <dependency>
