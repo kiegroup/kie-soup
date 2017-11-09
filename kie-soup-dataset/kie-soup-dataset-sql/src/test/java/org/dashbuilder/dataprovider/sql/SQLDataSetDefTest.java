@@ -1,12 +1,12 @@
 /**
  * Copyright 2014 Red Hat, Inc. and/or its affiliates.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,7 @@
 package org.dashbuilder.dataprovider.sql;
 
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.dashbuilder.dataset.DataSet;
@@ -27,11 +28,15 @@ import org.dashbuilder.dataset.group.AggregateFunctionType;
 import org.dashbuilder.dataset.sort.SortOrder;
 import org.junit.Test;
 
-import static org.dashbuilder.dataset.ExpenseReportsData.*;
-import static org.dashbuilder.dataset.Assertions.*;
-import static org.dashbuilder.dataset.filter.FilterFactory.*;
-import static org.fest.assertions.api.Assertions.*;
-import static org.junit.Assert.*;
+import static org.dashbuilder.dataset.Assertions.assertDataSetValues;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_AMOUNT;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_DEPARTMENT;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_EMPLOYEE;
+import static org.dashbuilder.dataset.filter.FilterFactory.OR;
+import static org.dashbuilder.dataset.filter.FilterFactory.greaterThan;
+import static org.dashbuilder.dataset.filter.FilterFactory.lowerThan;
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 
 public class SQLDataSetDefTest extends SQLDataSetTestBase {
 
@@ -48,9 +53,8 @@ public class SQLDataSetDefTest extends SQLDataSetTestBase {
 
     @Test
     public void testAllColumns() throws Exception {
-
         URL fileURL = Thread.currentThread().getContextClassLoader().getResource("expenseReports_allcolumns.dset");
-        String json = IOUtils.toString(fileURL);
+        String json = IOUtils.toString(fileURL, StandardCharsets.UTF_8);
         SQLDataSetDef def = (SQLDataSetDef) jsonMarshaller.fromJson(json);
         dataSetDefRegistry.registerDataSetDef(def);
 
@@ -61,10 +65,9 @@ public class SQLDataSetDefTest extends SQLDataSetTestBase {
 
     @Test
     public void testSQLDataSet() throws Exception {
-
         String testDsetFile = testSettings.getExpenseReportsSqlDsetFile();
         URL fileURL = Thread.currentThread().getContextClassLoader().getResource(testDsetFile);
-        String json = IOUtils.toString(fileURL);
+        String json = IOUtils.toString(fileURL, StandardCharsets.UTF_8);
         SQLDataSetDef def = (SQLDataSetDef) jsonMarshaller.fromJson(json);
         dataSetDefRegistry.registerDataSetDef(def);
 
@@ -92,9 +95,8 @@ public class SQLDataSetDefTest extends SQLDataSetTestBase {
 
     @Test
     public void testColumnSet() throws Exception {
-
         URL fileURL = Thread.currentThread().getContextClassLoader().getResource("expenseReports_columnset.dset");
-        String json = IOUtils.toString(fileURL);
+        String json = IOUtils.toString(fileURL, StandardCharsets.UTF_8);
         SQLDataSetDef def = (SQLDataSetDef) jsonMarshaller.fromJson(json);
         dataSetDefRegistry.registerDataSetDef(def);
 
@@ -121,7 +123,7 @@ public class SQLDataSetDefTest extends SQLDataSetTestBase {
     @Test
     public void testColumnAlias() throws Exception {
         URL fileURL = Thread.currentThread().getContextClassLoader().getResource("expenseReports_columnalias.dset");
-        String json = IOUtils.toString(fileURL);
+        String json = IOUtils.toString(fileURL, StandardCharsets.UTF_8);
         SQLDataSetDef def = (SQLDataSetDef) jsonMarshaller.fromJson(json);
         dataSetDefRegistry.registerDataSetDef(def);
 
@@ -152,9 +154,8 @@ public class SQLDataSetDefTest extends SQLDataSetTestBase {
 
     @Test
     public void testFilters() throws Exception {
-
         URL fileURL = Thread.currentThread().getContextClassLoader().getResource("expenseReports_filtered.dset");
-        String json = IOUtils.toString(fileURL);
+        String json = IOUtils.toString(fileURL, StandardCharsets.UTF_8);
         SQLDataSetDef def = (SQLDataSetDef) jsonMarshaller.fromJson(json);
         dataSetDefRegistry.registerDataSetDef(def);
 

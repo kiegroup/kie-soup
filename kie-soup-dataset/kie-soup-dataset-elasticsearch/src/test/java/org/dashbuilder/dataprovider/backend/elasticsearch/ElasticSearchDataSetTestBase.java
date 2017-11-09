@@ -15,6 +15,9 @@
  */
 package org.dashbuilder.dataprovider.backend.elasticsearch;
 
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.io.IOUtils;
 import org.dashbuilder.DataSetCore;
 import org.dashbuilder.dataprovider.DataSetProviderRegistry;
@@ -27,8 +30,6 @@ import org.dashbuilder.dataset.json.DataSetDefJSONMarshaller;
 import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URL;
 
 /**
  * <p>Base test for ElasticSearch providers and data sets.</p>
@@ -82,7 +83,7 @@ public class ElasticSearchDataSetTestBase {
     protected ElasticSearchDataSetDef _registerDataSet(String resource) throws Exception {
         // Register the SQL data set
         URL fileURL = Thread.currentThread().getContextClassLoader().getResource(resource);
-        String json = IOUtils.toString(fileURL);
+        String json = IOUtils.toString(fileURL, StandardCharsets.UTF_8);
         ElasticSearchDataSetDef def = (ElasticSearchDataSetDef) jsonMarshaller.fromJson(json);
         dataSetDefRegistry.registerDataSetDef(def);
         return def;

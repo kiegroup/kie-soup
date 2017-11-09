@@ -15,19 +15,20 @@
  */
 package org.dashbuilder.dataset.json;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import org.dashbuilder.dataprovider.DataSetProviderRegistry;
 import org.dashbuilder.dataprovider.DataSetProviderType;
 import org.dashbuilder.dataset.ColumnType;
-import org.dashbuilder.dataset.def.*;
+import org.dashbuilder.dataset.def.DataColumnDef;
+import org.dashbuilder.dataset.def.DataSetDef;
 import org.dashbuilder.dataset.filter.DataSetFilter;
 import org.dashbuilder.json.Json;
 import org.dashbuilder.json.JsonArray;
 import org.dashbuilder.json.JsonException;
 import org.dashbuilder.json.JsonObject;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * DataSetDef from/to JSON utilities
@@ -301,7 +302,7 @@ public class DataSetDefJSONMarshaller {
             return true;
         }
         for (int i = 0; i < strLen; i++) {
-            if (!Character.isSpace(str.charAt(i))) {
+            if (!Character.isWhitespace(str.charAt(i))) {
                 return false;
             }
         }

@@ -22,21 +22,17 @@ import java.util.List;
 
 import org.junit.Test;
 
-import static org.fest.assertions.api.Assertions.*;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class ComparatorUtilsTest {
 
-    Comparator comparator = new Comparator() {
-        public int compare(Object o1, Object o2) {
-            return ComparatorUtils.compare(o1, o2, -1);
-        }
-    };
+    private final Comparator<Object> comparator = (o1, o2) -> ComparatorUtils.compare(o1, o2, -1);
 
     @Test
     public void testString() throws Exception {
         String[] stringArray = new String[]{"3", "4", "1"};
-        List stringList = Arrays.asList(stringArray);
-        Collections.sort(stringList, comparator);
+        List<String> stringList = Arrays.asList(stringArray);
+        stringList.sort(comparator);
         assertThat(stringList.get(0)).isEqualTo("4");
         assertThat(stringList.get(1)).isEqualTo("3");
         assertThat(stringList.get(2)).isEqualTo("1");
@@ -44,10 +40,10 @@ public class ComparatorUtilsTest {
 
     @Test
     public void testLong() throws Exception {
-        Long a=new Long(3), b=new Long(2), c=new Long(4);
-        Long[] longArray = new Long[]{a,b,c};
-        List longList = Arrays.asList(longArray);
-        Collections.sort(longList, comparator);
+        Long a = 3L, b = 2L, c = 4L;
+        Long[] longArray = new Long[]{a, b, c};
+        List<Long> longList = Arrays.asList(longArray);
+        longList.sort(comparator);
         assertThat(longList.get(0)).isEqualTo(c);
         assertThat(longList.get(1)).isEqualTo(a);
         assertThat(longList.get(2)).isEqualTo(b);
@@ -56,8 +52,8 @@ public class ComparatorUtilsTest {
     @Test
     public void testBoolean() throws Exception {
         Boolean[] booleanArray = new Boolean[]{Boolean.FALSE, Boolean.TRUE, Boolean.FALSE};
-        List booleanList = Arrays.asList(booleanArray);
-        Collections.sort(booleanList, comparator);
+        List<Boolean> booleanList = Arrays.asList(booleanArray);
+        booleanList.sort(comparator);
         assertThat(booleanList.get(0)).isEqualTo(Boolean.TRUE);
         assertThat(booleanList.get(1)).isEqualTo(Boolean.FALSE);
         assertThat(booleanList.get(2)).isEqualTo(Boolean.FALSE);
@@ -65,8 +61,8 @@ public class ComparatorUtilsTest {
 
     @Test
     public void testCollection() throws Exception {
-        List collection1 = Arrays.asList(new String[]{"A"});
-        List collection2 = Arrays.asList(new String[]{"B"});
+        List<String> collection1 = Collections.singletonList("A");
+        List<String> collection2 = Collections.singletonList("B");
         int result = comparator.compare(collection1, collection2);
         assertThat(result).isEqualTo(1);
     }

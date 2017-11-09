@@ -21,8 +21,8 @@ import org.dashbuilder.DataSetCore;
 import org.dashbuilder.dataprovider.DataSetProviderRegistry;
 import org.dashbuilder.dataprovider.csv.CSVDataSetProvider;
 import org.dashbuilder.dataset.DataSet;
-import org.dashbuilder.dataset.DataSetFactory;
 import org.dashbuilder.dataset.DataSetFormatter;
+import org.dashbuilder.dataset.DataSetLookupFactory;
 import org.dashbuilder.dataset.DataSetManager;
 import org.dashbuilder.dataset.def.DataSetDefFactory;
 import org.dashbuilder.dataset.def.DataSetDefRegistry;
@@ -30,9 +30,9 @@ import org.dashbuilder.dataset.group.AggregateFunctionType;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.dashbuilder.dataset.Assertions.*;
-import static org.fest.assertions.api.Assertions.*;
-import static org.dashbuilder.dataset.filter.FilterFactory.*;
+import static org.dashbuilder.dataset.Assertions.assertDataSetValues;
+import static org.dashbuilder.dataset.filter.FilterFactory.lowerThan;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class CSVDataSetBasicTest {
 
@@ -71,7 +71,7 @@ public class CSVDataSetBasicTest {
     @Test
     public void testLoadDataSet() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EXPENSE_REPORTS)
                         .buildLookup());
 
@@ -83,7 +83,7 @@ public class CSVDataSetBasicTest {
     @Test
     public void testLookupDataSet() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EXPENSE_REPORTS)
                         .filter("amount", lowerThan(1000))
                         .group("department")
@@ -93,7 +93,7 @@ public class CSVDataSetBasicTest {
                         .buildLookup());
 
         //printDataSet(result);
-        assertDataSetValues(result, dataSetFormatter, new String[][] {
+        assertDataSetValues(result, dataSetFormatter, new String[][]{
                 {"Engineering", "16.00", "6,547.56"},
                 {"Services", "5.00", "2,504.50"},
                 {"Sales", "8.00", "3,213.53"},

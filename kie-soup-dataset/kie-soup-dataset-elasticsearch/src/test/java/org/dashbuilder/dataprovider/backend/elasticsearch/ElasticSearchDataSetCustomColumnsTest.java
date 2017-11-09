@@ -83,7 +83,7 @@ public class ElasticSearchDataSetCustomColumnsTest extends ElasticSearchDataSetT
     @Test
     public void testAllColumns() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_ALL_COLUMNS_UUID)
                         .buildLookup());
 
@@ -106,7 +106,7 @@ public class ElasticSearchDataSetCustomColumnsTest extends ElasticSearchDataSetT
     @Test
     public void testCustomColumns() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_CUSTOM_COLUMNS_UUID)
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
                         .buildLookup());
@@ -130,7 +130,7 @@ public class ElasticSearchDataSetCustomColumnsTest extends ElasticSearchDataSetT
     @Test
     public void testGivenColumns() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_CUSTOM_COLUMNS2_UUID)
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
                         .buildLookup());
@@ -161,7 +161,7 @@ public class ElasticSearchDataSetCustomColumnsTest extends ElasticSearchDataSetT
     @Test(expected = RuntimeException.class)
     public void testSortingWithNonExstingColumn() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_CUSTOM_COLUMNS_UUID)
                         .sort("mycolumn", SortOrder.DESCENDING)
                         .buildLookup());
@@ -170,7 +170,7 @@ public class ElasticSearchDataSetCustomColumnsTest extends ElasticSearchDataSetT
     @Test(expected = RuntimeException.class)
     public void testSortingWithNonDefinedColumn() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_CUSTOM_COLUMNS2_UUID)
                         .sort(ExpenseReportsData.COLUMN_DEPARTMENT, SortOrder.DESCENDING)
                         .buildLookup());
@@ -185,7 +185,7 @@ public class ElasticSearchDataSetCustomColumnsTest extends ElasticSearchDataSetT
     @Test(expected = RuntimeException.class)
     public void testColumnsBadDefined() throws Exception {
         dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_BAD_COLUMNS_UUID)
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
                         .buildLookup());

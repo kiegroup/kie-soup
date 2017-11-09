@@ -15,24 +15,32 @@
  */
 package org.dashbuilder.dataprovider.backend.elasticsearch;
 
-import org.dashbuilder.dataset.ColumnType;
-import org.dashbuilder.dataset.DataSet;
-import org.dashbuilder.dataset.DataSetFactory;
-import org.dashbuilder.dataset.ExpenseReportsData;
-import org.dashbuilder.dataset.group.DateIntervalPattern;
-import org.dashbuilder.dataset.sort.SortOrder;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import static org.dashbuilder.dataset.Assertions.assertDataSetValue;
+import static org.dashbuilder.dataset.filter.FilterFactory.AND;
+import static org.dashbuilder.dataset.filter.FilterFactory.NOT;
+import static org.dashbuilder.dataset.filter.FilterFactory.OR;
+import static org.dashbuilder.dataset.filter.FilterFactory.equalsTo;
+import static org.dashbuilder.dataset.filter.FilterFactory.greaterOrEqualsTo;
+import static org.dashbuilder.dataset.filter.FilterFactory.greaterThan;
+import static org.dashbuilder.dataset.filter.FilterFactory.likeTo;
+import static org.dashbuilder.dataset.filter.FilterFactory.lowerOrEqualsTo;
+import static org.dashbuilder.dataset.filter.FilterFactory.lowerThan;
+import static org.dashbuilder.dataset.filter.FilterFactory.notEqualsTo;
+import static org.dashbuilder.dataset.group.AggregateFunctionType.COUNT;
+import static org.dashbuilder.dataset.group.AggregateFunctionType.MIN;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static org.dashbuilder.dataset.Assertions.assertDataSetValue;
-import static org.dashbuilder.dataset.filter.FilterFactory.*;
-import static org.dashbuilder.dataset.group.AggregateFunctionType.COUNT;
-import static org.dashbuilder.dataset.group.AggregateFunctionType.MIN;
-import static org.fest.assertions.api.Assertions.assertThat;
+import org.dashbuilder.dataset.ColumnType;
+import org.dashbuilder.dataset.DataSet;
+import org.dashbuilder.dataset.DataSetLookupFactory;
+import org.dashbuilder.dataset.ExpenseReportsData;
+import org.dashbuilder.dataset.sort.SortOrder;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * <p>Data test for ElasticSearchDataSet.</p>
@@ -85,7 +93,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     @Test
     public void testColumns() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
                         .buildLookup());
@@ -125,7 +133,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     @Test
     public void testBasicLookup() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .buildLookup());
         
@@ -138,7 +146,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     @Test
     public void testDefaultLookup() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
                         .buildLookup());
@@ -199,7 +207,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     @Test
     public void testDefaultLookupWithSorting() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                          .sort(ExpenseReportsData.COLUMN_ID, SortOrder.DESCENDING)
                         .buildLookup());
@@ -213,7 +221,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     @Test(expected = RuntimeException.class)
     public void testSortingWithNonExistingColumn() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .sort("mycolumn", SortOrder.DESCENDING)
                         .buildLookup());
@@ -225,7 +233,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     @Test
     public void testLookupTrim() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
                         .rowNumber(10)
@@ -261,7 +269,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     @Test(expected = RuntimeException.class)
     public void testAggregationByNoFunctionColumn() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .column(ExpenseReportsData.COLUMN_DEPARTMENT, "Department")
                         .column(COUNT, "#items")
@@ -272,7 +280,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     @Test
     public void testAggregationWithColumns() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .group(ExpenseReportsData.COLUMN_DEPARTMENT)
                         .column(ExpenseReportsData.COLUMN_DEPARTMENT, "Department")
@@ -297,7 +305,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     public void testAggregationFunctionByNonExistingColumn() throws Exception {
 
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .group(ExpenseReportsData.COLUMN_DEPARTMENT)
                         .column(ExpenseReportsData.COLUMN_DEPARTMENT, "Department")
@@ -315,7 +323,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     @Test
     public void testFilterEqualsByStringNotAnalyzed() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_CITY, equalsTo(EL_EXAMPLE_CITY_BARCELONA))
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
@@ -329,7 +337,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     @Test
     public void testFilterEqualsByStringAnalyzed() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_EMPLOYEE, equalsTo(EL_EXAMPLE_EMP_NITA))
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
@@ -345,7 +353,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
 
         // Default analyzer for field (it applies lower-cased terms, so it's not case sensitive). As the pattern given in this lookup is not lower cased, result will be empty.
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_EMPLOYEE, likeTo(ExpenseReportsData.COLUMN_EMPLOYEE, "Jul%", true))
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
@@ -355,7 +363,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
 
         // Default analyzer for field (lowecased analyzer). The lower-cased pattern value works.
         result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_EMPLOYEE, likeTo(ExpenseReportsData.COLUMN_EMPLOYEE, "jul%", true))
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
@@ -366,7 +374,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
 
         // Custom analyzer for field (the example field it's case sensitive as it's analyzed using the custom tokenizer analyzer).
         result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_CSENSITIVE_UUID)
                         .filter(ExpenseReportsData.COLUMN_EMPLOYEE, likeTo(ExpenseReportsData.COLUMN_EMPLOYEE, "Jul%", true))
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
@@ -376,7 +384,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
 
         // Custom analyzer for field (the example field it's case sensitive as it's analyzed using the custom tokenizer analyzer).
         result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_CSENSITIVE_UUID)
                         .filter(ExpenseReportsData.COLUMN_EMPLOYEE, likeTo(ExpenseReportsData.COLUMN_EMPLOYEE, "jul%", true))
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
@@ -390,7 +398,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
         
         // Default analyzer for field (it applies lower-cased terms, so it's not case sensitive).
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_EMPLOYEE, likeTo(ExpenseReportsData.COLUMN_EMPLOYEE, "Jul%", false))
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
@@ -400,7 +408,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
 
         // Default analyzer for field (lowecased analyzer). It returns same results as previous lookup as the field is analyzed by the default ELS analyzer.
         result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_EMPLOYEE, likeTo(ExpenseReportsData.COLUMN_EMPLOYEE, "jul%", false))
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
@@ -411,7 +419,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
 
         // Custom analyzer for field is always for case sensitive filters, so this case will return empty results. 
         result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_CSENSITIVE_UUID)
                         .filter(ExpenseReportsData.COLUMN_EMPLOYEE, likeTo(ExpenseReportsData.COLUMN_EMPLOYEE, "Jul%", false))
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
@@ -421,7 +429,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
 
         // Custom analyzer for field is always for case sensitive filters, so this case will return empty results.
         result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_CSENSITIVE_UUID)
                         .filter(ExpenseReportsData.COLUMN_EMPLOYEE, likeTo(ExpenseReportsData.COLUMN_EMPLOYEE, "jul%", false))
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
@@ -436,7 +444,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
 
         // Case sensitive
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_DEPARTMENT, likeTo(ExpenseReportsData.COLUMN_DEPARTMENT, "Sal%", true))
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
@@ -450,7 +458,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     public void testFilterLikeToByStringNotAnalyzedAndCaseUnSensitive() throws Exception {
         // Case un-sensitive
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_DEPARTMENT, likeTo(ExpenseReportsData.COLUMN_DEPARTMENT, "Sal%", false))
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
@@ -461,7 +469,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     @Test
     public void testFilterMultiple() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_AMOUNT, lowerOrEqualsTo(120.35))
                         .filter(ExpenseReportsData.COLUMN_CITY, equalsTo(EL_EXAMPLE_CITY_BARCELONA))
@@ -473,7 +481,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
 
         // The order of the filter criteria does not alter the result.
         result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_CITY, equalsTo(EL_EXAMPLE_CITY_BARCELONA))
                         .filter(ExpenseReportsData.COLUMN_AMOUNT, lowerOrEqualsTo(120.35))
@@ -489,7 +497,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
        
         // The order of the filter criteria does not alter the result.
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_CITY, notEqualsTo(EL_EXAMPLE_CITY_BARCELONA))
                         .filter(ExpenseReportsData.COLUMN_AMOUNT, greaterOrEqualsTo(1000))
@@ -504,7 +512,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     public void testFilterByNonExistingColumn() throws Exception {
 
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter("myfield", greaterOrEqualsTo(1000))
                         .buildLookup());
@@ -514,7 +522,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     public void testANDExpression() throws Exception {
 
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_AMOUNT, AND(greaterThan(100), lowerThan(150)))
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
@@ -528,7 +536,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     public void testORExpression() throws Exception {
 
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_AMOUNT, OR(lowerThan(200), greaterThan(1000)))
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
@@ -552,7 +560,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     public void testNOTExpression() throws Exception {
 
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_AMOUNT, NOT(greaterThan(200)))
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
@@ -574,7 +582,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     public void testCombinedExpression() throws Exception {
 
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_AMOUNT, AND(
                                 equalsTo(ExpenseReportsData.COLUMN_DEPARTMENT, EL_EXAMPLE_DEPT_SALES),
@@ -606,7 +614,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     @Test
     public void testFilterByAnalyzedAndNonAnalyzedColumns() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_CITY, equalsTo(EL_EXAMPLE_CITY_BARCELONA))
                         .filter(ExpenseReportsData.COLUMN_EMPLOYEE, equalsTo(EL_EXAMPLE_EMP_JAMIE))
@@ -627,7 +635,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     @Test
     public void testFilterByNonAnalyzedAndNonAnalyzedColumns() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .filter(ExpenseReportsData.COLUMN_CITY, equalsTo(EL_EXAMPLE_CITY_BARCELONA))
                         .filter(ExpenseReportsData.COLUMN_DEPARTMENT, equalsTo(EL_EXAMPLE_DEPT_ENGINEERING))
@@ -651,7 +659,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     @Test
     public void testAggregationAndFilterByAnalyzedField() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .column(COUNT, "#items")
                         .filter(ExpenseReportsData.COLUMN_EMPLOYEE, equalsTo(EL_EXAMPLE_EMP_ROXIE))
@@ -665,7 +673,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
     @Test
     public void testAggregationAndFilterByNonAnalyzedField() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_UUID)
                         .column(COUNT, "#items")
                         .filter(ExpenseReportsData.COLUMN_DEPARTMENT, equalsTo(EL_EXAMPLE_DEPT_ENGINEERING))

@@ -16,6 +16,7 @@
 package org.dashbuilder.dataprovider;
 
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.dashbuilder.DataSetCore;
@@ -48,7 +49,7 @@ public class BeanDataSetGeneratorTest {
     @Test
     public void testGenerateDataSet() throws Exception {
         URL fileURL = Thread.currentThread().getContextClassLoader().getResource("salesPerYear.dset");
-        String json = IOUtils.toString(fileURL);
+        String json = IOUtils.toString(fileURL, StandardCharsets.UTF_8);
         DataSetDef def = jsonMarshaller.fromJson(json);
         dataSetDefRegistry.registerDataSetDef(def);
         DataSet result = dataSetManager.getDataSet("salesPerYear");
@@ -73,7 +74,7 @@ public class BeanDataSetGeneratorTest {
     @Test
     public void testGenerateDataSetAdjusted() throws Exception {
         URL fileURL = Thread.currentThread().getContextClassLoader().getResource("salesPerYearAdjusted.dset");
-        String json = IOUtils.toString(fileURL);
+        String json = IOUtils.toString(fileURL, StandardCharsets.UTF_8);
         DataSetDef def = jsonMarshaller.fromJson(json);
         dataSetDefRegistry.registerDataSetDef(def);
         DataSet result = dataSetManager.getDataSet("salesPerYearAdjusted");
@@ -98,7 +99,7 @@ public class BeanDataSetGeneratorTest {
     @Test
     public void testRetrieveColumnSubset() throws Exception {
         URL fileURL = Thread.currentThread().getContextClassLoader().getResource("salesYear2014.dset");
-        String json = IOUtils.toString(fileURL);
+        String json = IOUtils.toString(fileURL, StandardCharsets.UTF_8);
         DataSetDef def = jsonMarshaller.fromJson(json);
         dataSetDefRegistry.registerDataSetDef(def);
         DataSet result = dataSetManager.getDataSet("salesYear2014");

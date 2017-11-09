@@ -15,24 +15,18 @@
  */
 package org.dashbuilder.dataprovider.backend.elasticsearch;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.dashbuilder.dataset.ColumnType;
 import org.dashbuilder.dataset.DataColumn;
 import org.dashbuilder.dataset.DataSet;
-import org.dashbuilder.dataset.DataSetFactory;
+import org.dashbuilder.dataset.DataSetLookupFactory;
 import org.dashbuilder.dataset.impl.DataColumnImpl;
 import org.dashbuilder.dataset.sort.SortOrder;
-import org.elasticsearch.common.util.CollectionUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.core.IsEqual.equalTo;
 
 /**
  * <p>Data test for the multi-fields feature..</p>
@@ -63,7 +57,7 @@ public class ElasticSearchMultiFieldsTest extends ElasticSearchDataSetTestBase {
     @Test
     public void testColumns() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL__MULTIFIELDS_UUID)
                         .sort("FIELD2.RAW", SortOrder.DESCENDING)
                         .buildLookup());

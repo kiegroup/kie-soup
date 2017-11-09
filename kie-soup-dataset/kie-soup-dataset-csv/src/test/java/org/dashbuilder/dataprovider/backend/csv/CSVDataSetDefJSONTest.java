@@ -16,6 +16,8 @@
 package org.dashbuilder.dataprovider.backend.csv;
 
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.io.IOUtils;
 import org.dashbuilder.DataSetCore;
 import org.dashbuilder.dataprovider.DataSetProviderRegistry;
@@ -48,7 +50,7 @@ public class CSVDataSetDefJSONTest {
     @Test
     public void testParseCSVJson() throws Exception {
         URL fileURL = Thread.currentThread().getContextClassLoader().getResource("expenseReports.dset");
-        String json = IOUtils.toString(fileURL);
+        String json = IOUtils.toString(fileURL, StandardCharsets.UTF_8);
 
         DataSetDef def = jsonMarshaller.fromJson(json);
         assertThat(def.getProvider()).isEqualTo(DataSetProviderType.CSV);

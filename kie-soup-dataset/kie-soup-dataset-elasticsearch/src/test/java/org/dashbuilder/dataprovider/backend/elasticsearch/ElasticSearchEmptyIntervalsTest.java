@@ -15,16 +15,16 @@
  */
 package org.dashbuilder.dataprovider.backend.elasticsearch;
 
-import org.dashbuilder.dataset.DataSet;
-import org.dashbuilder.dataset.DataSetFactory;
-import org.dashbuilder.dataset.date.Month;
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.dashbuilder.dataset.Assertions.assertDataSetValues;
 import static org.dashbuilder.dataset.group.AggregateFunctionType.COUNT;
 import static org.dashbuilder.dataset.group.AggregateFunctionType.SUM;
 import static org.dashbuilder.dataset.group.DateIntervalType.MONTH;
+
+import org.dashbuilder.dataset.DataSet;
+import org.dashbuilder.dataset.DataSetLookupFactory;
+import org.dashbuilder.dataset.date.Month;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @since 0.4.0
@@ -48,7 +48,7 @@ public class ElasticSearchEmptyIntervalsTest extends ElasticSearchDataSetTestBas
     @Test
     public void testNonEmptyIntervals() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_EMPTYINTERVALS_UUID)
                         .group("DATE").fixed(MONTH, false).firstMonth(Month.JANUARY)
                         .column("DATE", "Period")
@@ -75,7 +75,7 @@ public class ElasticSearchEmptyIntervalsTest extends ElasticSearchDataSetTestBas
     @Test
     public void testEmptyIntervals() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_EMPTYINTERVALS_UUID)
                         .group("DATE").fixed(MONTH, true).firstMonth(Month.JANUARY)
                         .column("DATE", "Period")
@@ -104,7 +104,7 @@ public class ElasticSearchEmptyIntervalsTest extends ElasticSearchDataSetTestBas
     @Test
     public void testEmptyIntervalsUsingFirstMonth() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EL_DATASET_EMPTYINTERVALS_UUID)
                         .group("DATE").fixed(MONTH, true).firstMonth(Month.MARCH)
                         .column("DATE", "Period")

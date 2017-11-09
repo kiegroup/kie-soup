@@ -23,9 +23,11 @@ import org.dashbuilder.dataset.group.AggregateFunctionType;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.dashbuilder.dataset.ExpenseReportsData.*;
-import static org.fest.assertions.api.Assertions.*;
-import static org.dashbuilder.dataset.filter.FilterFactory.*;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_AMOUNT;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_CITY;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_DEPARTMENT;
+import static org.dashbuilder.dataset.filter.FilterFactory.equalsTo;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class DataSetIndexTest {
 
@@ -34,7 +36,7 @@ public class DataSetIndexTest {
     /**
      * Group by department and count occurrences
      */
-    DataSetLookup groupByDeptAndCount = DataSetFactory.newDataSetLookupBuilder()
+    DataSetLookup groupByDeptAndCount = DataSetLookupFactory.newDataSetLookupBuilder()
             .dataset(EXPENSE_REPORTS)
             .group(COLUMN_DEPARTMENT, "Department")
             .column(AggregateFunctionType.COUNT, "occurrences")
@@ -43,7 +45,7 @@ public class DataSetIndexTest {
     /**
      * Group by department and sum the amount
      */
-    DataSetLookup groupByDeptAndSum = DataSetFactory.newDataSetLookupBuilder()
+    DataSetLookup groupByDeptAndSum = DataSetLookupFactory.newDataSetLookupBuilder()
             .dataset(EXPENSE_REPORTS)
             .group(COLUMN_DEPARTMENT, "Department")
             .column(COLUMN_AMOUNT, AggregateFunctionType.AVERAGE)
@@ -52,7 +54,7 @@ public class DataSetIndexTest {
     /**
      * Filter by city & department
      */
-    DataSetLookup filterByCityAndDept = DataSetFactory.newDataSetLookupBuilder()
+    DataSetLookup filterByCityAndDept = DataSetLookupFactory.newDataSetLookupBuilder()
             .dataset(EXPENSE_REPORTS)
             .filter(COLUMN_CITY, equalsTo("Barcelona"))
             .filter(COLUMN_DEPARTMENT, equalsTo("Engineering"))
@@ -61,7 +63,7 @@ public class DataSetIndexTest {
     /**
      * Sort by amount in ascending order
      */
-    DataSetLookup sortByAmountAsc = DataSetFactory.newDataSetLookupBuilder()
+    DataSetLookup sortByAmountAsc = DataSetLookupFactory.newDataSetLookupBuilder()
             .dataset(EXPENSE_REPORTS)
             .sort(COLUMN_AMOUNT, "asc")
             .buildLookup();
@@ -69,7 +71,7 @@ public class DataSetIndexTest {
     /**
      * Sort by amount in descending order
      */
-    DataSetLookup sortByAmountDesc = DataSetFactory.newDataSetLookupBuilder()
+    DataSetLookup sortByAmountDesc = DataSetLookupFactory.newDataSetLookupBuilder()
             .dataset(EXPENSE_REPORTS)
             .sort(COLUMN_AMOUNT, "desc")
             .buildLookup();
@@ -93,7 +95,7 @@ public class DataSetIndexTest {
             dataSetOpEngine.execute(EXPENSE_REPORTS, groupByDeptAndCount.getOperationList());
             dataSetOpEngine.execute(EXPENSE_REPORTS, groupByDeptAndSum.getOperationList());
         }
-        long time = System.nanoTime()-begin;
+        long time = System.nanoTime() - begin;
 
         // Check out the resulting stats
         DataSetIndex dataSetIndex = dataSetOpEngine.getIndexRegistry().get(EXPENSE_REPORTS);
@@ -109,10 +111,10 @@ public class DataSetIndexTest {
         assertThat(stats.getBuildTime()).isLessThan(time);
 
         // The reuse rate must reflect the number of times the lookups are being reused.
-        assertThat(stats.getReuseRate()).isGreaterThanOrEqualTo(lookupTimes-1);
+        assertThat(stats.getReuseRate()).isGreaterThanOrEqualTo(lookupTimes - 1);
 
         // The index size must not be greater than the 20% of the dataset's size
-        assertThat(stats.getIndexSize()).isLessThan(dataSet.getEstimatedSize()/5);
+        assertThat(stats.getIndexSize()).isLessThan(dataSet.getEstimatedSize() / 5);
     }
 
     @Test
@@ -123,7 +125,7 @@ public class DataSetIndexTest {
         for (int i = 0; i < lookupTimes; i++) {
             dataSetOpEngine.execute(EXPENSE_REPORTS, filterByCityAndDept.getOperationList());
         }
-        long time = System.nanoTime()-begin;
+        long time = System.nanoTime() - begin;
 
         // Check out the resulting stats
         DataSetIndex dataSetIndex = dataSetOpEngine.getIndexRegistry().get(EXPENSE_REPORTS);
@@ -139,10 +141,10 @@ public class DataSetIndexTest {
         assertThat(stats.getBuildTime()).isLessThan(time);
 
         // The reuse rate must reflect the number of times the lookups are being reused.
-        assertThat(stats.getReuseRate()).isGreaterThanOrEqualTo(lookupTimes-1);
+        assertThat(stats.getReuseRate()).isGreaterThanOrEqualTo(lookupTimes - 1);
 
         // The index size must not be greater than the 20% of the dataset's size
-        assertThat(stats.getIndexSize()).isLessThan(dataSet.getEstimatedSize()/5);
+        assertThat(stats.getIndexSize()).isLessThan(dataSet.getEstimatedSize() / 5);
     }
 
     @Test
@@ -155,7 +157,7 @@ public class DataSetIndexTest {
             dataSetOpEngine.execute(EXPENSE_REPORTS, sortByAmountAsc.getOperationList());
             dataSetOpEngine.execute(EXPENSE_REPORTS, sortByAmountDesc.getOperationList());
         }
-        long time = System.nanoTime()-begin;
+        long time = System.nanoTime() - begin;
 
         // Check out the resulting stats
         DataSetIndex dataSetIndex = dataSetOpEngine.getIndexRegistry().get(EXPENSE_REPORTS);
@@ -174,6 +176,6 @@ public class DataSetIndexTest {
         assertThat(stats.getReuseRate()).isGreaterThanOrEqualTo(lookupTimes - 1);
 
         // The index size must not be greater than the 20% of the dataset's size
-        assertThat(stats.getIndexSize()).isLessThan(dataSet.getEstimatedSize()/5);
+        assertThat(stats.getIndexSize()).isLessThan(dataSet.getEstimatedSize() / 5);
     }
 }
