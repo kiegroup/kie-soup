@@ -15,6 +15,12 @@
  */
 package org.dashbuilder.dataprovider.backend.elasticsearch.rest.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.dashbuilder.dataprovider.backend.elasticsearch.ElasticSearchValueTypeMapper;
 import org.dashbuilder.dataprovider.backend.elasticsearch.rest.ElasticSearchClient;
 import org.dashbuilder.dataprovider.backend.elasticsearch.rest.exception.ElasticSearchClientGenericException;
@@ -30,9 +36,6 @@ import org.dashbuilder.dataset.group.AggregateFunctionType;
 import org.dashbuilder.dataset.group.DataSetGroup;
 import org.dashbuilder.dataset.group.GroupFunction;
 import org.dashbuilder.dataset.impl.DataColumnImpl;
-import org.elasticsearch.action.ActionResponse;
-
-import java.util.*;
 
 /**
  * @since 0.3.0
@@ -45,51 +48,56 @@ public class ElasticSearchUtils {
         this.valueTypeMapper = valueTypeMapper;
     }
 
-    public static int getResponseCode(ActionResponse response) {
-        if (response == null) return ElasticSearchClient.RESPONSE_CODE_NOT_FOUND;
-        String responseCode = response.getHeader( ElasticSearchClient.HEADER_RESPONSE_CODE );
-
-        if (responseCode == null) return ElasticSearchClient.RESPONSE_CODE_OK;
-        return Integer.decode(responseCode);
-    }
-    
     /**
      * <p>Obtain the minimum date and maximum date values for the given column with identifier <code>dateColumnId</code>.</p>
-     *
-     * @param  client The client for performing the query to ELS
+     * @param client The client for performing the query to ELS
      * @param metadata The data set metadata
      * @param dateColumnId The column identifier for the date type column
      * @param query The query model, if any, for filtering the results
      * @return The minimum and maximum dates.
      */
-    public Date[] calculateDateLimits(ElasticSearchClient client, DataSetMetadata metadata, String dateColumnId, Query query) throws ElasticSearchClientGenericException {
+    public Date[] calculateDateLimits(ElasticSearchClient client,
+                                      DataSetMetadata metadata,
+                                      String dateColumnId,
+                                      Query query) throws ElasticSearchClientGenericException {
 
         ElasticSearchDataSetDef def = (ElasticSearchDataSetDef) metadata.getDefinition();
 
         // The resulting data set columns.
         String minDateColumnId = dateColumnId + "_min";
         String maxDateColumnId = dateColumnId + "_max";
-        DataColumn minDateColumn = new DataColumnImpl(minDateColumnId, ColumnType.NUMBER);
-        DataColumn maxDateColumn = new DataColumnImpl(maxDateColumnId, ColumnType.NUMBER);
+        DataColumn minDateColumn = new DataColumnImpl(minDateColumnId,
+                                                      ColumnType.NUMBER);
+        DataColumn maxDateColumn = new DataColumnImpl(maxDateColumnId,
+                                                      ColumnType.NUMBER);
         List<DataColumn> columns = new ArrayList<DataColumn>(2);
         columns.add(minDateColumn);
         columns.add(maxDateColumn);
 
         // Create the aggregation model to bulid the query to EL server.
         DataSetGroup aggregation = new DataSetGroup();
-        GroupFunction minFunction = new GroupFunction(dateColumnId, minDateColumnId, AggregateFunctionType.MIN);
-        GroupFunction maxFunction = new GroupFunction(dateColumnId, maxDateColumnId, AggregateFunctionType.MAX);
-        aggregation.addGroupFunction(minFunction, maxFunction);
+        GroupFunction minFunction = new GroupFunction(dateColumnId,
+                                                      minDateColumnId,
+                                                      AggregateFunctionType.MIN);
+        GroupFunction maxFunction = new GroupFunction(dateColumnId,
+                                                      maxDateColumnId,
+                                                      AggregateFunctionType.MAX);
+        aggregation.addGroupFunction(minFunction,
+                                     maxFunction);
 
         SearchRequest request = new SearchRequest(metadata);
         request.setColumns(columns);
         request.setAggregations(Arrays.asList(aggregation));
 
         // Append the filter clauses
-        if (query != null) request.setQuery(query);
+        if (query != null) {
+            request.setQuery(query);
+        }
 
         // Perform the query.
-        SearchResponse searchResult = client.search(def, metadata, request);
+        SearchResponse searchResult = client.search(def,
+                                                    metadata,
+                                                    request);
         if (searchResult != null) {
             SearchHitResponse[] hits = searchResult.getHits();
             if (hits != null && hits.length == 1) {
@@ -98,9 +106,13 @@ public class ElasticSearchUtils {
                 if (fields != null && !fields.isEmpty()) {
                     Double min = (Double) fields.get(minDateColumnId);
                     Double max = (Double) fields.get(maxDateColumnId);
-                    Date minValue = valueTypeMapper.parseDate(def, dateColumnId, min.longValue());
-                    Date maxValue = valueTypeMapper.parseDate(def, dateColumnId, max.longValue());
-                    return new Date[] {minValue, maxValue};
+                    Date minValue = valueTypeMapper.parseDate(def,
+                                                              dateColumnId,
+                                                              min.longValue());
+                    Date maxValue = valueTypeMapper.parseDate(def,
+                                                              dateColumnId,
+                                                              max.longValue());
+                    return new Date[]{minValue, maxValue};
                 }
             }
         }
@@ -115,20 +127,20 @@ public class ElasticSearchUtils {
      * | ?   |     _       | Matches any character           |
      * | *   |     %       | Matches zero or more characters |
      * -------------------------------------------------------
-     *
      */
     public String transformPattern(String pattern) {
         if (pattern == null) {
             return null;
         }
-        
+
         if (pattern.trim().length() > 0) {
             // Replace Dashbuilder wildcard characters by the ones used in ELS wildcard query.
-            pattern = pattern.replace("%", "*");
-            pattern = pattern.replace("_", "?");
+            pattern = pattern.replace("%",
+                                      "*");
+            pattern = pattern.replace("_",
+                                      "?");
         }
-        
+
         return pattern;
     }
-    
 }

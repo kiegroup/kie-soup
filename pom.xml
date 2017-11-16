@@ -54,9 +54,15 @@
     <!-- Required since support for ELS 2.x. Keep in sync with kie-parent or remove when those
           two versions are being updated on the IP BOM.-->
     <version.com.fasterxml.jackson>2.6.2</version.com.fasterxml.jackson>
-    <version.org.elasticsearch>2.1.2</version.org.elasticsearch>
     <version.com.googlecode.jsonsimple>1.1.1</version.com.googlecode.jsonsimple>
     <version.org.mvel>2.3.2.Final</version.org.mvel>
+    <version.org.elasticsearch>5.6.1</version.org.elasticsearch>
+    <version.org.apache.lucene>6.6.1</version.org.apache.lucene>
+    <version.io.netty.old>3.10.6.Final</version.io.netty.old>
+    <version.io.netty>4.1.16.Final</version.io.netty>
+    <version.com.github.tdomzal.junit.docker>0.3</version.com.github.tdomzal.junit.docker>
+    <version.com.spotify.docker.client>5.0.2</version.com.spotify.docker.client>
+    <version.org.apache.logging.log4j>2.8.2</version.org.apache.logging.log4j>
   </properties>
 
   <repositories>
@@ -562,6 +568,22 @@
         <version>${version.org.elasticsearch}</version>
       </dependency>
       <dependency>
+        <groupId>org.elasticsearch.client</groupId>
+        <artifactId>transport</artifactId>
+        <version>${version.org.elasticsearch}</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>commons-logging</artifactId>
+            <groupId>commons-logging</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty</artifactId>
+        <version>${version.io.netty.old}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.lucene</groupId>
         <artifactId>lucene-core</artifactId>
         <version>${version.org.apache.lucene}</version>
@@ -622,6 +644,36 @@
             <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.spotify</groupId>
+        <artifactId>docker-client</artifactId>
+        <version>${version.com.spotify.docker.client}</version>
+        <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>javax.inject</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.github.tdomzal</groupId>
+        <artifactId>junit-docker-rule</artifactId>
+        <version>${version.com.github.tdomzal.junit.docker}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>${version.org.apache.logging.log4j}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>${version.org.apache.logging.log4j}</version>
+        <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>

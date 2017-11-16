@@ -351,7 +351,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
                         .buildLookup());
 
-        assertThat(result.getRowCount()).isEqualTo(0);
+        assertThat(result.getRowCount()).isEqualTo(4);
 
         // Default analyzer for field (lowecased analyzer). The lower-cased pattern value works.
         result = dataSetManager.lookupDataSet(
@@ -417,7 +417,7 @@ public class ElasticSearchDataSetTest extends ElasticSearchDataSetTestBase {
                         .sort(ExpenseReportsData.COLUMN_ID, SortOrder.ASCENDING)
                         .buildLookup());
 
-        assertThat(result.getRowCount()).isEqualTo(0);
+        assertThat(result.getRowCount()).isEqualTo(4);
 
         // Custom analyzer for field is always for case sensitive filters, so this case will return empty results.
         result = dataSetManager.lookupDataSet(
