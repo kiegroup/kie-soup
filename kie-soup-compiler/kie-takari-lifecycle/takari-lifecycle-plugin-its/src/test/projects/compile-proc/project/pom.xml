@@ -36,8 +36,8 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>kie.io.takari.maven.plugins</groupId>
-          <artifactId>kie-takari-lifecycle-plugin</artifactId>
+          <groupId>io.takari.maven.plugins</groupId>
+          <artifactId>takari-lifecycle-plugin</artifactId>
           <configuration>
             <!-- 
               | annotation processing must be explicitly enabled 
