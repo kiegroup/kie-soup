@@ -10,8 +10,8 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>io.takari.maven.plugins</groupId>
-        <artifactId>takari-lifecycle-plugin</artifactId>
+        <groupId>kie.io.takari.maven.plugins</groupId>
+        <artifactId>kie-takari-lifecycle-plugin</artifactId>
         <version>1.8.5</version>
         <extensions>true</extensions>
       </plugin>
