@@ -13,8 +13,8 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>io.takari.maven.plugins</groupId>
-        <artifactId>takari-lifecycle-plugin</artifactId>
+        <groupId>kie.io.takari.maven.plugins</groupId>
+        <artifactId>kie-takari-lifecycle-plugin</artifactId>
         <configuration>
           <outputDirectory>${project.build.directory}/custom</outputDirectory>
           <resources>
