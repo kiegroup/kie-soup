@@ -32,7 +32,7 @@
   <name>Project Datamodel API</name>
 
   <properties>
-    <osgi.Bundle-SymbolicName>org.kie.soup.project.datamodel</osgi.Bundle-SymbolicName>
+    <java.module.name>org.kie.soup.project.datamodel</java.module.name>
   </properties>
 
   <build>
