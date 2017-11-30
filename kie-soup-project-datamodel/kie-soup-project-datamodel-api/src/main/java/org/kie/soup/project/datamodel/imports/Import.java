@@ -25,22 +25,32 @@ public class Import {
 
     }
 
-    public Import( String t ) {
+    public Import(String t) {
         this.type = t;
+    }
+
+    public Import(Class<?> clazz) {
+        this(clazz.getName());
     }
 
     public String getType() {
         return this.type;
-    }
+    }   
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Import anImport = (Import) o;
 
-        if (type != null ? !type.equals(anImport.type) : anImport.type != null) return false;
+        if (type != null ? !type.equals(anImport.type) : anImport.type != null) {
+            return false;
+        }
 
         return true;
     }
