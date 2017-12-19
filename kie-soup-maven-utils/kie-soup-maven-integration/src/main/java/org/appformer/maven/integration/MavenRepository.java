@@ -30,7 +30,12 @@ import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.settings.Server;
+import org.appformer.maven.integration.embedder.MavenEmbedder;
+import org.appformer.maven.integration.embedder.MavenProjectLoader;
+import org.appformer.maven.integration.embedder.MavenSettings;
+import org.appformer.maven.support.AFReleaseId;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
@@ -56,16 +61,14 @@ import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.resolution.VersionRangeResult;
 import org.eclipse.aether.util.artifact.SubArtifact;
 import org.eclipse.aether.version.Version;
-import org.appformer.maven.integration.embedder.MavenEmbedder;
-import org.appformer.maven.integration.embedder.MavenProjectLoader;
-import org.appformer.maven.integration.embedder.MavenSettings;
-import org.appformer.maven.support.AFReleaseId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.appformer.maven.integration.embedder.MavenProjectLoader.parseMavenPom;
 
 public class MavenRepository {
+
+    private static final String SESSION_CHECKS = "updateCheckManager.checks";
 
     private static final Logger log = LoggerFactory.getLogger( MavenRepository.class );
 
@@ -162,8 +165,18 @@ public class MavenRepository {
         for ( RemoteRepository repo : remoteRepositoriesForRequest ) {
             artifactRequest.addRepository( repo );
         }
+
+        RepositorySystemSession session = aether.getSession();
+        Object sessionChecks = null;
+        boolean isSnapshot = artifactName.endsWith( "-SNAPSHOT" );
+        if (artifactName.endsWith( "-SNAPSHOT" )) {
+            // ensure to always update snapshots
+            sessionChecks = session.getData().get( SESSION_CHECKS );
+            session.getData().set( SESSION_CHECKS, null );
+        }
+
         try {
-            ArtifactResult artifactResult = aether.getSystem().resolveArtifact( aether.getSession(), artifactRequest );
+            ArtifactResult artifactResult = aether.getSystem().resolveArtifact( session, artifactRequest );
             return artifactResult.getArtifact();
         } catch ( ArtifactResolutionException e ) {
             if ( logUnresolvedArtifact ) {
@@ -174,6 +187,10 @@ public class MavenRepository {
                 }
             }
             return null;
+        } finally {
+            if (sessionChecks != null) {
+                session.getData().set( SESSION_CHECKS, sessionChecks );
+            }
         }
     }
 
