@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.kie.soup</groupId>
     <artifactId>kie-soup-parent</artifactId>
-    <version>7.5.1-SNAPSHOT</version>
+    <version>7.5.1.t020</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
