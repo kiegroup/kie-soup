@@ -42,7 +42,8 @@ public class Import {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        // Must do instanceof check because there is a subtype of this class in drools-workbench-models-datamodel-api
+        if (!(o instanceof Import)) {
             return false;
         }
 
