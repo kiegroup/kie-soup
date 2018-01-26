@@ -21,4 +21,5 @@
   <source path='validation'>
     <exclude name='Preconditions.java'/>
   </source>
+  <source path="util"/>
 </module>
