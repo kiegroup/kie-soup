@@ -32,7 +32,7 @@
   <name>Project DataModel - Commons</name>
 
   <properties>
-    <osgi.Bundle-SymbolicName>org.kie.soup.project.datamodel.commons</osgi.Bundle-SymbolicName>
+    <java.module.name>org.kie.soup.project.datamodel.commons</java.module.name>
   </properties>
 
   <dependencies>
