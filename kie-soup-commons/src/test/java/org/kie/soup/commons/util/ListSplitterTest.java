@@ -94,4 +94,37 @@ public class ListSplitterTest {
         assertEquals("Helsinki, Finland", split[0]);
         assertEquals(" Boston", split[1]);
     }
+
+    @Test
+    public void testQuoteCharacterUsedJustForComplexEnumEnd() throws Exception {
+        final String[] split = ListSplitter.split("\"",
+                                                  true,
+                                                  "Prague, Boston, \"Helsinki, Finland\"");
+        assertEquals(3, split.length);
+        assertEquals("Prague", split[0]);
+        assertEquals("Boston", split[1]);
+        assertEquals("Helsinki, Finland", split[2]);
+    }
+
+    @Test
+    public void testQuoteCharacterUsedJustForComplexEnumMiddle() throws Exception {
+        final String[] split = ListSplitter.split("\"",
+                                                  true,
+                                                  "Prague, \"Helsinki, Finland\", Boston");
+        assertEquals(3, split.length);
+        assertEquals("Prague", split[0]);
+        assertEquals("Helsinki, Finland", split[1]);
+        assertEquals("Boston", split[2]);
+    }
+
+    @Test
+    public void testQuoteCharacterUsedJustForComplexEnumStart() throws Exception {
+        final String[] split = ListSplitter.split("\"",
+                                                  true,
+                                                  "\"Helsinki, Finland\", Prague, Boston");
+        assertEquals(3, split.length);
+        assertEquals("Helsinki, Finland", split[0]);
+        assertEquals("Prague", split[1]);
+        assertEquals("Boston", split[2]);
+    }
 }
