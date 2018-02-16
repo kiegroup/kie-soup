@@ -20,9 +20,14 @@ import org.dashbuilder.dataset.group.AggregateFunctionType;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.dashbuilder.dataset.ExpenseReportsData.*;
-import static org.dashbuilder.dataset.Assertions.*;
-import static org.dashbuilder.dataset.sort.SortOrder.*;
+import static org.dashbuilder.dataset.Assertions.assertDataSetValue;
+import static org.dashbuilder.dataset.Assertions.assertDataSetValues;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_AMOUNT;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_CITY;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_DATE;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_DEPARTMENT;
+import static org.dashbuilder.dataset.sort.SortOrder.ASCENDING;
+import static org.dashbuilder.dataset.sort.SortOrder.DESCENDING;
 
 public class DataSetSortTest {
 
@@ -42,10 +47,10 @@ public class DataSetSortTest {
     @Test
     public void testSortByString() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
-                .dataset(EXPENSE_REPORTS)
-                .sort(COLUMN_CITY, ASCENDING)
-                .buildLookup());
+                DataSetLookupFactory.newDataSetLookupBuilder()
+                        .dataset(EXPENSE_REPORTS)
+                        .sort(COLUMN_CITY, ASCENDING)
+                        .buildLookup());
 
         //printDataSet(result);
         assertDataSetValue(result, 0, 1, "Barcelona");
@@ -59,10 +64,10 @@ public class DataSetSortTest {
     @Test
     public void testSortByNumber() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
-                .dataset(EXPENSE_REPORTS)
-                .sort(COLUMN_AMOUNT, ASCENDING)
-                .buildLookup());
+                DataSetLookupFactory.newDataSetLookupBuilder()
+                        .dataset(EXPENSE_REPORTS)
+                        .sort(COLUMN_AMOUNT, ASCENDING)
+                        .buildLookup());
 
         //printDataSet(result);
         assertDataSetValue(result, 0, 0, "23.00");
@@ -72,10 +77,10 @@ public class DataSetSortTest {
     @Test
     public void testSortByDate() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
-                .dataset(EXPENSE_REPORTS)
-                .sort(COLUMN_DATE, ASCENDING)
-                .buildLookup());
+                DataSetLookupFactory.newDataSetLookupBuilder()
+                        .dataset(EXPENSE_REPORTS)
+                        .sort(COLUMN_DATE, ASCENDING)
+                        .buildLookup());
 
         //printDataSet(result);
         assertDataSetValue(result, 0, 0, "50.00");
@@ -85,12 +90,12 @@ public class DataSetSortTest {
     @Test
     public void testSortMultiple() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
-                .dataset(EXPENSE_REPORTS)
-                .sort(COLUMN_CITY, ASCENDING)
-                .sort(COLUMN_DEPARTMENT, ASCENDING)
-                .sort(COLUMN_AMOUNT, DESCENDING)
-                .buildLookup());
+                DataSetLookupFactory.newDataSetLookupBuilder()
+                        .dataset(EXPENSE_REPORTS)
+                        .sort(COLUMN_CITY, ASCENDING)
+                        .sort(COLUMN_DEPARTMENT, ASCENDING)
+                        .sort(COLUMN_AMOUNT, DESCENDING)
+                        .buildLookup());
 
         //printDataSet(result);
         assertDataSetValue(result, 0, 0, "2.00");
@@ -102,16 +107,16 @@ public class DataSetSortTest {
     @Test
     public void testGroupAndSort() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
-                .dataset(EXPENSE_REPORTS)
-                .group(COLUMN_DEPARTMENT)
-                .column(COLUMN_DEPARTMENT)
-                .column(COLUMN_AMOUNT, AggregateFunctionType.SUM, "total")
-                .sort("total", DESCENDING)
-                .buildLookup());
+                DataSetLookupFactory.newDataSetLookupBuilder()
+                        .dataset(EXPENSE_REPORTS)
+                        .group(COLUMN_DEPARTMENT)
+                        .column(COLUMN_DEPARTMENT)
+                        .column(COLUMN_AMOUNT, AggregateFunctionType.SUM, "total")
+                        .sort("total", DESCENDING)
+                        .buildLookup());
 
         //printDataSet(result);
-        assertDataSetValues(result, dataSetFormatter, new String[][] {
+        assertDataSetValues(result, dataSetFormatter, new String[][]{
                 {"Engineering", "7,650.16"},
                 {"Management", "6,017.47"},
                 {"Support", "3,345.60"},
@@ -119,7 +124,6 @@ public class DataSetSortTest {
                 {"Services", "2,504.50"}
         }, 0);
     }
-
 
     private void printDataSet(DataSet dataSet) {
         System.out.print(dataSetFormatter.formatDataSet(dataSet, "{", "}", ",\n", "\"", "\"", ", ") + "\n\n");

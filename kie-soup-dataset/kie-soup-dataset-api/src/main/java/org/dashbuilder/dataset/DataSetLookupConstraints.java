@@ -255,7 +255,7 @@ public class DataSetLookupConstraints extends DataSetConstraints<DataSetLookupCo
     }
 
     public DataSetLookup newDataSetLookup(DataSetMetadata metatada) {
-        DataSetLookupBuilder<DataSetLookupBuilderImpl> builder = DataSetFactory.newDataSetLookupBuilder();
+        DataSetLookupBuilder<DataSetLookupBuilderImpl> builder = DataSetLookupFactory.newDataSetLookupBuilder();
         builder.dataset(metatada.getUUID());
 
         Set<Integer> exclude = new HashSet<Integer>();

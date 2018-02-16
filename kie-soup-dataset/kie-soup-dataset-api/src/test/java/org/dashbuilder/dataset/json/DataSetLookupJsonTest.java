@@ -14,11 +14,10 @@
 */
 package org.dashbuilder.dataset.json;
 
-
 import java.util.Date;
 
-import org.dashbuilder.dataset.DataSetFactory;
 import org.dashbuilder.dataset.DataSetLookup;
+import org.dashbuilder.dataset.DataSetLookupFactory;
 import org.dashbuilder.dataset.group.AggregateFunctionType;
 import org.dashbuilder.dataset.group.DateIntervalType;
 import org.dashbuilder.dataset.sort.SortOrder;
@@ -30,8 +29,15 @@ import org.dashbuilder.json.JsonString;
 import org.dashbuilder.json.JsonValue;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-import static org.dashbuilder.dataset.filter.FilterFactory.*;
+import static org.dashbuilder.dataset.filter.FilterFactory.OR;
+import static org.dashbuilder.dataset.filter.FilterFactory.between;
+import static org.dashbuilder.dataset.filter.FilterFactory.greaterOrEqualsTo;
+import static org.dashbuilder.dataset.filter.FilterFactory.greaterThan;
+import static org.dashbuilder.dataset.filter.FilterFactory.isNull;
+import static org.dashbuilder.dataset.filter.FilterFactory.notEqualsTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class DataSetLookupJsonTest {
 
@@ -39,7 +45,7 @@ public class DataSetLookupJsonTest {
 
     @Test
     public void testDataSetLookupMarshalling() {
-        DataSetLookup original = DataSetFactory.newDataSetLookupBuilder()
+        DataSetLookup original = DataSetLookupFactory.newDataSetLookupBuilder()
                 .dataset("mydataset")
                 .filter(OR(notEqualsTo("department", "IT"), greaterOrEqualsTo("amount", 100d)))
                 .filter("department", notEqualsTo("IT"))
@@ -75,7 +81,6 @@ public class DataSetLookupJsonTest {
 
     @Test
     public void test_DASHBUILDE_83() {
-
         JsonValue jsonNull = jsonMarshaller.formatValue(null);
         JsonValue jsonBoolean = jsonMarshaller.formatValue(true);
         JsonValue jsonNumber = jsonMarshaller.formatValue(100d);

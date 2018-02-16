@@ -16,6 +16,7 @@
 package org.dashbuilder.dataprovider.sql;
 
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import javax.sql.DataSource;
@@ -94,7 +95,7 @@ public class SQLDataSetTestBase {
 
         // Register the SQL data set
         URL fileURL = Thread.currentThread().getContextClassLoader().getResource(getExpenseReportsDsetFile());
-        String json = IOUtils.toString(fileURL);
+        String json = IOUtils.toString(fileURL, StandardCharsets.UTF_8);
         SQLDataSetDef def = (SQLDataSetDef) jsonMarshaller.fromJson(json);
         dataSetDefRegistry.registerDataSetDef(def);
 

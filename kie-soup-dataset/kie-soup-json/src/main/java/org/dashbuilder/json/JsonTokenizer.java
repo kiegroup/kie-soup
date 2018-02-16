@@ -87,7 +87,7 @@ class JsonTokenizer {
     int nextNonWhitespace() {
         while (true) {
             final int c = next();
-            if (!Character.isSpace((char) c)) {
+            if (!Character.isWhitespace((char) c)) {
                 return c;
             }
         }
@@ -143,7 +143,7 @@ class JsonTokenizer {
         final StringBuilder buffer = new StringBuilder();
         int c = next();
         while (c != INVALID_CHAR) {
-            if (Character.isSpace((char) c) || chars.indexOf((char) c) >= 0) {
+            if (Character.isWhitespace((char) c) || chars.indexOf((char) c) >= 0) {
                 back(c);
                 break;
             }

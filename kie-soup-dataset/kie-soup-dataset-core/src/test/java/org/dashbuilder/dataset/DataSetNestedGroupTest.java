@@ -21,11 +21,20 @@ import org.dashbuilder.dataset.group.DateIntervalType;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.dashbuilder.dataset.ExpenseReportsData.*;
-import static org.dashbuilder.dataset.Assertions.*;
+import static org.dashbuilder.dataset.Assertions.assertDataSetValue;
+import static org.dashbuilder.dataset.Assertions.assertDataSetValues;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_AMOUNT;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_CITY;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_DATE;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_DEPARTMENT;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_EMPLOYEE;
+import static org.dashbuilder.dataset.group.AggregateFunctionType.AVERAGE;
+import static org.dashbuilder.dataset.group.AggregateFunctionType.COUNT;
+import static org.dashbuilder.dataset.group.AggregateFunctionType.MAX;
+import static org.dashbuilder.dataset.group.AggregateFunctionType.MIN;
+import static org.dashbuilder.dataset.group.AggregateFunctionType.SUM;
 import static org.dashbuilder.dataset.group.DateIntervalType.QUARTER;
-import static org.fest.assertions.api.Assertions.*;
-import static org.dashbuilder.dataset.group.AggregateFunctionType.*;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 public class DataSetNestedGroupTest {
 
@@ -59,7 +68,7 @@ public class DataSetNestedGroupTest {
     @Test
     public void testGroupSelectionFilter() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EXPENSE_REPORTS)
                         .filter(COLUMN_AMOUNT, FilterFactory.greaterThan(500))
                         .group(COLUMN_DEPARTMENT).select("Engineering")
@@ -74,21 +83,21 @@ public class DataSetNestedGroupTest {
     @Test
     public void testNestedGroupFromMultipleSelection() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
-                .dataset(EXPENSE_REPORTS)
-                .group(COLUMN_DEPARTMENT, "Department").select("Services", "Engineering")
-                .group(COLUMN_CITY, "City")
-                .column(COLUMN_CITY)
-                .column(COUNT, "Occurrences")
-                .column(COLUMN_AMOUNT, MIN, "min")
-                .column(COLUMN_AMOUNT, MAX, "max")
-                .column(COLUMN_AMOUNT, AVERAGE, "average")
-                .column(COLUMN_AMOUNT, SUM, "total")
-                .sort(COLUMN_CITY, "asc")
-                .buildLookup());
+                DataSetLookupFactory.newDataSetLookupBuilder()
+                        .dataset(EXPENSE_REPORTS)
+                        .group(COLUMN_DEPARTMENT, "Department").select("Services", "Engineering")
+                        .group(COLUMN_CITY, "City")
+                        .column(COLUMN_CITY)
+                        .column(COUNT, "Occurrences")
+                        .column(COLUMN_AMOUNT, MIN, "min")
+                        .column(COLUMN_AMOUNT, MAX, "max")
+                        .column(COLUMN_AMOUNT, AVERAGE, "average")
+                        .column(COLUMN_AMOUNT, SUM, "total")
+                        .sort(COLUMN_CITY, "asc")
+                        .buildLookup());
 
         //printDataSet(result);
-        assertDataSetValues(result, dataSetFormatter, new String[][] {
+        assertDataSetValues(result, dataSetFormatter, new String[][]{
                 {"Barcelona", "6.00", "120.35", "1,100.10", "485.52", "2,913.14"},
                 {"Brno", "4.00", "159.01", "800.24", "364.86", "1,459.45"},
                 {"London", "3.00", "333.45", "868.45", "535.40", "1,606.20"},
@@ -101,16 +110,16 @@ public class DataSetNestedGroupTest {
     @Test
     public void testNestedGroupRequiresSelection() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
-                .dataset(EXPENSE_REPORTS)
-                .group(COLUMN_DEPARTMENT, "Department")
-                .column(COLUMN_DEPARTMENT)
-                .group(COLUMN_CITY, COLUMN_CITY)
-                .sort(COLUMN_DEPARTMENT, "asc")
-                .buildLookup());
+                DataSetLookupFactory.newDataSetLookupBuilder()
+                        .dataset(EXPENSE_REPORTS)
+                        .group(COLUMN_DEPARTMENT, "Department")
+                        .column(COLUMN_DEPARTMENT)
+                        .group(COLUMN_CITY, COLUMN_CITY)
+                        .sort(COLUMN_DEPARTMENT, "asc")
+                        .buildLookup());
 
         //printDataSet(result);
-        assertDataSetValues(result, dataSetFormatter, new String[][] {
+        assertDataSetValues(result, dataSetFormatter, new String[][]{
                 {"Engineering"},
                 {"Management"},
                 {"Sales"},
@@ -122,15 +131,15 @@ public class DataSetNestedGroupTest {
     @Test
     public void testNoResultsSelection() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
-                .dataset(EXPENSE_REPORTS)
-                .group(COLUMN_EMPLOYEE).select("Jerri Preble")
-                .group(COLUMN_DEPARTMENT).select("Engineering")
-                .group(COLUMN_CITY).select("Westford")
-                .group(COLUMN_DATE).fixed(DateIntervalType.MONTH, true)
-                .column(COLUMN_DATE)
-                .column(COLUMN_AMOUNT, SUM, "total")
-                .buildLookup());
+                DataSetLookupFactory.newDataSetLookupBuilder()
+                        .dataset(EXPENSE_REPORTS)
+                        .group(COLUMN_EMPLOYEE).select("Jerri Preble")
+                        .group(COLUMN_DEPARTMENT).select("Engineering")
+                        .group(COLUMN_CITY).select("Westford")
+                        .group(COLUMN_DATE).fixed(DateIntervalType.MONTH, true)
+                        .column(COLUMN_DATE)
+                        .column(COLUMN_AMOUNT, SUM, "total")
+                        .buildLookup());
 
         String intervalType = result.getColumnByIndex(0).getIntervalType();
         assertThat(intervalType).isNotEmpty();
@@ -156,17 +165,17 @@ public class DataSetNestedGroupTest {
     @Test
     public void testThreeNestedLevels() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
-                .dataset(EXPENSE_REPORTS)
-                .group(COLUMN_DEPARTMENT).select("Services", "Engineering")
-                .group(COLUMN_CITY).select("Madrid", "Barcelona")
-                .group(COLUMN_DATE).fixed(DateIntervalType.MONTH, true)
-                .column(COLUMN_DATE)
-                .column(COLUMN_AMOUNT, SUM, "total")
-                .buildLookup());
+                DataSetLookupFactory.newDataSetLookupBuilder()
+                        .dataset(EXPENSE_REPORTS)
+                        .group(COLUMN_DEPARTMENT).select("Services", "Engineering")
+                        .group(COLUMN_CITY).select("Madrid", "Barcelona")
+                        .group(COLUMN_DATE).fixed(DateIntervalType.MONTH, true)
+                        .column(COLUMN_DATE)
+                        .column(COLUMN_AMOUNT, SUM, "total")
+                        .buildLookup());
 
         //printDataSet(result);
-        assertDataSetValues(result, dataSetFormatter, new String[][] {
+        assertDataSetValues(result, dataSetFormatter, new String[][]{
                 {"1", "0.00"},
                 {"2", "0.00"},
                 {"3", "0.00"},
@@ -185,7 +194,7 @@ public class DataSetNestedGroupTest {
     @Test
     public void testGroupByQuarter() throws Exception {
         DataSet result = dataSetManager.lookupDataSet(
-                DataSetFactory.newDataSetLookupBuilder()
+                DataSetLookupFactory.newDataSetLookupBuilder()
                         .dataset(EXPENSE_REPORTS)
                         .group(COLUMN_DATE).fixed(QUARTER, true).select("1")
                         .buildLookup());
