@@ -109,7 +109,7 @@ public class Aether {
         	
         	//Method is deprecated because it's not to be used in the context of Maven 4 (I think ...).
         	try {
-				mer = populator.populateFromSettings(mer, settings);
+        		mer = populator.populateFromSettings(mer, settings);
 				
         		//Create and add the default repository if it's not added yet.
         		Set<String> definedRepositories = repositorySystem.getRepoIds(mer.getRemoteRepositories() );
