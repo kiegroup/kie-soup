@@ -15,6 +15,19 @@
  */
 package org.dashbuilder.dataprovider.backend.elasticsearch;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.dashbuilder.dataset.ColumnType;
+import org.dashbuilder.dataset.DataSet;
+import org.dashbuilder.dataset.DataSetLookupFactory;
+import org.dashbuilder.dataset.ExpenseReportsData;
+import org.dashbuilder.dataset.sort.SortOrder;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.dashbuilder.dataset.Assertions.assertDataSetValue;
 import static org.dashbuilder.dataset.filter.FilterFactory.AND;
 import static org.dashbuilder.dataset.filter.FilterFactory.NOT;
@@ -28,19 +41,6 @@ import static org.dashbuilder.dataset.filter.FilterFactory.lowerThan;
 import static org.dashbuilder.dataset.filter.FilterFactory.notEqualsTo;
 import static org.dashbuilder.dataset.group.AggregateFunctionType.COUNT;
 import static org.dashbuilder.dataset.group.AggregateFunctionType.MIN;
-import static org.fest.assertions.api.Assertions.assertThat;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import org.dashbuilder.dataset.ColumnType;
-import org.dashbuilder.dataset.DataSet;
-import org.dashbuilder.dataset.DataSetLookupFactory;
-import org.dashbuilder.dataset.ExpenseReportsData;
-import org.dashbuilder.dataset.sort.SortOrder;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * <p>Data test for ElasticSearchDataSet.</p>

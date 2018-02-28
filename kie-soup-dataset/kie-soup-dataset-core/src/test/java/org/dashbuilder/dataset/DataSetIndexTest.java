@@ -27,7 +27,7 @@ import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_AMOUNT;
 import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_CITY;
 import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_DEPARTMENT;
 import static org.dashbuilder.dataset.filter.FilterFactory.equalsTo;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DataSetIndexTest {
 

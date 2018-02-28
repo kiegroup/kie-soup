@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.dashbuilder.dataset.ColumnType.*;
-import static org.fest.assertions.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.dashbuilder.dataset.Assertions.*;
 
 public class DataSetLookupConstraintsTest {

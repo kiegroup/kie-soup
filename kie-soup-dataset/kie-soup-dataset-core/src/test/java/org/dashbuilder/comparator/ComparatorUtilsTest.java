@@ -22,45 +22,49 @@ import java.util.List;
 
 import org.junit.Test;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.atIndex;
 
 public class ComparatorUtilsTest {
 
     private final Comparator<Object> comparator = (o1, o2) -> ComparatorUtils.compare(o1, o2, -1);
 
     @Test
-    public void testString() throws Exception {
+    public void testString() {
         String[] stringArray = new String[]{"3", "4", "1"};
         List<String> stringList = Arrays.asList(stringArray);
         stringList.sort(comparator);
-        assertThat(stringList.get(0)).isEqualTo("4");
-        assertThat(stringList.get(1)).isEqualTo("3");
-        assertThat(stringList.get(2)).isEqualTo("1");
+        assertThat(stringList)
+                .contains("4", atIndex(0))
+                .contains("3", atIndex(1))
+                .contains("1", atIndex(2));
     }
 
     @Test
-    public void testLong() throws Exception {
+    public void testLong() {
         Long a = 3L, b = 2L, c = 4L;
         Long[] longArray = new Long[]{a, b, c};
         List<Long> longList = Arrays.asList(longArray);
         longList.sort(comparator);
-        assertThat(longList.get(0)).isEqualTo(c);
-        assertThat(longList.get(1)).isEqualTo(a);
-        assertThat(longList.get(2)).isEqualTo(b);
+        assertThat(longList)
+                .contains(c, atIndex(0))
+                .contains(a, atIndex(1))
+                .contains(b, atIndex(2));
     }
 
     @Test
-    public void testBoolean() throws Exception {
+    public void testBoolean() {
         Boolean[] booleanArray = new Boolean[]{Boolean.FALSE, Boolean.TRUE, Boolean.FALSE};
         List<Boolean> booleanList = Arrays.asList(booleanArray);
         booleanList.sort(comparator);
-        assertThat(booleanList.get(0)).isEqualTo(Boolean.TRUE);
-        assertThat(booleanList.get(1)).isEqualTo(Boolean.FALSE);
-        assertThat(booleanList.get(2)).isEqualTo(Boolean.FALSE);
+        assertThat(booleanList)
+                .contains(Boolean.TRUE, atIndex(0))
+                .contains(Boolean.FALSE, atIndex(1))
+                .contains(Boolean.FALSE, atIndex(2));
     }
 
     @Test
-    public void testCollection() throws Exception {
+    public void testCollection() {
         List<String> collection1 = Collections.singletonList("A");
         List<String> collection2 = Collections.singletonList("B");
         int result = comparator.compare(collection1, collection2);

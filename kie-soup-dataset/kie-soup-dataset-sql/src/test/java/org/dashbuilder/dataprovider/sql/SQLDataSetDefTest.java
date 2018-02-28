@@ -35,7 +35,7 @@ import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_EMPLOYEE;
 import static org.dashbuilder.dataset.filter.FilterFactory.OR;
 import static org.dashbuilder.dataset.filter.FilterFactory.greaterThan;
 import static org.dashbuilder.dataset.filter.FilterFactory.lowerThan;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 
 public class SQLDataSetDefTest extends SQLDataSetTestBase {

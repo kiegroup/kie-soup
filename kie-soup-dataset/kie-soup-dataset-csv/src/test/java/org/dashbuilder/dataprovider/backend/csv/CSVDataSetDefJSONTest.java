@@ -31,7 +31,7 @@ import org.dashbuilder.dataset.def.DataSetDef;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.fest.assertions.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CSVDataSetDefJSONTest {
     

@@ -32,7 +32,7 @@ import org.junit.Test;
 
 import static org.dashbuilder.dataset.Assertions.assertDataSetValues;
 import static org.dashbuilder.dataset.filter.FilterFactory.lowerThan;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CSVDataSetBasicTest {
 
