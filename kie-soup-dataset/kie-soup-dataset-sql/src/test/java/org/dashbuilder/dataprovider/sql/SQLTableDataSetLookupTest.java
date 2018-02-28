@@ -32,7 +32,7 @@ import static org.dashbuilder.dataset.ExpenseReportsData.*;
 import static org.dashbuilder.dataprovider.sql.SQLFactory.*;
 import static org.dashbuilder.dataset.filter.FilterFactory.*;
 import static org.dashbuilder.dataset.group.AggregateFunctionType.*;
-import static org.fest.assertions.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
 public class SQLTableDataSetLookupTest extends SQLDataSetTestBase {

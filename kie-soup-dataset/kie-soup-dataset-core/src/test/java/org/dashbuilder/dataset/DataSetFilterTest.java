@@ -33,7 +33,7 @@ import static org.dashbuilder.dataset.ExpenseReportsData.*;
 import static org.dashbuilder.dataset.Assertions.*;
 import static org.dashbuilder.dataset.filter.FilterFactory.*;
 import static org.dashbuilder.dataset.group.AggregateFunctionType.SUM;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DataSetFilterTest {
 

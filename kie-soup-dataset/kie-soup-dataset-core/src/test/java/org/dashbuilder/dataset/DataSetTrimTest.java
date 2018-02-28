@@ -22,7 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.dashbuilder.dataset.ExpenseReportsData.*;
-import static org.fest.assertions.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DataSetTrimTest {
 

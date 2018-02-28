@@ -22,7 +22,7 @@ import org.dashbuilder.dataset.group.DateIntervalType;
 import org.dashbuilder.dataset.group.GroupStrategy;
 import org.junit.Test;
 
-import static org.fest.assertions.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DateUtilsTest {
 

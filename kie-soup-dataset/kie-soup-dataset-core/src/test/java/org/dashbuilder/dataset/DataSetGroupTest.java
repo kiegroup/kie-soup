@@ -18,8 +18,6 @@ package org.dashbuilder.dataset;
 import org.dashbuilder.DataSetCore;
 import org.dashbuilder.dataset.date.DayOfWeek;
 import org.dashbuilder.dataset.date.Month;
-import org.dashbuilder.dataset.def.DataSetDef;
-import org.dashbuilder.dataset.def.DataSetDefFactory;
 import org.dashbuilder.dataset.filter.FilterFactory;
 import org.dashbuilder.dataset.group.AggregateFunctionType;
 import org.dashbuilder.dataset.group.DataSetGroup;
@@ -28,11 +26,26 @@ import org.dashbuilder.dataset.sort.SortOrder;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.dashbuilder.dataset.ExpenseReportsData.*;
-import static org.dashbuilder.dataset.Assertions.*;
-import static org.dashbuilder.dataset.group.AggregateFunctionType.*;
-import static org.dashbuilder.dataset.group.DateIntervalType.*;
-import static org.fest.assertions.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.dashbuilder.dataset.Assertions.assertDataSetValues;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_AMOUNT;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_CITY;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_DATE;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_DEPARTMENT;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_EMPLOYEE;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_ID;
+import static org.dashbuilder.dataset.group.AggregateFunctionType.AVERAGE;
+import static org.dashbuilder.dataset.group.AggregateFunctionType.COUNT;
+import static org.dashbuilder.dataset.group.AggregateFunctionType.DISTINCT;
+import static org.dashbuilder.dataset.group.AggregateFunctionType.MAX;
+import static org.dashbuilder.dataset.group.AggregateFunctionType.MIN;
+import static org.dashbuilder.dataset.group.AggregateFunctionType.SUM;
+import static org.dashbuilder.dataset.group.DateIntervalType.DAY;
+import static org.dashbuilder.dataset.group.DateIntervalType.DAY_OF_WEEK;
+import static org.dashbuilder.dataset.group.DateIntervalType.MONTH;
+import static org.dashbuilder.dataset.group.DateIntervalType.QUARTER;
+import static org.dashbuilder.dataset.group.DateIntervalType.YEAR;
 
 public class DataSetGroupTest {
 

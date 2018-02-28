@@ -34,7 +34,7 @@ import static org.dashbuilder.dataset.group.AggregateFunctionType.MAX;
 import static org.dashbuilder.dataset.group.AggregateFunctionType.MIN;
 import static org.dashbuilder.dataset.group.AggregateFunctionType.SUM;
 import static org.dashbuilder.dataset.group.DateIntervalType.QUARTER;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DataSetNestedGroupTest {
 
