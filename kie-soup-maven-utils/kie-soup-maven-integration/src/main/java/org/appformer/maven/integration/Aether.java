@@ -21,7 +21,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.maven.RepositoryUtils;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.bridge.MavenRepositorySystem;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionRequestPopulator;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.settings.Server;
@@ -82,14 +92,45 @@ public class Aether {
         this.offline = settings.isOffline();
         system = newRepositorySystem();
         session = newRepositorySystemSession( settings, system );
-        repositories = initRepositories( mavenProject );
+        repositories = initRepositories( settings, mavenProject );
     }
 
-    private Collection<RemoteRepository> initRepositories( MavenProject mavenProject ) {
+    private Collection<RemoteRepository> initRepositories( Settings settings, MavenProject mavenProject ) {
         Collection<RemoteRepository> reps = new HashSet<RemoteRepository>();
         reps.add( newCentralRepository() );
         if ( mavenProject != null ) {
             reps.addAll( mavenProject.getRemoteProjectRepositories() );
+        } else {
+        	//When we don't have a Maven project, we still need to add the repositories defined in the Maven settings file.
+        	//We use a dummy Maven Executor Request so we can reuse its Maven Settings parsing.
+        	MavenRepositorySystem repositorySystem = new MavenRepositorySystem();
+        	DefaultMavenExecutionRequestPopulator populator = new DefaultMavenExecutionRequestPopulator(repositorySystem);
+        	MavenExecutionRequest mer = new DefaultMavenExecutionRequest();
+        	
+        	//Method is deprecated because it's not to be used in the context of Maven 4 (I think ...).
+        	try {
+        		mer = populator.populateFromSettings(mer, settings);
+				
+        		//Create and add the default repository if it's not added yet.
+        		Set<String> definedRepositories = repositorySystem.getRepoIds(mer.getRemoteRepositories() );
+                if ( !definedRepositories.contains( org.apache.maven.repository.RepositorySystem.DEFAULT_REMOTE_REPO_ID ) )
+                {
+                	ArtifactRepositoryPolicy snapshotsPolicy =
+                            new ArtifactRepositoryPolicy( false, ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+                	ArtifactRepositoryPolicy releasesPolicy =
+                            new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+                	ArtifactRepository defaultArtifactRepository = MavenRepositorySystem.createArtifactRepository(org.apache.maven.repository.RepositorySystem.DEFAULT_REMOTE_REPO_ID, 
+                			org.apache.maven.repository.RepositorySystem.DEFAULT_REMOTE_REPO_URL, new DefaultRepositoryLayout(),
+                			snapshotsPolicy, releasesPolicy);
+                	mer.addRemoteRepository( defaultArtifactRepository );
+                }
+        		
+                List<ArtifactRepository> artifactRepositories = mer.getRemoteRepositories();
+                repositorySystem.injectProxy(session, artifactRepositories);
+                reps.addAll(RepositoryUtils.toRepos( artifactRepositories));
+            } catch (MavenExecutionRequestPopulationException merpe) {
+        		log.warn("Error adding Maven repositories from Maven settings.", merpe);
+        	}
         }
 
         RemoteRepository localRepo = newLocalRepository();
