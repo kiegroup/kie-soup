@@ -21,6 +21,7 @@ import org.dashbuilder.dataset.validation.groups.ElasticSearchDataSetDefValidati
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
 /**
  * <p>DataSet definition class for ElasticSearch provider.</p>
@@ -188,6 +189,18 @@ public class ElasticSearchDataSetDef extends DataSetDef {
         } catch (ClassCastException e) {
             return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(),
+                serverURL,
+                clusterName,
+                index,
+                type,
+                query,
+                relevance,
+                columnSort);
     }
 
     @Override

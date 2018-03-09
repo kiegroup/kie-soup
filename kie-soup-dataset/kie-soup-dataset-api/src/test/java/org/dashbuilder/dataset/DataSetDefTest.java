@@ -14,7 +14,8 @@
 */
 package org.dashbuilder.dataset;
 
-import org.dashbuilder.dataset.def.DataSetDef;
+import org.dashbuilder.dataset.def.BeanDataSetDef;
+import org.dashbuilder.dataset.def.CSVDataSetDef;
 import org.dashbuilder.dataset.def.DataSetDefFactory;
 import org.junit.Test;
 
@@ -22,7 +23,7 @@ import static org.junit.Assert.*;
 
 public class DataSetDefTest {
 
-    DataSetDef def1 = DataSetDefFactory.newBeanDataSetDef()
+    BeanDataSetDef beanDef1 = (BeanDataSetDef) DataSetDefFactory.newBeanDataSetDef()
             .uuid("uuid")
             .name("bean")
             .refreshOn("100s", true)
@@ -32,7 +33,7 @@ public class DataSetDefTest {
             .generatorParam("p1", "v1")
             .buildDef();
 
-    DataSetDef def2 = DataSetDefFactory.newBeanDataSetDef()
+    BeanDataSetDef beanDef2 = (BeanDataSetDef) DataSetDefFactory.newBeanDataSetDef()
             .uuid("uuid")
             .name("bean")
             .refreshOn("100s", true)
@@ -40,10 +41,38 @@ public class DataSetDefTest {
             .cacheOn(100)
             .generatorClass("class1")
             .generatorParam("p1", "v1")
+            .buildDef();
+
+    CSVDataSetDef csvDef1 = (CSVDataSetDef) DataSetDefFactory.newCSVDataSetDef()
+            .uuid("expenseReports")
+            .name("bean")
+            .filePath("expenseReports.csv")
+            .refreshOn("2s", false)
+            .pushOn(1024)
+            .cacheOn(100)
+            .separatorChar(';')
+            .quoteChar('"')
+            .escapeChar('\\')
+            .numberPattern("#,###.##")
+            .datePattern("MM-dd-yyyy")
             .buildDef();
 
     @Test
     public void testEquals() throws Exception {
-        assertTrue(def1.equals(def2));
+        assertTrue(beanDef1.equals(beanDef2));
+    }
+
+    @Test
+    public void testBeanHashCode() throws Exception {
+        assertEquals(beanDef1.hashCode(), beanDef2.hashCode());
+        beanDef1.getParamaterMap().put("p1", "v2");
+        assertNotEquals(beanDef1.hashCode(), beanDef2.hashCode());
+    }
+
+    @Test
+    public void testCsvHashCode() throws Exception {
+        System.out.println(csvDef1.hashCode());
+        System.out.println(csvDef1.toString());
+        assertEquals(csvDef1.hashCode(), csvDef1.clone().hashCode());
     }
 }

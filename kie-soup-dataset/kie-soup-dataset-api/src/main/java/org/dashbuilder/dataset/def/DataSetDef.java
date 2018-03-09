@@ -315,4 +315,23 @@ public class DataSetDef {
             return false;
         }
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(UUID,
+                name,
+                provider,
+                columns,
+                dataSetFilter,
+                isPublic,
+                pushEnabled,
+                pushMaxSize,
+                cacheEnabled,
+                cacheMaxRows,
+                refreshTime,
+                refreshAlways,
+                allColumnsEnabled,
+                patternMap,
+                propertyMap);
+    }
 }

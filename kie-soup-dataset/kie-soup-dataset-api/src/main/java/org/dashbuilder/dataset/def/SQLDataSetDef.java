@@ -22,6 +22,7 @@ import org.dashbuilder.dataset.validation.groups.SQLDataSetDefValidation;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
 public class SQLDataSetDef extends DataSetDef {
 
@@ -114,6 +115,15 @@ public class SQLDataSetDef extends DataSetDef {
         } catch (ClassCastException e) {
             return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(),
+                dataSource,
+                dbSchema,
+                dbTable,
+                dbSQL);
     }
 
     @Override
