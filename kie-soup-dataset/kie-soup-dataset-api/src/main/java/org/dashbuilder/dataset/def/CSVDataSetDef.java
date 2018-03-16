@@ -23,6 +23,7 @@ import org.dashbuilder.dataset.validation.groups.CSVDataSetDefValidation;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
 public class CSVDataSetDef extends DataSetDef {
 
@@ -173,6 +174,18 @@ public class CSVDataSetDef extends DataSetDef {
         } catch (ClassCastException e) {
             return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(),
+                fileURL,
+                filePath,
+                separatorChar,
+                quoteChar,
+                escapeChar,
+                datePattern,
+                numberPattern);
     }
 
     @Override
