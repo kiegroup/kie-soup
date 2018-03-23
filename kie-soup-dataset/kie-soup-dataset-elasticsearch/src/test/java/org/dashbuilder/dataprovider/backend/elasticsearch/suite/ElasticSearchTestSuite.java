@@ -143,6 +143,8 @@ public class ElasticSearchTestSuite {
                  "0.0.0.0")
             .env("transport.tcp.port",
                  "9300")
+            .env("script.max_compilations_per_minute",
+                 "30")
             .env("ES_JAVA_OPTS",
                  "-Xms256m -Xmx256m")
             .mountFrom(new File("src/test/resources/elasticsearch.yml").getAbsolutePath())
