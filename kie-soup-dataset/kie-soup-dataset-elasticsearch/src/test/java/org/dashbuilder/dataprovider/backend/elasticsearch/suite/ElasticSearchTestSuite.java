@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.InetAddress;
 
+import com.spotify.docker.client.DockerClient;
+import com.spotify.docker.client.exceptions.DockerException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -129,10 +131,10 @@ public class ElasticSearchTestSuite {
     private static Node elasticSearchNode = null;
     private static Client client = null;
 
-    @ClassRule
+    public static final String CONTAINER_NAME = "kie-elasticsearch";
     public static DockerRule elasticsearchRule = DockerRule.builder()
             .imageName(image)
-            .name("kie-elasticsearch")
+            .name(CONTAINER_NAME)
             .env(EL_CLUSTER_NAME_PROPERTY,
                  "elasticsearch")
             .env("discovery.type",
@@ -143,12 +145,12 @@ public class ElasticSearchTestSuite {
                  "0.0.0.0")
             .env("transport.tcp.port",
                  "9300")
+            .env("xpack.security.enabled",
+                 "false")
             .env("script.max_compilations_per_minute",
                  "30")
             .env("ES_JAVA_OPTS",
                  "-Xms256m -Xmx256m")
-            .mountFrom(new File("src/test/resources/elasticsearch.yml").getAbsolutePath())
-            .to("/usr/share/elasticsearch/config/elasticsearch.yml")
             .stopOptions(StopOption.KILL,
                          StopOption.REMOVE)
             .waitForTimeout(5 * 60)
@@ -156,7 +158,7 @@ public class ElasticSearchTestSuite {
                     "9200")
             .expose("9300",
                     "9300")
-            .waitFor(WaitFor.logMessage("started"))
+            .waitFor(WaitFor.logMessage("mode [trial] - valid"))
             .build();
 
     @BeforeClass
@@ -167,7 +169,7 @@ public class ElasticSearchTestSuite {
             createAndPopulateExpenseReportsCSensitiveIndex();
             createAndPopulateEmptyIntervalsIndex();
             createAndPopulateMultiFieldsIndex();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Error starting up the ELS instance.",
                          e);
         }
@@ -183,7 +185,20 @@ public class ElasticSearchTestSuite {
         }
     }
 
-    public static void runELServer() throws Exception {
+    public static void runELServer() throws Throwable {
+        if (existContainer()) {
+            logger.info("Container exists, removing");
+            if (elasticsearchRule.getDockerClient().inspectContainer(CONTAINER_NAME).state().running()) {
+                elasticsearchRule.getDockerClient().killContainer(CONTAINER_NAME);
+            }
+            elasticsearchRule.getDockerClient().removeContainer(CONTAINER_NAME);
+        } else {
+            logger.info("Container does not exist");
+        }
+
+        logger.info("Creating container");
+        elasticsearchRule.before();
+
         Settings.Builder settingsBuilder = Settings.builder()
                 .put(EL_CLUSTER_NAME_PROPERTY,
                      EL_PROPERTY_ELASTICSEARCH)
@@ -199,6 +214,13 @@ public class ElasticSearchTestSuite {
         Client spy = Mockito.spy(client);
         Mockito.doAnswer(invocationOnMock -> null).when(spy).close();
         NativeClientFactory.getInstance().setTestClient(spy);
+    }
+
+    private static boolean existContainer() throws DockerException, InterruptedException {
+        return elasticsearchRule.getDockerClient().listContainers(DockerClient.ListContainersParam.allContainers(true))
+                .stream()
+                .anyMatch(container -> container.names()
+                        .contains("/"+CONTAINER_NAME));
     }
 
     public static void createAndPopulateExpenseReportsIndex() throws Exception {
@@ -309,6 +331,7 @@ public class ElasticSearchTestSuite {
 
     public static void stopELServer() throws Exception {
         client.close();
+        elasticsearchRule.after();
     }
 
     public static void testDocumentsCount(String index,
