@@ -288,7 +288,7 @@ public class DataSetImpl implements DataSet {
             this.rowCountNonTrimmed = -1;
             return this;
         }
-        if (offset >= getRowCount()) {
+        if (offset > getRowCount()) {
             throw new IllegalArgumentException("Offset can't be greater than the number of rows: " + offset);
         }
 
