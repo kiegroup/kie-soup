@@ -15,8 +15,19 @@
  */
 package org.dashbuilder.dataprovider.sql;
 
+import org.dashbuilder.dataset.DataSet;
+import org.dashbuilder.dataset.DataSetGroupTest;
+import org.dashbuilder.dataset.DataSetLookupFactory;
 import org.dashbuilder.dataset.DataSetTrimTest;
 import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_AMOUNT;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_CITY;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_DATE;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_DEPARTMENT;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_EMPLOYEE;
+import static org.dashbuilder.dataset.ExpenseReportsData.COLUMN_ID;
 
 public class SQLDataSetTrimTest extends SQLDataSetTestBase {
 
@@ -31,5 +42,55 @@ public class SQLDataSetTrimTest extends SQLDataSetTestBase {
         subTest.testTrim();
         subTest.testTrimGroup();
         subTest.testDuplicatedColumns();
+    }
+    @Test
+    public void testTotalRowCountNonTrimmedFillingGroupBy() throws Exception {
+        DataSet result = dataSetManager.lookupDataSet(
+                DataSetLookupFactory.newDataSetLookupBuilder()
+                        .dataset(DataSetGroupTest.EXPENSE_REPORTS)
+                        .group(COLUMN_DEPARTMENT)
+                        .column(COLUMN_ID)
+                        .column(COLUMN_CITY)
+                        .column(COLUMN_DEPARTMENT)
+                        .column(COLUMN_EMPLOYEE)
+                        .column(COLUMN_DATE)
+                        .column(COLUMN_AMOUNT)
+                        .rowNumber(10)
+                        .rowOffset(0)
+                        .buildLookup());
+        assertThat(result.getRowCount()).isEqualTo(5);
+        assertThat(result.getRowCountNonTrimmed()).isEqualTo(5);
+
+        result = dataSetManager.lookupDataSet(
+                DataSetLookupFactory.newDataSetLookupBuilder()
+                        .dataset(DataSetGroupTest.EXPENSE_REPORTS)
+                        .group(COLUMN_DEPARTMENT)
+                        .column(COLUMN_ID)
+                        .column(COLUMN_CITY)
+                        .column(COLUMN_DEPARTMENT)
+                        .column(COLUMN_EMPLOYEE)
+                        .column(COLUMN_DATE)
+                        .column(COLUMN_AMOUNT)
+                        .rowNumber(3)
+                        .rowOffset(0)
+                        .buildLookup());
+        assertThat(result.getRowCount()).isEqualTo(3);
+        assertThat(result.getRowCountNonTrimmed()).isEqualTo(5);
+
+        result = dataSetManager.lookupDataSet(
+                DataSetLookupFactory.newDataSetLookupBuilder()
+                        .dataset(DataSetGroupTest.EXPENSE_REPORTS)
+                        .group(COLUMN_DEPARTMENT)
+                        .column(COLUMN_ID)
+                        .column(COLUMN_CITY)
+                        .column(COLUMN_DEPARTMENT)
+                        .column(COLUMN_EMPLOYEE)
+                        .column(COLUMN_DATE)
+                        .column(COLUMN_AMOUNT)
+                        .rowNumber(5)
+                        .rowOffset(5)
+                        .buildLookup());
+        assertThat(result.getRowCount()).isEqualTo(0);
+        assertThat(result.getRowCountNonTrimmed()).isEqualTo(5);
     }
 }
