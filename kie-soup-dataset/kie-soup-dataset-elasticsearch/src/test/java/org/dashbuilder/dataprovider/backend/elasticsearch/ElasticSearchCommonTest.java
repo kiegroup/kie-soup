@@ -10,7 +10,7 @@ import org.junit.Test;
 /**
  * This test case delegates to the common tests from data set core module.
  */
-public class ElasticSearchCommonTests extends ElasticSearchDataSetTestBase {
+public class ElasticSearchCommonTest extends ElasticSearchDataSetTestBase {
 
     protected static final String EL_EXAMPLE_DATASET_DEF = "org/dashbuilder/dataprovider/backend/elasticsearch/expensereports.dset";
     

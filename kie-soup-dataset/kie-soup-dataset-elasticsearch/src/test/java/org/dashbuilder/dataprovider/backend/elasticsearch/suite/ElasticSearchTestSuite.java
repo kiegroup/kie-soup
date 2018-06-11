@@ -1,6 +1,5 @@
 package org.dashbuilder.dataprovider.backend.elasticsearch.suite;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -15,7 +14,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.dashbuilder.dataprovider.backend.elasticsearch.ElasticSearchCommonTests;
+import org.dashbuilder.dataprovider.backend.elasticsearch.ElasticSearchCommonTest;
 import org.dashbuilder.dataprovider.backend.elasticsearch.ElasticSearchDataSetCustomColumnsTest;
 import org.dashbuilder.dataprovider.backend.elasticsearch.ElasticSearchDataSetTest;
 import org.dashbuilder.dataprovider.backend.elasticsearch.ElasticSearchDataSetTestBase;
@@ -89,7 +88,7 @@ import pl.domzal.junit.docker.rule.WaitFor;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        ElasticSearchCommonTests.class,
+        ElasticSearchCommonTest.class,
         ElasticSearchDataSetCustomColumnsTest.class,
         ElasticSearchDataSetTest.class,
         ElasticSearchEmptyIntervalsTest.class,
