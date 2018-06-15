@@ -39,6 +39,23 @@ public class ListSplitter {
                                  trim,
                                  split).getSplit();
     }
+
+    public static String[] splitPreserveQuotes(final String quoteCharacter,
+                                               final boolean trim,
+                                               final String valueList) {
+        final String[] split = valueList.split(",");
+        final String[] result = new InnerSplitter(quoteCharacter,
+                                                  trim,
+                                                  split).getSplit();
+
+        for (int i = 0; i < result.length; i++) {
+            if (result[i].contains(",")) {
+                result[i] = quoteCharacter + result[i] + quoteCharacter;
+            }
+        }
+
+        return result;
+    }
 }
 
 class InnerSplitter {
@@ -74,8 +91,8 @@ class InnerSplitter {
                 }
             } else {
 
-                if (item.endsWith(this.quoteCharacter)) {
-                    current += item.substring(0, item.length() - 1);
+                if (item.trim().endsWith(this.quoteCharacter)) {
+                    current += item.substring(0, item.lastIndexOf(this.quoteCharacter) );
                     result.add(current);
                     current = null;
                 } else {
