@@ -16,7 +16,7 @@ package org.kie.soup.commons.util;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ListSplitterTest {
 
@@ -86,6 +86,16 @@ public class ListSplitterTest {
     }
 
     @Test
+    public void changeQuoteCharacterPreserveQuotes() throws Exception {
+        final String[] split = ListSplitter.splitPreserveQuotes("\"",
+                                                                true,
+                                                                "\"Helsinki, Finland\", Boston");
+        assertEquals(2, split.length);
+        assertEquals("\"Helsinki, Finland\"", split[0]);
+        assertEquals("Boston", split[1]);
+    }
+
+    @Test
     public void changeQuoteCharacterSkipTrimming() throws Exception {
         final String[] split = ListSplitter.split("\"",
                                                   false,
@@ -115,6 +125,16 @@ public class ListSplitterTest {
         assertEquals("Prague", split[0]);
         assertEquals("Helsinki, Finland", split[1]);
         assertEquals("Boston", split[2]);
+    }
+
+    @Test
+    public void testDoubleQuotes() throws Exception {
+        final String[] split = ListSplitter.split("\"",
+                                                  true,
+                                                  " \"Prague\", \"\"Helsinki, Finland\"\" ");
+        assertEquals(2, split.length);
+        assertEquals("Prague", split[0]);
+        assertEquals("\"Helsinki, Finland\"", split[1]);
     }
 
     @Test
