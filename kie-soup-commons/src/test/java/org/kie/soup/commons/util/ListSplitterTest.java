@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 package org.kie.soup.commons.util;
 
 import org.junit.Test;
@@ -135,6 +135,24 @@ public class ListSplitterTest {
         assertEquals(2, split.length);
         assertEquals("Prague", split[0]);
         assertEquals("\"Helsinki, Finland\"", split[1]);
+    }
+
+    @Test
+    public void testJustOneItem() throws Exception {
+        final String[] split = ListSplitter.split("\"",
+                                                  true,
+                                                  " \"Prague\" ");
+        assertEquals(1, split.length);
+        assertEquals("Prague", split[0]);
+    }
+
+    @Test
+    public void testJustOneComplexItem() throws Exception {
+        final String[] split = ListSplitter.split("\"",
+                                                  true,
+                                                  " \"Prague, Czechia\" ");
+        assertEquals(1, split.length);
+        assertEquals("Prague, Czechia", split[0]);
     }
 
     @Test
