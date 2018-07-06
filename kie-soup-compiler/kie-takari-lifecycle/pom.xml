@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2014 Takari, Inc.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.takari</groupId>
+    <artifactId>takari</artifactId>
+    <version>25</version>
+  </parent>
+
+  <groupId>kie.io.takari.maven.plugins</groupId>
+  <artifactId>kie-takari-lifecycle</artifactId>
+  <version>1.13.3</version>
+  <packaging>pom</packaging>
+
+  <prerequisites>
+    <maven>[3.3.9,)</maven>
+  </prerequisites>
+
+  <properties>
+    <mavenVersion>3.3.9</mavenVersion>
+    <sisuVersion>0.3.0</sisuVersion>
+    <sisuGuiceVersion>3.2.5</sisuGuiceVersion>
+    <aetherVersion>1.0.2.v20150114</aetherVersion>
+    <incrementalbuild.version>0.20.6</incrementalbuild.version>
+    <guava.version>18.0</guava.version>
+    <mavenPluginPluginVersion>3.3</mavenPluginPluginVersion>
+    <m2eWorkspaceVersion>0.4.0</m2eWorkspaceVersion>
+    <pluginTestingVersion>2.9.0</pluginTestingVersion>
+    <takariLifecycleVersion>1.13.0</takariLifecycleVersion>
+    <takari.javaSourceVersion>1.8</takari.javaSourceVersion>
+  </properties>
+
+  <!--<scm>
+    <connection>scm:git:git@github.com/takari/takari-lifecycle-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/takari/takari-lifecycle-plugin.git</developerConnection>
+    <url>http://github.com/takari/takari-lifecycle-plugin</url>
+    <tag>takari-lifecycle-1.13.3</tag>
+  </scm>-->
+
+  <!--
+  <repositories>
+    <repository>
+      <id>takari-snapshots</id>
+      <url>https://otto.takari.io/content/repositories/snapshots/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  -->
+
+  <modules>
+    <module>takari-lifecycle-plugin</module>
+    <!-- TODO consider moving integration tests to the main module -->
+    <module>takari-lifecycle-plugin-its</module>
+  </modules>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>src/main/resources-filtered</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>io.takari.maven.plugins</groupId>
+          <artifactId>takari-lifecycle-plugin</artifactId>
+          <dependencies>
+            <dependency>
+              <groupId>io.takari.m2e.workspace</groupId>
+              <artifactId>org.eclipse.m2e.workspace.cli</artifactId>
+              <version>${m2eWorkspaceVersion}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>com.mycila</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <configuration>
+            <excludes combine.children="append">
+              <!-- don't override copyright of code copied from other projects -->
+              <!--
+                | Please note that license-plugin is quite dumb and processes the same sources multiple times
+                | once per each level of parent/module hierarchy. This means the same excludes has to be configured
+                | on each hierarchy level too. (or hope we remember to run "mvn -N license:format", which I am sure
+                | we'll forget) 
+               -->
+              <exclude>takari-lifecycle-plugin/src/main/java/io/takari/maven/plugins/compile/jdt/ReferenceCollection.java</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
