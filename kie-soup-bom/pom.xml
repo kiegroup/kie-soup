@@ -29,7 +29,7 @@
 
   <groupId>org.kie.soup</groupId>
   <artifactId>kie-soup-bom</artifactId>
-  <version>7.9.0-SNAPSHOT</version>
+  <version>7.8.0.t032</version>
   <packaging>pom</packaging>
 
   <name>KIE Soup BOM (Bill Of Materials)</name>
