@@ -29,7 +29,7 @@
 
   <groupId>org.kie.soup</groupId>
   <artifactId>kie-soup-parent</artifactId>
-  <version>7.10.0-SNAPSHOT</version>
+  <version>7.8.0.t033</version>
   <packaging>pom</packaging>
 
   <name>KIE Soup parent</name>
