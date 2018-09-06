@@ -61,27 +61,23 @@ public class ListSplitter {
 class InnerSplitter {
 
     private final List<String> result = new ArrayList<>();
-    private final String quoteCharacter;
-
-    private String current = null;
 
     InnerSplitter(final String quoteCharacter,
                   final boolean trim,
                   final String[] split) {
 
-        this.quoteCharacter = quoteCharacter;
-
+        String current = null;
         for (final String item : split) {
 
             if (current == null) {
-                if (item.trim().startsWith(this.quoteCharacter) && item.trim().endsWith(this.quoteCharacter)) {
+                if (item.trim().startsWith(quoteCharacter) && item.trim().endsWith(quoteCharacter)) {
                     if (item.length() == 1) {
                         result.add(item);
                     } else {
-                        result.add(item.substring(item.indexOf(this.quoteCharacter) + 1, item.lastIndexOf(this.quoteCharacter)));
+                        result.add(item.substring(item.indexOf(quoteCharacter) + 1, item.lastIndexOf(quoteCharacter)));
                     }
-                } else if (item.trim().startsWith(this.quoteCharacter)) {
-                    current = item.substring(item.indexOf(this.quoteCharacter) + 1) + ",";
+                } else if (item.trim().startsWith(quoteCharacter)) {
+                    current = item.substring(item.indexOf(quoteCharacter) + 1) + ",";
                 } else {
                     if (trim) {
                         result.add(item.trim());
@@ -91,8 +87,8 @@ class InnerSplitter {
                 }
             } else {
 
-                if (item.trim().endsWith(this.quoteCharacter)) {
-                    current += item.substring(0, item.lastIndexOf(this.quoteCharacter) );
+                if (item.trim().endsWith(quoteCharacter)) {
+                    current += item.substring(0, item.lastIndexOf(quoteCharacter) );
                     result.add(current);
                     current = null;
                 } else {
@@ -103,7 +99,7 @@ class InnerSplitter {
     }
 
     String[] getSplit() {
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 }
 

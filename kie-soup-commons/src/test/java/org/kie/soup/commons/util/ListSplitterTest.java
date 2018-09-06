@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 public class ListSplitterTest {
 
     @Test
-    public void basicABC() throws Exception {
+    public void basicABC() {
         final String[] split = ListSplitter.split("a,b,c");
         assertEquals(3, split.length);
         assertEquals("a", split[0]);
@@ -30,7 +30,7 @@ public class ListSplitterTest {
     }
 
     @Test
-    public void keepSpacesABC() throws Exception {
+    public void keepSpacesABC() {
         final String[] split = ListSplitter.split("a, b ,c");
         assertEquals(3, split.length);
         assertEquals("a", split[0]);
@@ -39,7 +39,7 @@ public class ListSplitterTest {
     }
 
     @Test
-    public void specialABC() throws Exception {
+    public void specialABC() {
         final String[] split = ListSplitter.split("'a','b','c'");
         assertEquals(3, split.length);
         assertEquals("a", split[0]);
@@ -48,7 +48,7 @@ public class ListSplitterTest {
     }
 
     @Test
-    public void specialABCSpaces() throws Exception {
+    public void specialABCSpaces() {
         final String[] split = ListSplitter.split(" 'a' , 'b' , 'c' ");
         assertEquals(3, split.length);
         assertEquals("a", split[0]);
@@ -57,7 +57,7 @@ public class ListSplitterTest {
     }
 
     @Test
-    public void basicCharacters() throws Exception {
+    public void basicCharacters() {
         final String[] split = ListSplitter.split("',!,%,)");
         assertEquals(4, split.length);
         assertEquals("'", split[0]);
@@ -67,7 +67,7 @@ public class ListSplitterTest {
     }
 
     @Test
-    public void splitItemsWithCommas() throws Exception {
+    public void splitItemsWithCommas() {
         final String[] split = ListSplitter.split("'One sentence.','Another one, but with comma.','Third one. I'll make things, if possible, even more complicated.'");
         assertEquals(3, split.length);
         assertEquals("One sentence.", split[0]);
@@ -76,7 +76,7 @@ public class ListSplitterTest {
     }
 
     @Test
-    public void changeQuoteCharacter() throws Exception {
+    public void changeQuoteCharacter() {
         final String[] split = ListSplitter.split("\"",
                                                   true,
                                                   "\"Helsinki, Finland\", Boston");
@@ -86,7 +86,7 @@ public class ListSplitterTest {
     }
 
     @Test
-    public void changeQuoteCharacterPreserveQuotes() throws Exception {
+    public void changeQuoteCharacterPreserveQuotes() {
         final String[] split = ListSplitter.splitPreserveQuotes("\"",
                                                                 true,
                                                                 "\"Helsinki, Finland\", Boston");
@@ -96,7 +96,7 @@ public class ListSplitterTest {
     }
 
     @Test
-    public void changeQuoteCharacterSkipTrimming() throws Exception {
+    public void changeQuoteCharacterSkipTrimming() {
         final String[] split = ListSplitter.split("\"",
                                                   false,
                                                   "\"Helsinki, Finland\", Boston");
@@ -106,7 +106,7 @@ public class ListSplitterTest {
     }
 
     @Test
-    public void testQuoteCharacterUsedJustForComplexEnumEnd() throws Exception {
+    public void testQuoteCharacterUsedJustForComplexEnumEnd() {
         final String[] split = ListSplitter.split("\"",
                                                   true,
                                                   "Prague, Boston, \"Helsinki, Finland\"");
@@ -117,7 +117,7 @@ public class ListSplitterTest {
     }
 
     @Test
-    public void testQuoteCharacterUsedJustForComplexEnumMiddle() throws Exception {
+    public void testQuoteCharacterUsedJustForComplexEnumMiddle() {
         final String[] split = ListSplitter.split("\"",
                                                   true,
                                                   "Prague, \"Helsinki, Finland\", Boston");
@@ -128,7 +128,7 @@ public class ListSplitterTest {
     }
 
     @Test
-    public void testDoubleQuotes() throws Exception {
+    public void testDoubleQuotes() {
         final String[] split = ListSplitter.split("\"",
                                                   true,
                                                   " \"Prague\", \"\"Helsinki, Finland\"\" ");
@@ -138,7 +138,7 @@ public class ListSplitterTest {
     }
 
     @Test
-    public void testJustOneItem() throws Exception {
+    public void testJustOneItem() {
         final String[] split = ListSplitter.split("\"",
                                                   true,
                                                   " \"Prague\" ");
@@ -147,7 +147,7 @@ public class ListSplitterTest {
     }
 
     @Test
-    public void testJustOneComplexItem() throws Exception {
+    public void testJustOneComplexItem() {
         final String[] split = ListSplitter.split("\"",
                                                   true,
                                                   " \"Prague, Czechia\" ");
@@ -156,7 +156,7 @@ public class ListSplitterTest {
     }
 
     @Test
-    public void testQuoteCharacterUsedJustForComplexEnumStart() throws Exception {
+    public void testQuoteCharacterUsedJustForComplexEnumStart() {
         final String[] split = ListSplitter.split("\"",
                                                   true,
                                                   "\"Helsinki, Finland\", Prague, Boston");
