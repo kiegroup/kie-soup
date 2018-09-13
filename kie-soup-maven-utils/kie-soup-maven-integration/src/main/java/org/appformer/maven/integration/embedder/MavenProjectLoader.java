@@ -98,10 +98,10 @@ public class MavenProjectLoader {
         }
         return mavenEmbedder;
     }
-    
+
     public static MavenRequest createMavenRequest(boolean offline) {
         MavenRequest mavenRequest = new MavenRequest();
-        mavenRequest.setLocalRepositoryPath(System.getProperty(GLOBAL_M2_REPO_URL, GLOBAL_M2_REPO_URL_DEFAULT););
+        mavenRequest.setLocalRepositoryPath(System.getProperty(GLOBAL_M2_REPO_URL, GLOBAL_M2_REPO_URL_DEFAULT));
         //mavenRequest.setUserSettingsSource(MavenSettings.getUserSettingsSource());
 
         // BZ-1007894: If dependency is not resolvable and maven project builder does not complain about it,
