@@ -28,23 +28,23 @@ import org.slf4j.LoggerFactory;
 public class MavenProjectLoader {
     private static final Logger log = LoggerFactory.getLogger(MavenProjectLoader.class);
     public static final String GLOBAL_M2_REPO_URL = "org.appformer.m2repo.url";
-    
+
     private static final String DUMMY_POM =
             "    <project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-            "      xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n" +
-            "      <modelVersion>4.0.0</modelVersion>\n" +
-            "     \n" +
-            "      <groupId>myGroupId</groupId>\n" +
-            "      <artifactId>myArtifactId</artifactId>\n" +
-            "      <version>1.0-SNAPSHOT</version>\n" +
-            "    </project>";
- 
+                    "      xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n" +
+                    "      <modelVersion>4.0.0</modelVersion>\n" +
+                    "     \n" +
+                    "      <groupId>myGroupId</groupId>\n" +
+                    "      <artifactId>myArtifactId</artifactId>\n" +
+                    "      <version>1.0-SNAPSHOT</version>\n" +
+                    "    </project>";
+
     static MavenProject mavenProject;
- 
+
     public static MavenProject parseMavenPom(File pomFile) {
         return parseMavenPom(pomFile, false);
     }
- 
+
     public static MavenProject parseMavenPom(File pomFile, boolean offline) {
         boolean hasPom = pomFile.exists();
 
@@ -66,7 +66,7 @@ public class MavenProjectLoader {
             }
         }
     }
-    
+
     public static MavenProject parseMavenPom(InputStream pomStream) {
         return parseMavenPom(pomStream, false);
     }
@@ -89,12 +89,12 @@ public class MavenProjectLoader {
     public static MavenEmbedder newMavenEmbedder(boolean offline) {
         MavenRequest mavenRequest = createMavenRequest(offline);
         MavenEmbedder mavenEmbedder;
-            try {
-                mavenEmbedder = new MavenEmbedder( mavenRequest );
-            } catch (MavenEmbedderException e) {
-                log.error("Unable to create new MavenEmbedder", e);
-                throw new RuntimeException(e);
-            }
+        try {
+            mavenEmbedder = new MavenEmbedder( mavenRequest );
+        } catch (MavenEmbedderException e) {
+            log.error("Unable to create new MavenEmbedder", e);
+            throw new RuntimeException(e);
+        }
         return mavenEmbedder;
     }
 
@@ -114,7 +114,7 @@ public class MavenProjectLoader {
         // BZ-1007894: If dependency is not resolvable and maven project builder does not complain about it,
         // then a <code>java.lang.NullPointerException</code> is thrown to the client.
         // So, the user will se an exception message "null", not descriptive about the real error.
-        mavenRequest.setResolveDependencies(false);//offline works with false
+        //mavenRequest.setResolveDependencies(false);//offline works with false
         mavenRequest.setOffline( offline );
         return mavenRequest;
     }
