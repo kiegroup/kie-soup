@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
 public class MavenProjectLoader {
     private static final Logger log = LoggerFactory.getLogger(MavenProjectLoader.class);
     public static final String GLOBAL_M2_REPO_URL = "org.appformer.m2repo.url";
+    /*Temporary to avoid circular dep*/
+    private static final String GLOBAL_M2_REPO_URL_DEFAULT = "repositories" +File.separator +"kie" +File.separator +"global";
 
     private static final String DUMMY_POM =
             "    <project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
@@ -98,23 +100,13 @@ public class MavenProjectLoader {
         return mavenEmbedder;
     }
 
-    public static String getGlobalRepo(){
-        String global = System.getProperty(GLOBAL_M2_REPO_URL);
-        if(global == null){
-            global = "repositories" +File.separator +"kie" +File.separator +"global";
-        }
-        return global;
-    }
 
     public static MavenRequest createMavenRequest(boolean offline) {
         MavenRequest mavenRequest = new MavenRequest();
-        mavenRequest.setLocalRepositoryPath(getGlobalRepo());
-        //mavenRequest.setUserSettingsSource(MavenSettings.getUserSettingsSource());
-
+        mavenRequest.setLocalRepositoryPath(System.getProperty(GLOBAL_M2_REPO_URL, GLOBAL_M2_REPO_URL_DEFAULT));
         // BZ-1007894: If dependency is not resolvable and maven project builder does not complain about it,
         // then a <code>java.lang.NullPointerException</code> is thrown to the client.
         // So, the user will se an exception message "null", not descriptive about the real error.
-        //mavenRequest.setResolveDependencies(false);//offline works with false
         mavenRequest.setOffline( offline );
         return mavenRequest;
     }
