@@ -29,7 +29,7 @@ public class MavenProjectLoader {
     private static final Logger log = LoggerFactory.getLogger(MavenProjectLoader.class);
     public static final String GLOBAL_M2_REPO_URL = "org.appformer.m2repo.url";
     /*Temporary to avoid circular dep*/
-    private static final String GLOBAL_M2_REPO_URL_DEFAULT = "repositories" +File.separator +"kie" +File.separator +"global";
+    private static final String GLOBAL_M2_REPO_URL_DEFAULT = "repositories/kie/global";
 
     private static final String DUMMY_POM =
             "    <project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
