@@ -20,7 +20,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,30 +28,17 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.appformer.maven.integration.Aether;
-import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
-import org.eclipse.aether.impl.DefaultServiceLocator;
-import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
-import org.eclipse.aether.spi.connector.transport.TransporterFactory;
-import org.eclipse.aether.transport.file.FileTransporterFactory;
-import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MavenProjectLoader {
 
-    public static final String GLOBAL_M2_REPO_URL = "org.appformer.m2repo.url";
     private static final Logger log = LoggerFactory.getLogger(MavenProjectLoader.class);
-    /*Temporary to avoid circular dep*/
-    private static final String GLOBAL_M2_REPO_URL_DEFAULT = "repositories/kie/global";
 
     private static final String DUMMY_POM =
             "    <project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
@@ -100,7 +86,7 @@ public class MavenProjectLoader {
 
         if (mavenProject.getArtifacts().isEmpty()) {
             Set<Artifact> artifacts = new HashSet<>();
-            RepositorySystemSession session = newSession(newRepositorySystem());
+            RepositorySystemSession session = Aether.getAether().getSession();
             for (Dependency dep : mavenProject.getDependencies()) {
                 Artifact artifact = new DefaultArtifact(dep.getGroupId(),
                                                         dep.getArtifactId(),
@@ -147,26 +133,6 @@ public class MavenProjectLoader {
         }
     }
 
-    private static RepositorySystemSession newSession(RepositorySystem system) {
-        DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
-        LocalRepository localRepo = new LocalRepository(GLOBAL_M2_REPO_URL_DEFAULT);
-        session.setLocalRepositoryManager(system.newLocalRepositoryManager(session,
-                                                                           localRepo));
-
-        return session;
-    }
-
-    private static RepositorySystem newRepositorySystem() {
-        DefaultServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
-        locator.addService(RepositoryConnectorFactory.class,
-                           BasicRepositoryConnectorFactory.class);
-        locator.addService(TransporterFactory.class,
-                           FileTransporterFactory.class);
-        locator.addService(TransporterFactory.class,
-                           HttpTransporterFactory.class);
-        return locator.getService(RepositorySystem.class);
-    }
-
     public static MavenProject parseMavenPom(InputStream pomStream,
                                              boolean offline) {
         MavenEmbedder mavenEmbedder = null;
@@ -199,8 +165,6 @@ public class MavenProjectLoader {
 
     public static MavenRequest createMavenRequest(boolean offline) {
         MavenRequest mavenRequest = new MavenRequest();
-        mavenRequest.setLocalRepositoryPath(System.getProperty(GLOBAL_M2_REPO_URL,
-                                                               GLOBAL_M2_REPO_URL_DEFAULT));
         // BZ-1007894: If dependency is not resolvable and maven project builder does not complain about it,
         // then a <code>java.lang.NullPointerException</code> is thrown to the client.
         // So, the user will se an exception message "null", not descriptive about the real error.
