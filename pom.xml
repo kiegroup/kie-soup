@@ -21,10 +21,9 @@
   <!-- Does not have kie-parent because that would cause circular dependency.
        Change to kie-parent and remove version properties when UberFire moves to kiegroup. -->
   <parent>
-    <groupId>org.jboss.integration-platform</groupId>
-    <artifactId>jboss-integration-platform-bom</artifactId>
-    <!-- Keep in sync with the parent version of kie-soup-bom/pom.xml -->
-    <version>8.1.0.Final</version>
+    <groupId>org.kie</groupId>
+    <artifactId>kie-parent</artifactId>
+    <version>7.12.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.kie.soup</groupId>
@@ -51,15 +50,8 @@
   </licenses>
 
   <properties>
-    <!-- Required since support for ELS 2.x. Keep in sync with kie-parent or remove when those
-          two versions are being updated on the IP BOM.-->
-    <version.com.fasterxml.jackson>2.8.9</version.com.fasterxml.jackson>
     <version.com.googlecode.jsonsimple>1.1.1</version.com.googlecode.jsonsimple>
-    <version.org.mvel>2.3.2.Final</version.org.mvel>
     <version.org.elasticsearch>5.6.1</version.org.elasticsearch>
-    <version.org.apache.lucene>6.6.1</version.org.apache.lucene>
-    <version.io.netty.old>3.10.6.Final</version.io.netty.old>
-    <version.io.netty>4.1.16.Final</version.io.netty>
     <version.com.github.tdomzal.junit.docker>0.3</version.com.github.tdomzal.junit.docker>
     <version.com.spotify.docker.client>5.0.2</version.com.spotify.docker.client>
     <version.org.apache.logging.log4j>2.8.2</version.org.apache.logging.log4j>
