@@ -31,12 +31,14 @@ import org.apache.maven.project.MavenProject;
 import org.appformer.maven.integration.Aether;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.resolution.ArtifactRequest;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MavenProjectLoader {
+
+    public static final String FORCE_OFFLINE = "kie.maven.offline.force";
+    public static final boolean IS_FORCE_OFFLINE = Boolean.valueOf(System.getProperty(FORCE_OFFLINE, "false"));
 
     private static final Logger log = LoggerFactory.getLogger(MavenProjectLoader.class);
 
@@ -53,12 +55,10 @@ public class MavenProjectLoader {
     static MavenProject mavenProject;
 
     public static MavenProject parseMavenPom(File pomFile) {
-        return parseMavenPom(pomFile,
-                             true);
+        return parseMavenPom(pomFile, false);
     }
 
-    public static MavenProject parseMavenPom(File pomFile,
-                                             boolean offline) {
+    public static MavenProject parseMavenPom(File pomFile, boolean offline) {
         boolean hasPom = pomFile.exists();
 
         MavenRequest mavenRequest = createMavenRequest(offline);
@@ -81,72 +81,63 @@ public class MavenProjectLoader {
     }
 
     public static MavenProject parseMavenPom(InputStream pomStream) {
-        MavenProject mavenProject = parseMavenPom(pomStream,
-                                                  false);
-
-        if (mavenProject.getArtifacts().isEmpty()) {
-            Set<Artifact> artifacts = new HashSet<>();
-            RepositorySystemSession session = Aether.getAether().getSession();
-            for (Dependency dep : mavenProject.getDependencies()) {
-                Artifact artifact = new DefaultArtifact(dep.getGroupId(),
-                                                        dep.getArtifactId(),
-                                                        dep.getVersion(),
-                                                        dep.getScope(),
-                                                        dep.getType(),
-                                                        dep.getClassifier(),
-                                                        new DefaultArtifactHandler());
-                if (resolve(session,
-                            artifact)) {
-                    artifacts.add(artifact);
-                }
-            }
-            if (!artifacts.isEmpty()) {
-                mavenProject.setArtifacts(artifacts);
-            }
-        }
-        return mavenProject;
+        return parseMavenPom(pomStream, false);
     }
 
-    private static boolean resolve(RepositorySystemSession session,
-                                   Artifact artifact) {
-
-        ArtifactRequest artifactRequest = new ArtifactRequest();
-        org.eclipse.aether.artifact.Artifact jarArtifact = new org.eclipse.aether.artifact.DefaultArtifact(artifact.getGroupId(),
-                                                                                                           artifact.getArtifactId(),
-                                                                                                           artifact.getClassifier(),
-                                                                                                           "jar",
-                                                                                                           artifact.getVersion());
-
-        artifactRequest.setArtifact(jarArtifact);
-        try {
-            ArtifactResult result = Aether.getAether().getSystem().resolveArtifact(session,
-                                                                                   artifactRequest);
-            if (result != null && result.isResolved()) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (ArtifactResolutionException are) {
-            log.info(are.getMessage(),
-                     are);
-            return false;
-        }
-    }
-
-    public static MavenProject parseMavenPom(InputStream pomStream,
-                                             boolean offline) {
+    public static MavenProject parseMavenPom(InputStream pomStream, boolean offline) {
         MavenEmbedder mavenEmbedder = null;
         try {
             mavenEmbedder = newMavenEmbedder(offline);
-            return mavenEmbedder.readProject(pomStream);
+            final MavenProject project = mavenEmbedder.readProject(pomStream);
+            if (IS_FORCE_OFFLINE) {
+                final Set<Artifact> artifacts = new HashSet<>();
+                final RepositorySystemSession session = Aether.getAether().getSession();
+                for (Dependency dep : mavenProject.getDependencies()) {
+                    Artifact artifact = new DefaultArtifact(dep.getGroupId(),
+                                                            dep.getArtifactId(),
+                                                            dep.getVersion(),
+                                                            dep.getScope(),
+                                                            dep.getType(),
+                                                            dep.getClassifier(),
+                                                            new DefaultArtifactHandler());
+                    if (resolve(session, artifact)) {
+                        artifacts.add(artifact);
+                    } else {
+                        log.error("Artifact can't be resolved {}'", artifact.toString());
+                    }
+                }
+                if (!artifacts.isEmpty()) {
+                    mavenProject.setArtifacts(artifacts);
+                }
+            }
+            return project;
         } catch (Exception e) {
-            log.error("Unable to create MavenProject from InputStream",
-                      e);
+            log.error("Unable to create MavenProject from InputStream", e);
             throw new RuntimeException(e);
         } finally {
             if (mavenEmbedder != null) {
                 mavenEmbedder.dispose();
             }
+        }
+    }
+
+    private static boolean resolve(final RepositorySystemSession session,
+                                   final Artifact artifact) {
+        final ArtifactRequest artifactRequest = new ArtifactRequest();
+        final org.eclipse.aether.artifact.Artifact jarArtifact = new org.eclipse.aether.artifact.DefaultArtifact(artifact.getGroupId(),
+                                                                                                                 artifact.getArtifactId(),
+                                                                                                                 artifact.getClassifier(),
+                                                                                                                 "jar",
+                                                                                                                 artifact.getVersion());
+
+        artifactRequest.setArtifact(jarArtifact);
+        try {
+            ArtifactResult result = Aether.getAether().getSystem().resolveArtifact(session,
+                                                                                   artifactRequest);
+            return result != null && result.isResolved();
+        } catch (final Exception are) {
+            log.info(are.getMessage(), are);
+            return false;
         }
     }
 
@@ -156,18 +147,23 @@ public class MavenProjectLoader {
         try {
             mavenEmbedder = new MavenEmbedder(mavenRequest);
         } catch (MavenEmbedderException e) {
-            log.error("Unable to create new MavenEmbedder",
-                      e);
+            log.error("Unable to create new MavenEmbedder", e);
             throw new RuntimeException(e);
         }
         return mavenEmbedder;
     }
 
-    public static MavenRequest createMavenRequest(boolean offline) {
+    public static MavenRequest createMavenRequest(boolean _offline) {
         MavenRequest mavenRequest = new MavenRequest();
+        mavenRequest.setLocalRepositoryPath(MavenSettings.getSettings().getLocalRepository());
+        mavenRequest.setUserSettingsSource(MavenSettings.getUserSettingsSource());
+
+        final boolean offline = IS_FORCE_OFFLINE || _offline;
+
         // BZ-1007894: If dependency is not resolvable and maven project builder does not complain about it,
         // then a <code>java.lang.NullPointerException</code> is thrown to the client.
         // So, the user will se an exception message "null", not descriptive about the real error.
+        mavenRequest.setResolveDependencies(!offline);
         mavenRequest.setOffline(offline);
         return mavenRequest;
     }
@@ -180,8 +176,7 @@ public class MavenProjectLoader {
         if (mavenProject == null) {
             File pomFile = new File("pom.xml");
             try {
-                mavenProject = parseMavenPom(pomFile,
-                                             offline);
+                mavenProject = parseMavenPom(pomFile, offline);
             } catch (Exception e) {
                 log.warn("Unable to parse pom.xml file of the running project: " + e.getMessage());
             }
