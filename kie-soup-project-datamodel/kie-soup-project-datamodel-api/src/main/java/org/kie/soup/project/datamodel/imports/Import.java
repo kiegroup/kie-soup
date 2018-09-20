@@ -56,6 +56,10 @@ public class Import {
         return true;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public int hashCode() {
         return type != null ? type.hashCode() : 0;
