@@ -24,7 +24,7 @@
     <groupId>org.jboss.integration-platform</groupId>
     <artifactId>jboss-integration-platform-bom</artifactId>
     <!-- Keep in sync with the parent version of kie-soup-bom/pom.xml -->
-    <version>8.1.0.Final</version>
+    <version>8.2.0.Final</version>
   </parent>
 
   <groupId>org.kie.soup</groupId>
@@ -53,7 +53,6 @@
   <properties>
     <!-- Required since support for ELS 2.x. Keep in sync with kie-parent or remove when those
           two versions are being updated on the IP BOM.-->
-    <version.com.fasterxml.jackson>2.8.10</version.com.fasterxml.jackson>
     <version.com.googlecode.jsonsimple>1.1.1</version.com.googlecode.jsonsimple>
     <version.org.mvel>2.3.2.Final</version.org.mvel>
     <version.org.elasticsearch>5.6.1</version.org.elasticsearch>
@@ -592,27 +591,6 @@
         <groupId>org.apache.lucene</groupId>
         <artifactId>lucene-queryparser</artifactId>
         <version>${version.org.apache.lucene}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.dataformat</groupId>
-        <artifactId>jackson-dataformat-smile</artifactId>
-        <version>${version.com.fasterxml.jackson}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.dataformat</groupId>
-        <artifactId>jackson-dataformat-yaml</artifactId>
-        <version>${version.com.fasterxml.jackson}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.dataformat</groupId>
-        <artifactId>jackson-dataformat-cbor</artifactId>
-        <version>${version.com.fasterxml.jackson}</version>
       </dependency>
       <!-- Required to run the ElasticSearch server when performing the unit test executions.
           The ELS data provider requires groovy scripts enabled on the server.-->
