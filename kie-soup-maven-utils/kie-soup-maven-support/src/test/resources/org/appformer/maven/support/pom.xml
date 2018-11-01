@@ -19,7 +19,8 @@
     <dependency>
       <groupId>dep1GroupId</groupId>
       <artifactId>dep1ArtifactId</artifactId>
-     <version>dep1Version</version>
+      <version>dep1Version</version>
+      <scope>provided</scope>
     </dependency>     
   </dependencies>
   

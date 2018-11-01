@@ -19,7 +19,6 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class PomModelParserTest {
@@ -30,18 +29,6 @@ public class PomModelParserTest {
         assertNotNull( is );
         
         PomModel pomModel = PomModel.Parser.parse( PomModelParserTest.class.getName().replace( '.', '/' ) + ".pom.xml", is );
-        assertEquals( "groupId", pomModel.getReleaseId().getGroupId() );
-        assertEquals( "artifactId", pomModel.getReleaseId().getArtifactId() );
-        assertEquals( "version", pomModel.getReleaseId().getVersion() );
-        
-        assertEquals( "parentGroupId", pomModel.getParentReleaseId().getGroupId() );
-        assertEquals( "parentArtifactId", pomModel.getParentReleaseId().getArtifactId() );
-        assertEquals( "parentVersion", pomModel.getParentReleaseId().getVersion() );
-
-        assertEquals( 1, pomModel.getDependencies().size() );
-        AFReleaseId dep = pomModel.getDependencies().iterator().next();
-        assertEquals( "dep1GroupId", dep.getGroupId() );
-        assertEquals( "dep1ArtifactId", dep.getArtifactId() );
-        assertEquals( "dep1Version", dep.getVersion() );
+        ParserTestUtil.assertPomModel(pomModel);
     }
 }
