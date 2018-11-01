@@ -71,7 +71,7 @@ public class MinimalPomParser extends DefaultHandler {
                              final String localName,
                              final String qname,
                              final Attributes attrs) throws SAXException {
-        if ( "groupId".equals( qname ) || "artifactId".equals( qname ) || "version".equals( qname ) ) {
+        if ( "groupId".equals( qname ) || "artifactId".equals( qname ) || "version".equals( qname ) || "scope".equals( qname ) ) {
             this.characters = new StringBuilder();            
         }
         
