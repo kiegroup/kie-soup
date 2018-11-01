@@ -47,7 +47,7 @@ public final class ParserTestUtil {
         assertEquals(0, dependencies.size());
     }
 
-    public ParserTestUtil() {
+    private ParserTestUtil() {
         // It is forbidden to instantiate util classes.
     }
 }
