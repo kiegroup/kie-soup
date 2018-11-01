@@ -16,7 +16,10 @@
 
 package org.appformer.maven.support;
 
+import java.util.Collection;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public final class ParserTestUtil {
 
@@ -34,6 +37,14 @@ public final class ParserTestUtil {
         assertEquals( "dep1GroupId", dep.getGroupId() );
         assertEquals( "dep1ArtifactId", dep.getArtifactId() );
         assertEquals( "dep1Version", dep.getVersion() );
+
+        Collection<AFReleaseId> dependencies = pomModel.getDependencies(DependencyFilter.TAKE_ALL_FILTER);
+        assertNotNull(dependencies);
+        assertEquals(1, dependencies.size());
+
+        dependencies = pomModel.getDependencies(DependencyFilter.COMPILE_FILTER);
+        assertNotNull(dependencies);
+        assertEquals(0, dependencies.size());
     }
 
     public ParserTestUtil() {

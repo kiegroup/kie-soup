@@ -17,11 +17,9 @@
 package org.appformer.maven.support;
 
 import java.io.InputStream;
-import java.util.Collection;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class MinimalPomParserTest {
@@ -33,13 +31,5 @@ public class MinimalPomParserTest {
 
         final PomModel model = MinimalPomParser.parse(MinimalPomParserTest.class.getName().replace( '.', '/' ) + ".pom.xml", is);
         ParserTestUtil.assertPomModel(model);
-
-        Collection<AFReleaseId> dependencies = model.getDependencies(DependencyFilter.TAKE_ALL_FILTER);
-        assertNotNull(dependencies);
-        assertEquals(1, dependencies.size());
-
-        dependencies = model.getDependencies(DependencyFilter.COMPILE_FILTER);
-        assertNotNull(dependencies);
-        assertEquals(0, dependencies.size());
     }
 }
