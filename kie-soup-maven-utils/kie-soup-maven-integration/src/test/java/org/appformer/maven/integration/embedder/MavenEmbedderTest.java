@@ -24,23 +24,48 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequestPopulator;
+import org.apache.maven.model.building.ModelSource;
+import org.apache.maven.project.DependencyResolutionResult;
+import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectBuildingResult;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.DefaultSettingsBuilderFactory;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingException;
+import org.apache.maven.settings.building.SettingsBuildingRequest;
+import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsSource;
+import org.appformer.maven.integration.MavenRepositoryConfiguration;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.logging.Logger;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
+import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
+import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.junit.Assert;
 import org.junit.Test;
-import org.appformer.maven.integration.MavenRepositoryConfiguration;
 
-import static org.junit.Assert.*;
 import static org.appformer.maven.integration.embedder.MavenSettings.CUSTOM_SETTINGS_PROPERTY;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MavenEmbedderTest {
 
@@ -48,6 +73,75 @@ public class MavenEmbedderTest {
                                           "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                                           "      xsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.0.0\n" +
                                           "                          http://maven.apache.org/xsd/settings-1.0.0.xsd\"/>\n";
+
+    final ComponentProvider componentProviderMocked = mock(ComponentProvider.class);
+
+    @Test
+    public void testInvalidLocalDependency() throws MavenEmbedderException, ProjectBuildingException, ComponentLookupException, SettingsBuildingException, InvalidRepositoryException {
+        final MavenExecutionRequestPopulator mavenExecutionRequestPopulator =  mock(MavenExecutionRequestPopulator.class);
+        final Logger logger =  mock(Logger.class);
+        final RepositorySystem repositorySystem = mock(RepositorySystem.class);
+        final ArtifactRepository artifactRepository = mock(ArtifactRepository.class);
+
+        final SettingsBuilder settingsBuilder =  mock(SettingsBuilder.class);
+        final SettingsBuildingResult settingsBuildingResult = mock(SettingsBuildingResult.class);
+        final ProjectBuilder projectBuilderMock =  mock(ProjectBuilder.class);
+        final DependencyResolutionResult drr = mock(DependencyResolutionResult.class);
+        final ProjectBuildingResult projectBuildingResult =  mock(ProjectBuildingResult.class);
+        final ArtifactDescriptorException exception = mock(ArtifactDescriptorException.class);
+        final ArtifactDescriptorRequest request = new ArtifactDescriptorRequest();
+
+        final ArtifactDescriptorResult result = new ArtifactDescriptorResult(request);
+        final Artifact artifactResult = mock(Artifact .class);
+
+        final List<Exception> list = new ArrayList<Exception>() {{
+            add(exception);
+        }};
+        request.setArtifact(artifactResult);
+        result.setArtifact(artifactResult);
+
+        doReturn(settingsBuilder).when(componentProviderMocked).lookup(SettingsBuilder.class);
+        doReturn(settingsBuildingResult).when(settingsBuilder).build(any(SettingsBuildingRequest.class));
+        when(settingsBuildingResult.getEffectiveSettings()).thenReturn(mock(Settings.class));
+        when(componentProviderMocked.getSystemClassLoader()).thenReturn(getClass().getClassLoader());
+
+
+        doReturn(artifactRepository).when(repositorySystem).createLocalRepository(any(File.class));
+
+        doReturn(new File("").toPath().toString()).when(artifactRepository).getBasedir();
+
+        doReturn(repositorySystem).when(componentProviderMocked).lookup(RepositorySystem.class);
+
+        doReturn(projectBuilderMock).when(componentProviderMocked).lookup(ProjectBuilder.class);
+
+        doReturn(logger).when(componentProviderMocked).lookup(Logger.class);
+        doReturn(mavenExecutionRequestPopulator).when(componentProviderMocked).lookup(MavenExecutionRequestPopulator.class);
+
+        doReturn(projectBuildingResult).when(projectBuilderMock).build(any(ModelSource.class), any(ProjectBuildingRequest.class));
+        when(projectBuildingResult.getDependencyResolutionResult()).thenReturn(drr);
+        when(projectBuildingResult.getDependencyResolutionResult()).thenReturn(drr);
+        when(drr.getCollectionErrors()).thenReturn(list);
+        when(exception.getResult()).thenReturn(result);
+
+        boolean[] didExecuteTryRemoveLocalArtifact = {false};
+        final MavenRequest mavenRequest = createMavenRequest(null);
+        final MavenEmbedder embedder = new MavenEmbedderMock2( mavenRequest, null ) {
+            void tryRemoveLocalArtifact(Artifact artifact) {
+                didExecuteTryRemoveLocalArtifact[0] = true;
+                assertEquals(artifact, artifactResult);
+            }
+        };
+
+
+        try {
+            embedder.readProject(mock(InputStream.class));
+            fail("expected to throw an exception");
+        } catch ( MavenEmbedderException ex){
+        }
+
+        assertTrue(didExecuteTryRemoveLocalArtifact[0]);
+    }
+
 
     @Test
     public void testExternalRepositories() {
@@ -124,6 +218,24 @@ public class MavenEmbedderTest {
                 System.setProperty( CUSTOM_SETTINGS_PROPERTY, oldSettingsXmlPath );
             }
             MavenSettings.reinitSettings();
+        }
+    }
+
+    class MavenEmbedderMock2 extends MavenEmbedder {
+
+        protected MavenEmbedderMock2(MavenRequest mavenRequest, ComponentProvider componentProvider) throws MavenEmbedderException {
+            super(mavenRequest, componentProviderMocked);
+        }
+
+        public String getLocalRepositoryPath(){
+            return new File("").toString();
+        }
+
+        void init(){
+        }
+
+        ProjectBuildingRequest getProjectBuildingRequest() throws ComponentLookupException {
+            return mock(ProjectBuildingRequest.class);
         }
     }
 
