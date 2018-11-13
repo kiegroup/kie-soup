@@ -52,12 +52,16 @@ import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingException;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsSource;
+import org.appformer.maven.integration.MavenRepository;
+import org.appformer.maven.support.AFReleaseIdImpl;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.eclipse.aether.RepositorySystemSession;
 import org.appformer.maven.integration.MavenRepositoryConfiguration;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.slf4j.LoggerFactory;
 
 import static org.appformer.maven.integration.IoUtils.copyInTempFile;
@@ -87,11 +91,15 @@ public class MavenEmbedder {
         this( mavenRequest, MavenEmbedderUtils.buildComponentProvider( mavenClassLoader, parent, mavenRequest ) );
     }
 
-    private MavenEmbedder( MavenRequest mavenRequest,
-                           ComponentProvider componentProvider ) throws MavenEmbedderException {
+    protected MavenEmbedder( MavenRequest mavenRequest,
+                             ComponentProvider componentProvider ) throws MavenEmbedderException {
         this.mavenRequest = mavenRequest;
         this.componentProvider = componentProvider;
 
+        init();
+    }
+
+    void init() throws MavenEmbedderException {
         try {
             this.mavenExecutionRequest = this.buildMavenExecutionRequest( mavenRequest );
 
@@ -280,7 +288,7 @@ public class MavenEmbedder {
     public MavenProject readProject( final InputStream mavenProjectStream ) throws ProjectBuildingException, MavenEmbedderException {
         ModelSource modelSource = new ModelSource() {
             @Override
-            public InputStream getInputStream() throws IOException {
+            public InputStream getInputStream() {
                 return mavenProjectStream;
             }
 
@@ -292,18 +300,29 @@ public class MavenEmbedder {
 
         ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader( componentProvider.getSystemClassLoader() );
-            ProjectBuilder projectBuilder = componentProvider.lookup( ProjectBuilder.class );
-            // BZ-1007894: Check if added dependencies are resolvable.
-            ProjectBuildingResult result = projectBuilder.build( modelSource, getProjectBuildingRequest() );
-            if ( result != null && result.getDependencyResolutionResult() != null && !result.getDependencyResolutionResult().getCollectionErrors().isEmpty() ) {
-                // A dependency resolution error has been produced. It can contains some error. Throw the first one to the client, so the user will fix every one sequentially.
-                Exception depedencyResolutionException = result.getDependencyResolutionResult().getCollectionErrors().get( 0 );
-                if ( depedencyResolutionException != null ) {
-                    throw new MavenEmbedderException( depedencyResolutionException.getMessage(), depedencyResolutionException );
+            org.eclipse.aether.artifact.Artifact lastArtifact = null;
+            do {
+                Thread.currentThread().setContextClassLoader(componentProvider.getSystemClassLoader());
+                ProjectBuilder projectBuilder = componentProvider.lookup(ProjectBuilder.class);
+                // BZ-1007894: Check if added dependencies are resolvable.
+                ProjectBuildingResult result = projectBuilder.build(modelSource, getProjectBuildingRequest());
+                if (result != null && result.getDependencyResolutionResult() != null && !result.getDependencyResolutionResult().getCollectionErrors().isEmpty()) {
+                    // A dependency resolution error has been produced. It can contains some error. Throw the first one to the client, so the user will fix every one sequentially.
+                    final Exception depedencyResolutionException = result.getDependencyResolutionResult().getCollectionErrors().get(0);
+                    if (depedencyResolutionException instanceof ArtifactDescriptorException) {
+                        final org.eclipse.aether.artifact.Artifact artifact = ((ArtifactDescriptorException) depedencyResolutionException).getResult().getArtifact();
+                        if (!artifact.equals(lastArtifact)) {
+                            tryRemoveLocalArtifact(artifact);
+                            lastArtifact = artifact;
+                            continue;
+                        }
+                    }
+                    if (depedencyResolutionException != null) {
+                        throw new MavenEmbedderException(depedencyResolutionException.getMessage(), depedencyResolutionException);
+                    }
                 }
-            }
-            return result.getProject();
+                return (result == null || result.getProject() == null ) ? null : result.getProject();
+            } while (true);
         } catch ( ComponentLookupException e ) {
             throw new MavenEmbedderException( e.getMessage(), e );
         } finally {
@@ -313,6 +332,10 @@ public class MavenEmbedder {
             } catch ( IOException e ) {
             }
         }
+    }
+
+    void tryRemoveLocalArtifact(Artifact artifact) {
+        MavenRepository.getMavenRepository().removeLocalArtifact(new AFReleaseIdImpl(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()));
     }
 
     public MavenProject readProject( File mavenProject ) throws ProjectBuildingException, MavenEmbedderException {
@@ -350,7 +373,7 @@ public class MavenEmbedder {
         }
     }
 
-    private ProjectBuildingRequest getProjectBuildingRequest() throws ComponentLookupException {
+    ProjectBuildingRequest getProjectBuildingRequest() throws ComponentLookupException {
         ProjectBuildingRequest projectBuildingRequest = this.mavenExecutionRequest.getProjectBuildingRequest();
         projectBuildingRequest.setValidationLevel( this.mavenRequest.getValidationLevel() );
         RepositorySystemSession repositorySystemSession = componentProvider.getRepositorySystemSession( mavenExecutionRequest );

@@ -28,6 +28,7 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.providers.http.HttpWagon;
+import org.appformer.maven.integration.embedder.MavenProjectLoader;
 import org.appformer.maven.integration.embedder.MavenSettings;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
@@ -87,9 +88,11 @@ public class Aether {
 
     private Collection<RemoteRepository> initRepositories( MavenProject mavenProject ) {
         Collection<RemoteRepository> reps = new HashSet<RemoteRepository>();
-        reps.add( newCentralRepository() );
-        if ( mavenProject != null ) {
-            reps.addAll( mavenProject.getRemoteProjectRepositories() );
+        if (!isForcedOffline()){
+            reps.add( newCentralRepository() );
+            if ( mavenProject != null ) {
+                reps.addAll( mavenProject.getRemoteProjectRepositories() );
+            }
         }
 
         RemoteRepository localRepo = newLocalRepository();
@@ -97,6 +100,10 @@ public class Aether {
             localRepository = localRepo;
         }
         return reps;
+    }
+
+    boolean isForcedOffline() {
+        return MavenProjectLoader.IS_FORCE_OFFLINE;
     }
 
     private RepositorySystem newRepositorySystem() {
@@ -158,7 +165,7 @@ public class Aether {
         }
     }
 
-    private RemoteRepository newCentralRepository() {
+    RemoteRepository newCentralRepository() {
         return new RemoteRepository.Builder( "central", "default", "http://repo1.maven.org/maven2/" ).build();
     }
 
