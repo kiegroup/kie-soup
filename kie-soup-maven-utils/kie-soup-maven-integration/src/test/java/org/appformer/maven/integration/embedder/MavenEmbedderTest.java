@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -57,7 +56,9 @@ import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static java.util.Collections.singletonList;
 import static org.appformer.maven.integration.embedder.MavenSettings.CUSTOM_SETTINGS_PROPERTY;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -94,9 +95,8 @@ public class MavenEmbedderTest {
         final ArtifactDescriptorResult result = new ArtifactDescriptorResult(request);
         final Artifact artifactResult = mock(Artifact .class);
 
-        final List<Exception> list = new ArrayList<Exception>() {{
-            add(exception);
-        }};
+        final List<Exception> list = singletonList(exception);
+
         request.setArtifact(artifactResult);
         result.setArtifact(artifactResult);
 
@@ -132,12 +132,8 @@ public class MavenEmbedderTest {
             }
         };
 
-
-        try {
-            embedder.readProject(mock(InputStream.class));
-            fail("expected to throw an exception");
-        } catch ( MavenEmbedderException ex){
-        }
+        assertThatThrownBy(() -> embedder.readProject(mock(InputStream.class)))
+                .isInstanceOf(MavenEmbedderException.class);
 
         assertTrue(didExecuteTryRemoveLocalArtifact[0]);
     }

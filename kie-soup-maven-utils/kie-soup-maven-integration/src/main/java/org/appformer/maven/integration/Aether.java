@@ -90,9 +90,9 @@ public class Aether {
         Collection<RemoteRepository> reps = new HashSet<RemoteRepository>();
         if (!isForcedOffline()){
             reps.add( newCentralRepository() );
-        }
-        if ( mavenProject != null ) {
-            reps.addAll( mavenProject.getRemoteProjectRepositories() );
+            if ( mavenProject != null ) {
+                reps.addAll( mavenProject.getRemoteProjectRepositories() );
+            }
         }
 
         RemoteRepository localRepo = newLocalRepository();

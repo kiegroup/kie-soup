@@ -16,16 +16,19 @@
 
 package org.appformer.maven.integration;
 
-import org.assertj.core.api.Condition;
+import java.util.Collections;
+
+import org.apache.maven.project.MavenProject;
+import org.appformer.maven.integration.embedder.MavenSettings;
 import org.eclipse.aether.repository.Proxy;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.Test;
-import org.appformer.maven.integration.embedder.MavenSettings;
 
+import static org.appformer.maven.integration.embedder.MavenSettings.CUSTOM_SETTINGS_PROPERTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.appformer.maven.integration.embedder.MavenSettings.CUSTOM_SETTINGS_PROPERTY;
-import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AetherTest {
 
@@ -73,7 +76,10 @@ public class AetherTest {
     public void testForcedOffline() {
         final RemoteRepository central = new RemoteRepository.Builder( "central", "default", "http://repo1.maven.org/maven2/" ).build();
 
-        final Aether aether = new Aether(null) {
+        final MavenProject mavenProject = mock(MavenProject.class);
+        when(mavenProject.getRemoteProjectRepositories()).thenReturn(Collections.singletonList(central));
+
+        final Aether aether = new Aether(mavenProject) {
             @Override
             boolean isForcedOffline() {
                 return true;
@@ -86,13 +92,15 @@ public class AetherTest {
     public void testNotOffline() {
         final RemoteRepository central = new RemoteRepository.Builder( "central", "default", "http://repo1.maven.org/maven2/" ).build();
 
-        final Aether aether = new Aether(null) {
+        final MavenProject mavenProject = mock(MavenProject.class);
+        when(mavenProject.getRemoteProjectRepositories()).thenReturn(Collections.singletonList(central));
+
+        final Aether aether = new Aether(mavenProject) {
             @Override
             boolean isForcedOffline() {
                 return false;
             }
         };
-
 
         assertThat(aether.getRepositories()).contains(central);
     }
