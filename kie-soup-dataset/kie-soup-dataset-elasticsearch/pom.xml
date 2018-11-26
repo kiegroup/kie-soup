@@ -40,12 +40,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <configuration combine.self="override">
+        <configuration>
           <!-- Run the integration Test Suite. Skip the local for development.-->
-          <includes>
+          <includes combine.self="override">
             <include>**/*TestSuite.java</include>
           </includes>
-          <excludes>
+          <excludes combine.self="override">
             <exclude>**/LocalTestSuite.java</exclude>
           </excludes>
         </configuration>
@@ -262,9 +262,9 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <configuration combine.self="override">
+            <configuration>
               <!-- Run the integration Test Suite. Skip the local for development.-->
-              <includes>
+              <includes combine.self="override">
                 <include>**/LocalTestSuite.java</include>
               </includes>
             </configuration>
