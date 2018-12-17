@@ -17,6 +17,7 @@
 package org.kie.soup.commons.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Lists {
@@ -30,6 +31,16 @@ public class Lists {
 
         public Lists.Builder<E> add(E e) {
             result.add(e);
+            return this;
+        }
+
+        public Lists.Builder<E> addAll(List<E> elements) {
+            result.addAll(elements);
+            return this;
+        }
+
+        public Lists.Builder<E> addAll(Collection<E> elements) {
+            result.addAll(elements);
             return this;
         }
 

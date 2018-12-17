@@ -16,10 +16,14 @@
 
 package org.kie.soup.commons.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -58,5 +62,32 @@ public class ListsTest {
         assertEquals(2, list.size());
         assertTrue(list.contains(E_1));
         assertTrue(list.contains(E_2));
+    }
+
+    @Test
+    public void testAddAll() {
+        List<String> strings = new ArrayList<>();
+        strings.add("first");
+        strings.add("second");
+        strings.add("third");
+
+        List<String> tested = new Lists.Builder<String>()
+                .addAll(strings).build();
+
+        assertEquals(strings, tested);
+    }
+
+    @Test
+    public void testAddAllFromCollection() {
+        Collection<String> strings = new HashSet<>();
+        strings.add("first");
+        strings.add("second");
+        strings.add("third");
+
+        List<String> tested = new Lists.Builder<String>()
+                .addAll(strings).build();
+
+        assertThat(tested).containsSequence(strings);
+        assertThat(tested.size()).isEqualTo(strings.size());
     }
 }
