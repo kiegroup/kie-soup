@@ -20,6 +20,7 @@ package org.kie.soup.project.datamodel.oracle;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.kie.soup.commons.validation.PortablePreconditions;
 
@@ -29,7 +30,7 @@ import org.kie.soup.commons.validation.PortablePreconditions;
 public class Annotation {
 
     private String qualifiedTypeName;
-    private Map<String, Object> parameters = new HashMap<String, Object>();
+    private Map<String, Object> parameters = new HashMap<>();
 
     public Annotation() {
         //Needed for Errai marshalling
@@ -55,5 +56,27 @@ public class Annotation {
                                            name);
         this.parameters.put(name,
                             value);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Annotation that = (Annotation) o;
+        return Objects.equals(qualifiedTypeName, that.qualifiedTypeName) &&
+                Objects.equals(parameters, that.parameters);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hashCode(qualifiedTypeName);
+        result = ~~result;
+        result = 31 * result + Objects.hashCode(parameters);
+        result = ~~result;
+        return result;
     }
 }
