@@ -15,6 +15,10 @@
  */
 package org.dashbuilder.dataprovider.sql;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -25,13 +29,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.sql.DataSource;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dashbuilder.dataprovider.sql.dialect.DB2Dialect;
 import org.dashbuilder.dataprovider.sql.dialect.DefaultDialect;
@@ -274,6 +277,7 @@ public class JDBCUtils {
 
             // Text-like columns.
             case Types.LONGVARCHAR:
+            case Types.CLOB:
             case Types.LONGNVARCHAR: {
                 return ColumnType.TEXT;
             }
@@ -303,5 +307,23 @@ public class JDBCUtils {
                 return null;
             }
         }
+    }
+
+    /**
+     * Converts a clob value to String
+     * @param value
+     *  The clob value to be converted
+     * @return
+     * The clob String value or an empty String if there's any problem converting it 
+     */
+    public static String clobToString(Clob value) {
+        String result = "";
+        try {
+            Reader valueReader = value.getCharacterStream();
+            result = IOUtils.toString(valueReader);
+        } catch (Exception e) {
+            log.debug("Not able to convert Clob", e);
+        }
+        return result;
     }
 }
