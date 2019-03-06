@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie.soup</groupId>
+    <artifactId>kie-soup-dataset</artifactId>
+    <version>7.19.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>kie-soup-dataset-sql-tests</artifactId>
+  <packaging>pom</packaging>
+
+  <name>KIE Soup Dataset SQL Tests</name>
+
+  <!--
+      Every test module has deps against a JDBC driver and a server instance.
+      This is the main reason DB integration tests are not part of the build.
+  -->
+  <!--modules>
+    <module>kie-soup-dataset-sql-tests-h2</module>
+    <module>kie-soup-dataset-sql-tests-mysql</module>
+    <module>kie-soup-dataset-sql-tests-mariadb</module>
+    <module>kie-soup-dataset-sql-tests-postgres</module>
+    <module>kie-soup-dataset-sql-tests-oracle</module>
+    <module>kie-soup-dataset-sql-tests-sqlserver</module>
+    <module>kie-soup-dataset-sql-tests-db2</module>
+    <module>kie-soup-dataset-sql-tests-sybase</module>
+    <module>kie-soup-dataset-sql-tests-monetdb</module>
+  </modules-->
+
+  <dependencies>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.soup</groupId>
+      <artifactId>kie-soup-dataset-api</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.soup</groupId>
+      <artifactId>kie-soup-dataset-core</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.soup</groupId>
+      <artifactId>kie-soup-dataset-sql</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.soup</groupId>
+      <artifactId>kie-soup-dataset-sql</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+</project>
