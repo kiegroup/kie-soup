@@ -25,6 +25,7 @@ import java.sql.Statement;
 import org.dashbuilder.dataset.DataColumn;
 import org.dashbuilder.dataset.DataSet;
 import org.dashbuilder.dataset.def.SQLDataSetDef;
+import org.junit.Before;
 import org.junit.Test;
 
 public class SQLColumnsTypeTest extends SQLDataSetTestBase {
@@ -34,9 +35,27 @@ public class SQLColumnsTypeTest extends SQLDataSetTestBase {
     String CLOB_COLUMN = "CLOB_CL";
     String CLOB_VAL = "TEST_CLOB";
 
+    @Before
+    public void prepareForClobTest() throws SQLException {
+        String TABLE_SQL = "CREATE TABLE "+ CLOB_TABLE +" ("
+                + "ID INTEGER PRIMARY KEY,"
+                + CLOB_COLUMN + " CLOB);";
+        String INSERT = "INSERT INTO " + CLOB_TABLE + " VALUES(1, '"+ CLOB_VAL + "')";
+        Statement stmt = conn.createStatement();
+        stmt.executeUpdate(TABLE_SQL);
+        stmt.executeUpdate(INSERT);
+    }
+    
+    @Override
+    public void tearDown() throws Exception {
+        String DELETE = "DROP TABLE " + CLOB_TABLE;
+        Statement stmt = conn.createStatement();
+        stmt.executeUpdate(DELETE);
+        super.tearDown();
+    }
+    
     @Test
     public void clobColumnTest() throws Exception {
-        prepareForClobTest();
         
         SQLDataSetDef def = new SQLDataSetDef();
         def.setDbTable(CLOB_TABLE);
@@ -53,14 +72,5 @@ public class SQLColumnsTypeTest extends SQLDataSetTestBase {
         assertEquals(CLOB_VAL, object.toString());
     }
 
-    private void prepareForClobTest() throws SQLException {
-        String TABLE_SQL = "CREATE TABLE "+ CLOB_TABLE +" ("
-                + "ID INTEGER PRIMARY KEY,"
-                + CLOB_COLUMN + " CLOB);";
-        String INSERT = "INSERT INTO " + CLOB_TABLE + " VALUES(1, '"+ CLOB_VAL + "')";
-        Statement stmt = conn.createStatement();
-        stmt.executeUpdate(TABLE_SQL);
-        stmt.executeUpdate(INSERT);
-    }
     
 }

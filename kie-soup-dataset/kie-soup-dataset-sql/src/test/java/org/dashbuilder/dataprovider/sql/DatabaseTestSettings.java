@@ -39,20 +39,27 @@ public class DatabaseTestSettings {
     public static final String MONETDB = "monetdb";
 
     protected Properties connectionSettings;
-
+    
     public DatabaseTestSettings() {
-        String type = getDatabaseType();
-        connectionSettings = new Properties();
-        String propsFile = "testdb-" + type + ".properties";
-        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(propsFile);
-        if (is != null) {
-            try {
-                connectionSettings.load(is);
-            } catch (IOException e) {
-                throw new RuntimeException("Database settings file load error: " + propsFile, e);
+        this(false);
+    }
+
+    public DatabaseTestSettings(boolean externalDatasourceConfig) {
+        
+        if (!externalDatasourceConfig) {
+            String type = getDatabaseType();
+            connectionSettings = new Properties();
+            String propsFile = "testdb-" + type + ".properties";
+            InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(propsFile);
+            if (is != null) {
+                try {
+                    connectionSettings.load(is);
+                } catch (IOException e) {
+                    throw new RuntimeException("Database settings file load error: " + propsFile, e);
+                }
+            } else {
+                throw new IllegalArgumentException("Database settings file not found in classpath: " + propsFile);
             }
-        } else {
-            throw new IllegalArgumentException("Database settings file not found in classpath: " + propsFile);
         }
     }
 

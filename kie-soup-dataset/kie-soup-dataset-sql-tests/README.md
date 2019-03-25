@@ -1,34 +1,20 @@
-SQL data provider integration tests
-------------------------------------------
+Tests for SQL Datasets that can run with any database
+--
 
-The *dashbuilder-dataset-sql* module contains all the SQL data provider tests. By default, those tests are executed
-against an H2 in memory database. The maven modules under this directory just get all those all tests and execute them
-against an specific database configuration.
+Run all tests using a SQL dataset. By default it uses the in-memory H2 database, but you can replace changes in pom.xml for another database. Here's an example of properties for a MySQL database:
 
-The procedure for running the test battery against a given DB is always the same.
-
-For instance, to execute the tests under Oracle:
-
-1. Download the driver from the Oracle web site
-
-2. *cd dashbuilder/dashbuilder-backend/dashbuilder-dataset-sql-tests/dashbuilder-dataset-sql-tests-oracle*
-
-3. Edit *pom.xml* and change the driver's path property *oracle.driver.path*
-
-4. Edit *src/test/resources/testdb-oracle.properties*" and configure the data source connection properties
-
-5. Run the tests
-
-        mvn clean install
-
-  (append *-Dorg.slf4j.simpleLogger.log.org.dashbuilder.dataprovider.sql.JDBCUtils=debug*
-   if you want to see the actual SQL logs being executed)
-
-     
-        NOTE: The tests do not change the database contents since all the temporal data created is removed once finished.
-
-
-The procedure above can be applied to any of the commercial DBs supported: Oracle, SQLServer, DB2 or Sybase.
-
-For the rest of open source DBs you can skip steps #1 to #3 since the driver is added as a module dependency.
-
+~~~
+    <!-- These are properties used in the database profiles. Some of them 
+      must be initialized to be empty so that Maven applies their values via filtering 
+      to the resources. -->
+    <maven.datasource.classname>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</maven.datasource.classname>
+    <maven.jdbc.driver.class>com.mysql.cj.jdbc.Driver</maven.jdbc.driver.class>
+    <maven.jdbc.db.name>test</maven.jdbc.db.name>
+    <maven.jdbc.db.port>3306</maven.jdbc.db.port>
+    <maven.jdbc.db.server>localhost</maven.jdbc.db.server>
+    <maven.jdbc.driver.jar>/home/wsiqueir/Downloads/mysql-connector-java-5.1.47.jar</maven.jdbc.driver.jar>
+    <maven.jdbc.username>root</maven.jdbc.username>
+    <maven.jdbc.password/>
+    <maven.jdbc.url>jdbc:mysql://localhost/test</maven.jdbc.url>
+    <maven.jdbc.schema>public</maven.jdbc.schema>
+~~~

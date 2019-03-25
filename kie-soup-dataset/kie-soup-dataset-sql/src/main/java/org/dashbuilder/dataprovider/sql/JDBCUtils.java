@@ -15,8 +15,6 @@
  */
 package org.dashbuilder.dataprovider.sql;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.sql.Clob;
 import java.sql.Connection;
@@ -318,8 +316,7 @@ public class JDBCUtils {
      */
     public static String clobToString(Clob value) {
         String result = "";
-        try {
-            Reader valueReader = value.getCharacterStream();
+        try (Reader valueReader = value.getCharacterStream()) {
             result = IOUtils.toString(valueReader);
         } catch (Exception e) {
             log.debug("Not able to convert Clob", e);
