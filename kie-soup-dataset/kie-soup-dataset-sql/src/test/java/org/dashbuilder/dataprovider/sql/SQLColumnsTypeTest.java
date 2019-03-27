@@ -30,39 +30,43 @@ import org.junit.Test;
 
 public class SQLColumnsTypeTest extends SQLDataSetTestBase {
     
-
     String CLOB_TABLE = "CLOB_TABLE";
     String CLOB_COLUMN = "CLOB_CL";
     String CLOB_VAL = "TEST_CLOB";
 
     @Before
     public void prepareForClobTest() throws SQLException {
-        String TABLE_SQL = "CREATE TABLE "+ CLOB_TABLE +" ("
-                + "ID INTEGER PRIMARY KEY,"
-                + CLOB_COLUMN + " CLOB);";
+        String TABLE_SQL = createTableWithClobSQL();
         String INSERT = "INSERT INTO " + CLOB_TABLE + " VALUES(1, '"+ CLOB_VAL + "')";
         Statement stmt = conn.createStatement();
         stmt.executeUpdate(TABLE_SQL);
         stmt.executeUpdate(INSERT);
     }
-    
+
     @Override
     public void tearDown() throws Exception {
-        String DELETE = "DROP TABLE " + CLOB_TABLE;
-        Statement stmt = conn.createStatement();
-        stmt.executeUpdate(DELETE);
+        removeClobTable();
         super.tearDown();
+    }
+
+    @Override
+    public void testAll() throws Exception {
+        // before won't work when running all tests
+        prepareForClobTest();
+        clobColumnTest();
+        removeClobTable();
     }
     
     @Test
     public void clobColumnTest() throws Exception {
-        
         SQLDataSetDef def = new SQLDataSetDef();
         def.setDbTable(CLOB_TABLE);
         
-        def.setDataSource("jdbc:h2:mem:test");
+        // it does not actually matter what is the datasource name
+        // it will use the settings provided by the current test settings
+        // and by default the datasource name is ignored.
+        def.setDataSource("test");
         dataSetDefRegistry.registerDataSetDef(def);
-        
         DataSet ds = sqlDataSetProvider.lookupDataSet(def, null);
         
         DataColumn clobColumn = ds.getColumnById(CLOB_COLUMN);
@@ -71,6 +75,32 @@ public class SQLColumnsTypeTest extends SQLDataSetTestBase {
         Object object = clobColumn.getValues().get(0);
         assertEquals(CLOB_VAL, object.toString());
     }
-
+    
+    /**
+     * CLOB type may not be present in some DBMS systems.
+     * 
+     * @return
+     *  The SQL create table specific for the current database.
+     */
+    private String createTableWithClobSQL() {
+        String databaseType = testSettings.getDatabaseType();
+        switch(databaseType) {
+            case DatabaseTestSettings.MYSQL:
+            case DatabaseTestSettings.MARIADB:
+                return  "CREATE TABLE "+ CLOB_TABLE +" ("
+                        + "ID INTEGER PRIMARY KEY,"
+                        + CLOB_COLUMN + " LONGTEXT);";
+            default:
+            return "CREATE TABLE "+ CLOB_TABLE +" ("
+                    + "ID INTEGER PRIMARY KEY,"
+                    + CLOB_COLUMN + " CLOB);";
+        } 
+    }
+    
+    private void removeClobTable() throws SQLException {
+        String DELETE = "DROP TABLE " + CLOB_TABLE;
+        Statement stmt = conn.createStatement();
+        stmt.executeUpdate(DELETE);
+    }
     
 }
