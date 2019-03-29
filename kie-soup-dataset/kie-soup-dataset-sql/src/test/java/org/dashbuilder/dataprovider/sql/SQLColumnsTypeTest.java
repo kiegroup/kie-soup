@@ -90,10 +90,14 @@ public class SQLColumnsTypeTest extends SQLDataSetTestBase {
                 return  "CREATE TABLE "+ CLOB_TABLE +" ("
                         + "ID INTEGER PRIMARY KEY,"
                         + CLOB_COLUMN + " LONGTEXT);";
+            case DatabaseTestSettings.POSTGRES:
+                return  "CREATE TABLE "+ CLOB_TABLE +" ("
+                        + "ID INTEGER PRIMARY KEY,"
+                        + CLOB_COLUMN + " TEXT);";    
             default:
-            return "CREATE TABLE "+ CLOB_TABLE +" ("
-                    + "ID INTEGER PRIMARY KEY,"
-                    + CLOB_COLUMN + " CLOB);";
+                return "CREATE TABLE "+ CLOB_TABLE +" ("
+                        + "ID INTEGER PRIMARY KEY,"
+                        + CLOB_COLUMN + " CLOB);";
         } 
     }
     
