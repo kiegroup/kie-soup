@@ -22,11 +22,12 @@ import org.dashbuilder.dataprovider.DataSetProvider;
 import org.dashbuilder.dataprovider.DataSetProviderRegistry;
 import org.dashbuilder.dataprovider.DataSetProviderType;
 import org.dashbuilder.dataprovider.StaticDataSetProvider;
-import org.dashbuilder.dataset.exception.DataSetLookupException;
 import org.dashbuilder.dataset.def.DataSetDef;
 import org.dashbuilder.dataset.def.DataSetDefRegistry;
+import org.dashbuilder.dataset.def.DataSetPostProcessor;
 import org.dashbuilder.dataset.def.DataSetPreprocessor;
 import org.dashbuilder.dataset.def.StaticDataSetDef;
+import org.dashbuilder.dataset.exception.DataSetLookupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,8 +151,14 @@ public class DataSetManagerImpl implements DataSetManager {
             }
         }
         try {
-            return resolveProvider(dataSetDef)
-                    .lookupDataSet(dataSetDef, lookup);
+            final DataSet dataSet = resolveProvider(dataSetDef).lookupDataSet(dataSetDef, lookup);
+
+            List<DataSetPostProcessor> dataSetDefPostProcessors = dataSetDefRegistry.getDataSetDefPostProcessors(uuid);
+            if (dataSetDefPostProcessors != null) {
+                dataSetDefPostProcessors.forEach(post -> post.postProcess(lookup, dataSet));
+            }
+
+            return dataSet;
         } catch (Exception e) {
             throw new DataSetLookupException(uuid, "Can't lookup on specified data set: " + lookup.getDataSetUUID(), e);
         }

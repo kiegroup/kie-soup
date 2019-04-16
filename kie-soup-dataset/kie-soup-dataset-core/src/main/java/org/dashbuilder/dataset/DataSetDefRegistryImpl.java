@@ -26,6 +26,7 @@ import org.dashbuilder.dataprovider.DataSetProvider;
 import org.dashbuilder.dataprovider.DataSetProviderRegistry;
 import org.dashbuilder.dataprovider.DataSetProviderType;
 import org.dashbuilder.dataset.def.DataSetDefRegistryListener;
+import org.dashbuilder.dataset.def.DataSetPostProcessor;
 import org.dashbuilder.dataset.def.DataSetPreprocessor;
 import org.dashbuilder.dataset.date.TimeAmount;
 import org.dashbuilder.dataset.def.DataSetDef;
@@ -79,6 +80,7 @@ public class DataSetDefRegistryImpl implements DataSetDefRegistry {
         long refreshInMillis;
 
         List<DataSetPreprocessor> preprocessors;
+        List<DataSetPostProcessor> postProcessors;
 
         public DataSetDefEntry(DataSetDef def) {
             this.def = def;
@@ -98,8 +100,19 @@ public class DataSetDefRegistryImpl implements DataSetDefRegistry {
             preprocessors.add(preprocessor);
         }
 
+        public void registerDataSetPostProcessor(DataSetPostProcessor postProcessor) {
+            if (postProcessors == null) {
+                postProcessors = new ArrayList<>();
+            }
+            postProcessors.add(postProcessor);
+        }
+
         public List<DataSetPreprocessor> getDataSetPreprocessors() {
             return preprocessors;
+        }
+
+        public List<DataSetPostProcessor> getDataSetPostProcessors() {
+            return postProcessors;
         }
 
         public void schedule() {
@@ -180,12 +193,28 @@ public class DataSetDefRegistryImpl implements DataSetDefRegistry {
         record.registerDataSetPreprocessor(preprocessor);
     }
 
+    public synchronized void registerPostProcessor(String uuid, DataSetPostProcessor postProcessor) {
+        DataSetDefEntry record = dataSetDefMap.get(uuid);
+        if (record == null) {
+            throw new IllegalStateException("DataSetDef not found: " + uuid);
+        }
+        record.registerDataSetPostProcessor(postProcessor);
+    }
+
     public synchronized List<DataSetPreprocessor> getDataSetDefPreProcessors(String uuid) {
         DataSetDefEntry record = dataSetDefMap.get(uuid);
         if (record == null) {
             return null;
         }
         return record.getDataSetPreprocessors();
+    }
+
+    public synchronized List<DataSetPostProcessor> getDataSetDefPostProcessors(String uuid) {
+        DataSetDefEntry record = dataSetDefMap.get(uuid);
+        if (record == null) {
+            return null;
+        }
+        return record.getDataSetPostProcessors();
     }
 
     public synchronized void registerDataSetDef(DataSetDef newDef) {

@@ -15,9 +15,11 @@
  */
 package org.dashbuilder.dataset;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.dashbuilder.dataset.filter.DataSetFilter;
 import org.dashbuilder.dataset.group.ColumnGroup;
@@ -54,6 +56,8 @@ public class DataSetLookup {
      * The list of operations to apply on the target data set as part of the lookup operation.
      */
     protected List<DataSetOp> operationList = new ArrayList<DataSetOp>();
+    
+    private final Map<String, Object> metadata = new HashMap<>();
 
     public DataSetLookup() {
     }
@@ -118,6 +122,14 @@ public class DataSetLookup {
 
     public List<DataSetOp> getOperationList() {
         return operationList;
+    }
+
+    public Object getMetadata(String key) {
+        return metadata.get(key);
+    }
+    
+    public void setMetadata(String key, Object value){
+        metadata.put(key, value);
     }
 
     public <T extends DataSetOp> List<T> getOperationList(Class<T> type) {
@@ -261,7 +273,8 @@ public class DataSetLookup {
         }
         return clone;
     }
-
+    
+    @Override
     public boolean equals(Object obj) {
         try {
             DataSetLookup other = (DataSetLookup) obj;

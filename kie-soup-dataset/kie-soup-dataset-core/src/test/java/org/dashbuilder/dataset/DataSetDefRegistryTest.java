@@ -16,18 +16,16 @@
 package org.dashbuilder.dataset;
 
 import org.dashbuilder.DataSetCore;
-import org.dashbuilder.dataset.def.DataSetDef;
-import org.dashbuilder.dataset.def.DataSetDefFactory;
-import org.dashbuilder.dataset.def.DataSetDefRegistry;
-import org.dashbuilder.dataset.def.DataSetDefRegistryListener;
+import org.dashbuilder.dataset.def.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataSetDefRegistryTest {
@@ -71,5 +69,25 @@ public class DataSetDefRegistryTest {
 
         dataSetDefRegistry.removeDataSetDef("sequence");
         verify(registryListener).onDataSetDefRemoved(modifiedDef);
+    }
+
+    @Test
+    public void testEventListeners() throws Exception {
+        String dataSetUUID = "expense_reports";
+        DataSetManager dataSetManager = DataSetCore.get().getDataSetManager();
+        DataSet dataSet = ExpenseReportsData.INSTANCE.toDataSet();
+        dataSet.setUUID(dataSetUUID);
+        dataSetManager.registerDataSet(dataSet);
+
+        final DataSetPreprocessor dataSetPreprocessor = mock(DataSetPreprocessor.class);
+        dataSetDefRegistry.registerPreprocessor(dataSetUUID, dataSetPreprocessor);
+        final DataSetPostProcessor dataSetPostProcessor = mock(DataSetPostProcessor.class);
+        dataSetDefRegistry.registerPostProcessor(dataSetUUID, dataSetPostProcessor);
+
+        DataSetLookup dataSetLookup = DataSetLookupFactory.newDataSetLookupBuilder().dataset(dataSetUUID).buildLookup();
+        dataSet = dataSetManager.lookupDataSet(dataSetLookup);
+
+        verify(dataSetPreprocessor).preprocess(dataSetLookup);
+        verify(dataSetPostProcessor).postProcess(dataSetLookup, dataSet);
     }
 }
