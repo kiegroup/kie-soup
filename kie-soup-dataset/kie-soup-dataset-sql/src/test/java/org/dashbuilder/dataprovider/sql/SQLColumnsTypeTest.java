@@ -38,9 +38,8 @@ public class SQLColumnsTypeTest extends SQLDataSetTestBase {
     public void prepareForClobTest() throws SQLException {
         String TABLE_SQL = createTableWithClobSQL();
         String INSERT = "INSERT INTO " + CLOB_TABLE + " VALUES(1, '"+ CLOB_VAL + "')";
-        Statement stmt = conn.createStatement();
-        stmt.executeUpdate(TABLE_SQL);
-        stmt.executeUpdate(INSERT);
+        JDBCUtils.execute(conn, TABLE_SQL);
+        JDBCUtils.execute(conn, INSERT);
     }
 
     @Override
@@ -89,15 +88,15 @@ public class SQLColumnsTypeTest extends SQLDataSetTestBase {
             case DatabaseTestSettings.MARIADB:
                 return  "CREATE TABLE "+ CLOB_TABLE +" ("
                         + "ID INTEGER PRIMARY KEY,"
-                        + CLOB_COLUMN + " LONGTEXT);";
+                        + CLOB_COLUMN + " LONGTEXT)";
             case DatabaseTestSettings.POSTGRES:
                 return  "CREATE TABLE "+ CLOB_TABLE +" ("
                         + "ID INTEGER PRIMARY KEY,"
-                        + CLOB_COLUMN + " TEXT);";    
+                        + CLOB_COLUMN + " TEXT)";
             default:
                 return "CREATE TABLE "+ CLOB_TABLE +" ("
                         + "ID INTEGER PRIMARY KEY,"
-                        + CLOB_COLUMN + " CLOB);";
+                        + CLOB_COLUMN + " CLOB)";
         } 
     }
     
