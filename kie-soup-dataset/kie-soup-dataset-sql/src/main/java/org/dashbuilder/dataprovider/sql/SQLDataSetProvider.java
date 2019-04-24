@@ -15,6 +15,7 @@
  */
 package org.dashbuilder.dataprovider.sql;
 
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
@@ -1060,7 +1062,12 @@ public class SQLDataSetProvider implements DataSetProvider, DataSetDefRegistryLi
             while (_rs.next() && (numRows < 0 || rowIdx++ < numRows)) {
                 for (int i=0; i<columns.size(); i++) {
                     DataColumn column = dataSet.getColumnByIndex(i);
-                    column.getValues().add(_rs.getObject(i+1));
+                    Object value = _rs.getObject(i+1);
+                    // Clob conversion must be done when object is still open
+                    if (value instanceof Clob) {
+                        value = JDBCUtils.clobToString((Clob) value);
+                    }
+                    column.getValues().add(value);
                 }
             }
 
