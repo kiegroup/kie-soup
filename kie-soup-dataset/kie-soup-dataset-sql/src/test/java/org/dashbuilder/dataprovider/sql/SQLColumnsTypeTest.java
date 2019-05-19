@@ -16,6 +16,8 @@
 
 package org.dashbuilder.dataprovider.sql;
 
+import static org.dashbuilder.dataprovider.sql.SQLFactory.dropTable;
+import static org.dashbuilder.dataprovider.sql.SQLFactory.table;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -37,15 +39,15 @@ public class SQLColumnsTypeTest extends SQLDataSetTestBase {
     @Before
     public void prepareForClobTest() throws SQLException {
         String TABLE_SQL = createTableWithClobSQL();
-        String INSERT = "INSERT INTO " + CLOB_TABLE + " VALUES(1, '"+ CLOB_VAL + "')";
+        String INSERT = "INSERT INTO " + CLOB_TABLE + " VALUES('"+ CLOB_VAL + "')";
         JDBCUtils.execute(conn, TABLE_SQL);
         JDBCUtils.execute(conn, INSERT);
     }
 
     @Override
     public void tearDown() throws Exception {
-        removeClobTable();
         super.tearDown();
+        removeClobTable();
     }
 
     @Override
@@ -87,20 +89,23 @@ public class SQLColumnsTypeTest extends SQLDataSetTestBase {
             case DatabaseTestSettings.MYSQL:
             case DatabaseTestSettings.MARIADB:
                 return  "CREATE TABLE "+ CLOB_TABLE +" ("
-                        + "ID INTEGER PRIMARY KEY,"
                         + CLOB_COLUMN + " LONGTEXT)";
             case DatabaseTestSettings.POSTGRES:
                 return  "CREATE TABLE "+ CLOB_TABLE +" ("
-                        + "ID INTEGER PRIMARY KEY,"
                         + CLOB_COLUMN + " TEXT)";
+            case DatabaseTestSettings.SYBASE:
+                return  "CREATE TABLE "+ CLOB_TABLE +" ("
+                        + CLOB_COLUMN + " VARCHAR(1000))";   
+            case DatabaseTestSettings.SQLSERVER:
+                return  "CREATE TABLE "+ CLOB_TABLE +" ("
+                        + CLOB_COLUMN + " VARCHAR(max))"; 
             default:
                 return "CREATE TABLE "+ CLOB_TABLE +" ("
-                        + "ID INTEGER PRIMARY KEY,"
                         + CLOB_COLUMN + " CLOB)";
         } 
     }
     
-    private void removeClobTable() throws SQLException {
+    public void removeClobTable() throws SQLException {
         String DELETE = "DROP TABLE " + CLOB_TABLE;
         Statement stmt = conn.createStatement();
         stmt.executeUpdate(DELETE);

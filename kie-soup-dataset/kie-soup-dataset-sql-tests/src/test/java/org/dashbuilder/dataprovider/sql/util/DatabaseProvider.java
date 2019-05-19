@@ -37,15 +37,11 @@ public class DatabaseProvider {
             return DatabaseTestSettings.MYSQL;
         } else if (sanitizedDriverClassName.startsWith("oracle")) {
             return DatabaseTestSettings.ORACLE;
-        } else if (sanitizedDriverClassName.startsWith("org.postgresql")) {
+        } else if (sanitizedDriverClassName.startsWith("org.postgresql") ||
+                   sanitizedDriverClassName.startsWith("com.edb")) {
             return DatabaseTestSettings.POSTGRES;
-       
         } else if (sanitizedDriverClassName.startsWith("com.sybase")) {
             return DatabaseTestSettings.SYBASE;
-//        } else if (sanitizedDriverClassName.startsWith("com.edb")) {
-//             TODO: Check if this db is supported with dataset APIs 
-//             for now do nothing and let the illegal argument exception be thrown
-//             return DatabaseTestSettings.POSTGRES;
         } else {
             throw new IllegalArgumentException("Unsupported database provider with a driver class:" + driverClassName);
         }
