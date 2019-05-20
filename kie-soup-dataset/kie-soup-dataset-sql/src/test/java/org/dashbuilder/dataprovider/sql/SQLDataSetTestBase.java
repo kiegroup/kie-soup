@@ -63,7 +63,7 @@ public class SQLDataSetTestBase {
     }
 
     protected DatabaseTestSettings createTestSettings() {
-        return new DatabaseTestSettings();
+        return DatabaseTestSettingsProvider.get();
     }
 
     public String getExpenseReportsDsetFile() {
