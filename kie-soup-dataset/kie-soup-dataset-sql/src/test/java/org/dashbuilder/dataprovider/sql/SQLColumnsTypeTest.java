@@ -46,8 +46,8 @@ public class SQLColumnsTypeTest extends SQLDataSetTestBase {
 
     @Override
     public void tearDown() throws Exception {
-        super.tearDown();
         removeClobTable();
+        super.tearDown();
     }
 
     @Override
