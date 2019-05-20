@@ -30,6 +30,7 @@ import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.providers.http.HttpWagon;
 import org.appformer.maven.integration.embedder.MavenProjectLoader;
 import org.appformer.maven.integration.embedder.MavenSettings;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -37,14 +38,17 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.impl.DefaultServiceLocator;
+import org.eclipse.aether.internal.transport.wagon.PlexusWagonConfigurator;
+import org.eclipse.aether.internal.transport.wagon.PlexusWagonProvider;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.Proxy;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
-import org.eclipse.aether.transport.http.HttpTransporterFactory;
+import org.eclipse.aether.transport.wagon.WagonConfigurator;
 import org.eclipse.aether.transport.wagon.WagonProvider;
+import org.eclipse.aether.transport.wagon.WagonTransporterFactory;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +114,13 @@ public class Aether {
         DefaultServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
         locator.addService( RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class );
         locator.addService( TransporterFactory.class, FileTransporterFactory.class );
-        locator.addService( TransporterFactory.class, HttpTransporterFactory.class );
+        locator.addService( TransporterFactory.class, WagonTransporterFactory.class );
+        locator.addService( WagonProvider.class, PlexusWagonProvider.class );
+        try {
+            locator.setServices( WagonConfigurator.class, new PlexusWagonConfigurator(new DefaultPlexusContainer()) );
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         locator.setServices( WagonProvider.class, new ManualWagonProvider() );
 
         return locator.getService( RepositorySystem.class );
@@ -147,19 +157,25 @@ public class Aether {
 
         for (Server server : servers) {
             if (server.getConfiguration() instanceof Xpp3Dom ) {
-                Xpp3Dom configDom = (Xpp3Dom) server.getConfiguration();
-                if (configDom != null) {
-                    Xpp3Dom headersConfiguration = configDom.getChild("httpHeaders");
-                    if (headersConfiguration != null) {
-                        Xpp3Dom[] properties = headersConfiguration.getChildren();
-                        if (properties != null && properties.length > 0) {
-                            HashMap<String, String> httpHeaders = new HashMap<>();
-                            for (Xpp3Dom property : properties) {
-                                httpHeaders.put(property.getChild("name").getValue(), property.getChild("value").getValue());
+                Xpp3Dom dom = (Xpp3Dom) server.getConfiguration();
+                if (dom != null) {
+                    for (int i = dom.getChildCount() - 1; i >= 0; i--) {
+                        Xpp3Dom child = dom.getChild(i);
+                        if ("wagonProvider".equals(child.getName())) {
+                            dom.removeChild(i);
+                        } else if ("httpHeaders".equals(child.getName())) {
+                            Xpp3Dom[] properties = child.getChildren();
+                            if (properties != null && properties.length > 0) {
+                                HashMap<String, String> httpHeaders = new HashMap<>();
+                                for (Xpp3Dom property : properties) {
+                                    httpHeaders.put(property.getChild("name").getValue(), property.getChild("value").getValue());
+                                }
+                                session.setConfigProperty(ConfigurationProperties.HTTP_HEADERS + "." + server.getId(), httpHeaders);
                             }
-                            session.setConfigProperty( ConfigurationProperties.HTTP_HEADERS + "." + server.getId(), httpHeaders );
                         }
                     }
+
+                    session.setConfigProperty("aether.connector.wagon.config." + server.getId(), dom);
                 }
             }
         }
