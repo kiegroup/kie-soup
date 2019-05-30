@@ -1,0 +1,49 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <servers>
+    <server>
+      <id>test-server</id>
+      <username>testuser</username>
+      <password>testpassword</password>
+    </server>
+  </servers>
+  <profiles>
+    <profile>
+      <id>jboss</id>
+      <repositories>
+        <repository>
+          <id>test-server</id>
+          <name>Test repository</name>
+          <url>file://home/testuser/.m2/repository/</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>test-server</id>
+          <name>Test repository</name>
+          <url>file://home/testuser/.m2/repository/</url>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>jboss</activeProfile>
+  </activeProfiles>
+  <proxies>
+    <proxy>
+      <active>true</active>
+      <protocol>http</protocol>
+      <host>localhost</host>
+      <port>3128</port>
+    </proxy>
+  </proxies>
+</settings>
