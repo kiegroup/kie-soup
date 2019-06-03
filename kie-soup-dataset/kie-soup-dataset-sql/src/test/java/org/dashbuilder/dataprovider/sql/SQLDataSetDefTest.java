@@ -61,12 +61,27 @@ public class SQLDataSetDefTest extends SQLDataSetTestBase {
         DataSetMetadata metadata = dataSetManager.getDataSetMetadata("expense_reports_allcolumns");
         assertThat(metadata.getNumberOfColumns()).isEqualTo(6);
         assertThat(metadata.getEstimatedSize()).isEqualTo(6350);
+        assertThat(metadata.getNumberOfRows()).isEqualTo(50);
+    }
+
+    @Test
+    public void testNoEstimateSize() throws Exception {
+        URL fileURL = Thread.currentThread().getContextClassLoader().getResource("expenseReports_allcolumns.dset");
+        String json = IOUtils.toString(fileURL, StandardCharsets.UTF_8);
+        SQLDataSetDef def = (SQLDataSetDef) jsonMarshaller.fromJson(json);
+        def.setEstimateSize(false);
+        dataSetDefRegistry.registerDataSetDef(def);
+
+        DataSetMetadata metadata = dataSetManager.getDataSetMetadata("expense_reports_allcolumns");
+        assertThat(metadata.getNumberOfColumns()).isEqualTo(6);
+        assertThat(metadata.getEstimatedSize()).isEqualTo(0);
+        assertThat(metadata.getNumberOfRows()).isEqualTo(0);
     }
 
     @Test
     public void testSQLDataSet() throws Exception {
-        String testDsetFile = testSettings.getExpenseReportsSqlDsetFile();
-        URL fileURL = Thread.currentThread().getContextClassLoader().getResource(testDsetFile);
+        String testDataSetFile = testSettings.getExpenseReportsSqlDsetFile();
+        URL fileURL = Thread.currentThread().getContextClassLoader().getResource(testDataSetFile);
         String json = IOUtils.toString(fileURL, StandardCharsets.UTF_8);
         SQLDataSetDef def = (SQLDataSetDef) jsonMarshaller.fromJson(json);
         dataSetDefRegistry.registerDataSetDef(def);
@@ -74,6 +89,7 @@ public class SQLDataSetDefTest extends SQLDataSetTestBase {
         DataSetMetadata metadata = dataSetManager.getDataSetMetadata("expense_reports_sql");
         assertThat(metadata.getNumberOfColumns()).isEqualTo(3);
         assertThat(metadata.getNumberOfRows()).isEqualTo(6);
+        assertThat(metadata.getEstimatedSize()).isEqualTo(342);
 
         final String uuid = "expense_reports_sql";
         DataSet dataSet = dataSetManager.lookupDataSet(
@@ -104,6 +120,7 @@ public class SQLDataSetDefTest extends SQLDataSetTestBase {
         assertThat(metadata.getNumberOfColumns()).isEqualTo(4);
         if (!testSettings.isMonetDB()) {
             assertThat(metadata.getEstimatedSize()).isEqualTo(4300);
+            assertThat(metadata.getNumberOfRows()).isEqualTo(50);
         }
 
         final String uuid = "expense_reports_columnset";
@@ -164,6 +181,7 @@ public class SQLDataSetDefTest extends SQLDataSetTestBase {
         assertThat(metadata.getNumberOfColumns()).isEqualTo(5);
         if (!testSettings.isMonetDB()) {
             assertThat(metadata.getEstimatedSize()).isEqualTo(666);
+            assertThat(metadata.getNumberOfRows()).isEqualTo(6);
         }
 
         DataSet dataSet = dataSetManager.lookupDataSet(
