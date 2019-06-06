@@ -17,6 +17,8 @@
 
 package org.kie.soup.project.datamodel.oracle;
 
+import java.util.Objects;
+
 /**
  * An Oracle for all things "data type" related
  */
@@ -40,6 +42,7 @@ public class DataType {
     public static final String TYPE_NUMERIC_SHORT = "Short";
     public static final String TYPE_BOOLEAN = "Boolean";
     public static final String TYPE_DATE = "Date";
+    public static final String TYPE_LOCAL_DATE = "LocalDate";
     public static final String TYPE_OBJECT = "Object";                                                                                                                                                      // for all other unknown
     public static final String TYPE_FINAL_OBJECT = "FinalObject";                                                                                                                                                 // for all other unknown
     public static final String TYPE_THIS = "this";
@@ -57,30 +60,34 @@ public class DataType {
         NUMERIC_LONG,
         NUMERIC_SHORT,
         DATE,
+        LOCAL_DATE,
         BOOLEAN
     }
 
-    public static boolean isNumeric( final String type ) {
-        if ( type.equals( TYPE_NUMERIC ) ) {
+    public static boolean isNumeric(final String type) {
+        if (type.equals(TYPE_NUMERIC)) {
             return true;
-        } else if ( type.equals( TYPE_NUMERIC_BIGDECIMAL ) ) {
+        } else if (type.equals(TYPE_NUMERIC_BIGDECIMAL)) {
             return true;
-        } else if ( type.equals( TYPE_NUMERIC_BIGINTEGER ) ) {
+        } else if (type.equals(TYPE_NUMERIC_BIGINTEGER)) {
             return true;
-        } else if ( type.equals( TYPE_NUMERIC_BYTE ) ) {
+        } else if (type.equals(TYPE_NUMERIC_BYTE)) {
             return true;
-        } else if ( type.equals( TYPE_NUMERIC_DOUBLE ) ) {
+        } else if (type.equals(TYPE_NUMERIC_DOUBLE)) {
             return true;
-        } else if ( type.equals( TYPE_NUMERIC_FLOAT ) ) {
+        } else if (type.equals(TYPE_NUMERIC_FLOAT)) {
             return true;
-        } else if ( type.equals( TYPE_NUMERIC_INTEGER ) ) {
+        } else if (type.equals(TYPE_NUMERIC_INTEGER)) {
             return true;
-        } else if ( type.equals( TYPE_NUMERIC_LONG ) ) {
+        } else if (type.equals(TYPE_NUMERIC_LONG)) {
             return true;
-        } else if ( type.equals( TYPE_NUMERIC_SHORT ) ) {
+        } else if (type.equals(TYPE_NUMERIC_SHORT)) {
             return true;
         }
         return false;
     }
 
+    public static boolean isDate(final String type) {
+        return Objects.equals(type, DataType.TYPE_DATE) || Objects.equals(type, DataType.TYPE_LOCAL_DATE);
+    }
 }
