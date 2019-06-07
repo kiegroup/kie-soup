@@ -39,6 +39,8 @@ public class SQLDataSetDef extends DataSetDef {
     @NotNull(groups = {SQLDataSetDefDbSQLValidation.class})
     @Size(min = 1, groups = {SQLDataSetDefDbSQLValidation.class})
     protected String dbSQL;
+    
+    protected boolean estimateSize = true;
 
     public SQLDataSetDef() {
         super.setProvider(DataSetProviderType.SQL);
@@ -92,6 +94,14 @@ public class SQLDataSetDef extends DataSetDef {
         this.cacheMaxRows = cacheMaxRows;
     }
 
+    public void setEstimateSize(boolean estimateSize) {
+        this.estimateSize = estimateSize;
+    }
+
+    public boolean isEstimateSize() {
+        return estimateSize;
+    }
+
     @Override
     public boolean equals(Object obj) {
         try {
@@ -109,6 +119,9 @@ public class SQLDataSetDef extends DataSetDef {
                 return false;
             }
             if (dbSQL != null && !dbSQL.equals(other.dbSQL)) {
+                return false;
+            }
+            if(estimateSize != other.estimateSize){
                 return false;
             }
             return true;
@@ -134,6 +147,7 @@ public class SQLDataSetDef extends DataSetDef {
         def.setDbSchema(getDbSchema());
         def.setDbTable(getDbTable());
         def.setDbSQL(getDbSQL());
+        def.setEstimateSize(isEstimateSize());
         return def;
     }
 
@@ -155,6 +169,7 @@ public class SQLDataSetDef extends DataSetDef {
         out.append("Get all columns=").append(allColumnsEnabled).append("\n");
         out.append("Cache enabled=").append(cacheEnabled).append("\n");
         out.append("Cache max rows=").append(cacheMaxRows).append(" Kb\n");
+        out.append("Estimate size=").append(estimateSize).append("\n");
         return out.toString();
     }
 }

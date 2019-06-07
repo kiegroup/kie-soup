@@ -46,4 +46,9 @@ public class SQLDataSetDefBuilderImpl extends AbstractDataSetDefBuilder<SQLDataS
         ((SQLDataSetDef) def).setAllColumnsEnabled(allColumns);
         return this;
     }
+
+    public SQLDataSetDefBuilderImpl estimateSize(boolean estimateSize) {
+        ((SQLDataSetDef) def).setEstimateSize(estimateSize);
+        return this;
+    }
 }
