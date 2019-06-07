@@ -19,6 +19,7 @@ import java.io.Reader;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -26,6 +27,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.naming.InitialContext;
 import javax.naming.NameClassPair;
@@ -94,6 +96,18 @@ public class JDBCUtils {
                 log.debug(sql);
             }
             connection.createStatement().execute(sql);
+        } catch (SQLException e) {
+            log.error(sql);
+            throw e;
+        }
+    }
+
+    public static <T> T metadata(Connection connection, String sql, Function<ResultSetMetaData, T> callback) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement(sql)){
+            if (log.isDebugEnabled()) {
+                log.debug(sql);
+            }
+            return callback.apply(ps.getMetaData());
         } catch (SQLException e) {
             log.error(sql);
             throw e;
@@ -193,10 +207,13 @@ public class JDBCUtils {
     }
 
     public static List<Column> getColumns(ResultSet resultSet, String[] exclude) throws SQLException {
+        return getColumns(resultSet.getMetaData(), exclude);        
+    }
+    
+    public static List<Column> getColumns(ResultSetMetaData meta, String[] exclude) throws SQLException {
         List<Column> columnList = new ArrayList<Column>();
         List<String> columnExcluded = exclude == null ? new ArrayList<String>() : Arrays.asList(exclude);
 
-        ResultSetMetaData meta = resultSet.getMetaData();
         for (int i = 1; i <= meta.getColumnCount(); i++) {
             String name = meta.getColumnName(i);
             String alias = meta.getColumnLabel(i);
