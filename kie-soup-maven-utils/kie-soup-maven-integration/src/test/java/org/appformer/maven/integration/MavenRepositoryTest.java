@@ -31,23 +31,46 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class MavenRepositoryTest {
 
     @Test
     public void testMirrors() {
-        MavenRepository repo = new MavenRepositoryMock( Aether.getAether());
-        Collection<RemoteRepository> remoteRepos = repo.getRemoteRepositoriesForRequest();
+        MavenRepositoryMock.setCustomSettingsFileName("settings_with_mirror.xml");
+        final MavenRepository repo = new MavenRepositoryMock(Aether.getAether());
+        final Collection<RemoteRepository> remoteRepos = repo.getRemoteRepositoriesForRequest();
         assertEquals(2, remoteRepos.size());
-        for (RemoteRepository remoteRepo : remoteRepos) {
+        for (final RemoteRepository remoteRepo : remoteRepos) {
             assertTrue(remoteRepo.getId().equals("qa") ||
                        remoteRepo.getId().equals("foo"));
         }
     }
 
+    @Test
+    public void testProxy() {
+        MavenRepositoryMock.setCustomSettingsFileName("settings_custom.xml");
+        final MavenRepository repo = new MavenRepositoryMock(Aether.getAether());
+        final Collection<RemoteRepository> remoteRepos = repo.getRemoteRepositoriesForRequest();
+        assertEquals(5, remoteRepos.size());
+        for (RemoteRepository remoteRepository : remoteRepos) {
+            if (remoteRepository.getId().equals("test-server")) {
+                assertNotNull(remoteRepository.getProxy());
+            }
+        }
+    }
+
     public static class MavenRepositoryMock extends MavenRepository {
-        protected MavenRepositoryMock(Aether aether) {
+
+        private static String customSettingsFileName;
+
+        // This is needed to do like this, because the repository is initialized by calling parent constructor with super().
+        public static void setCustomSettingsFileName(final String customSettingsFileNameParam) {
+            customSettingsFileName = customSettingsFileNameParam;
+        }
+
+        protected MavenRepositoryMock(final Aether aether) {
             super(aether);
         }
 
@@ -57,17 +80,17 @@ public class MavenRepositoryTest {
         }
 
         private Settings getMavenSettings() {
-            String path = getClass().getResource(".").toString().substring("file:".length());
-            File testSettingsFile = new File(path + "settings_with_mirror.xml");
+            final String path = getClass().getResource(".").toString().substring("file:".length());
+            final File testSettingsFile = new File(path + customSettingsFileName);
             assertTrue(testSettingsFile.exists());
 
-            SettingsBuilder settingsBuilder = new DefaultSettingsBuilderFactory().newInstance();
-            DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
+            final SettingsBuilder settingsBuilder = new DefaultSettingsBuilderFactory().newInstance();
+            final DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
             request.setUserSettingsFile( testSettingsFile );
 
             try {
                 return settingsBuilder.build( request ).getEffectiveSettings();
-            } catch ( SettingsBuildingException e ) {
+            } catch ( final SettingsBuildingException e ) {
                 throw new RuntimeException(e);
             }
         }
