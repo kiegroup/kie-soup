@@ -18,13 +18,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <!-- Does not have kie-parent because that would cause circular dependency.
-       Change to kie-parent and remove version properties when UberFire moves to kiegroup. -->
   <parent>
-    <groupId>org.jboss.integration-platform</groupId>
-    <artifactId>jboss-integration-platform-bom</artifactId>
+    <groupId>org.kie</groupId>
+    <artifactId>kie-parent</artifactId>
+    <version>7.24.0-SNAPSHOT</version>
     <!-- Keep in sync with the parent version of kie-soup-bom/pom.xml -->
-    <version>8.6.0.Final</version>
   </parent>
 
   <groupId>org.kie.soup</groupId>
@@ -114,10 +112,12 @@
   <build>
     <pluginManagement>
       <plugins>
+        
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>
-          <dependencies>
+	  <version>${version.enforcer.plugin}</version>
+	  <dependencies>
             <dependency>
               <groupId>org.codehaus.mojo</groupId>
               <artifactId>extra-enforcer-rules</artifactId>
@@ -266,7 +266,8 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <executions>
+	  <version>${version.failsafe.plugin}</version>
+	  <executions>
             <execution>
               <goals>
                 <goal>integration-test</goal>
@@ -548,6 +549,13 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-platform-bom</artifactId>
+	    <version>${project.version}</version>
+	    <type>pom</type>
+	    <scope>import</scope>
+      </dependency>		  
       <dependency>
         <groupId>org.kie.soup</groupId>
         <artifactId>kie-soup-bom</artifactId>
