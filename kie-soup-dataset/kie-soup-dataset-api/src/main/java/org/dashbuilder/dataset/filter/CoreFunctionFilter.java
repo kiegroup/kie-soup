@@ -24,6 +24,7 @@ import java.util.List;
 public class CoreFunctionFilter extends ColumnFilter {
 
     protected CoreFunctionType type = null;
+    protected String labelValue = null;
     protected List parameters = new ArrayList();
 
     public CoreFunctionFilter() {
@@ -52,6 +53,14 @@ public class CoreFunctionFilter extends ColumnFilter {
 
     public void setType(CoreFunctionType type) {
         this.type = type;
+    }
+
+    public String getLabelValue() {
+        return labelValue;
+    }
+
+    public void setLabelValue(String labelValue) {
+        this.labelValue = labelValue;
     }
 
     public List getParameters() {
