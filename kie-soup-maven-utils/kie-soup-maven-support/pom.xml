@@ -14,6 +14,10 @@
 
   <name>Maven-support</name>
 
+  <properties>
+    <java.module.name>org.kie.soup.maven.support</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
