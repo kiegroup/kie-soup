@@ -379,24 +379,26 @@ public class SQLDataSetProvider implements DataSetProvider, DataSetDefRegistryLi
 
 
         // Calculate the estimated size
-        int rowCount = _getRowCount(result.metadata, def, conn);
-        int estimatedSize = 0;
-        for (int i=0; i<targetDbColumnIds.size(); i++) {
-            ColumnType cType = targetDbColumnTypes.get(i);
+        if(def.isEstimateSize()) {
+            int rowCount = _getRowCount(result.metadata, def, conn);
+            int estimatedSize = 0;
+            for (int i = 0; i < targetDbColumnIds.size(); i++) {
+                ColumnType cType = targetDbColumnTypes.get(i);
 
-            if (ColumnType.DATE.equals(cType)) {
-                estimatedSize += MemSizeEstimator.sizeOf(Date.class) * rowCount;
-            } else if (ColumnType.NUMBER.equals(cType)) {
-                estimatedSize += MemSizeEstimator.sizeOf(Double.class) * rowCount;
-            } else {
-                int length = targetDbColumnsLength.get(i);
-                estimatedSize += length / 2 * rowCount;
+                if (ColumnType.DATE.equals(cType)) {
+                    estimatedSize += MemSizeEstimator.sizeOf(Date.class) * rowCount;
+                } else if (ColumnType.NUMBER.equals(cType)) {
+                    estimatedSize += MemSizeEstimator.sizeOf(Double.class) * rowCount;
+                } else {
+                    int length = targetDbColumnsLength.get(i);
+                    estimatedSize += length / 2 * rowCount;
+                }
             }
-        }
 
-        // Update the metadata
-        result.metadata.setNumberOfRows(rowCount);
-        result.metadata.setEstimatedSize(estimatedSize);
+            // Update the metadata
+            result.metadata.setNumberOfRows(rowCount);
+            result.metadata.setEstimatedSize(estimatedSize);
+        }
 
         // Store in the cache
         if (!skipCache) {
@@ -411,9 +413,15 @@ public class SQLDataSetProvider implements DataSetProvider, DataSetDefRegistryLi
         Dialect dialect = JDBCUtils.dialect(conn);
         if (!StringUtils.isBlank(def.getDbSQL())) {
             Select query = SQLFactory.select(conn).from(def.getDbSQL()).limit(1);
-            return JDBCUtils.getColumns(logSQL(query).fetch(), dialect.getExcludedColumns());
-        }
-        else {
+            return JDBCUtils.metadata(conn, def.getDbSQL(), meta -> {
+                try {
+                    return JDBCUtils.getColumns(meta, dialect.getExcludedColumns());
+                } catch (SQLException ex) {
+                    log.error("Error reading SQL metadata", ex);
+                    return null;
+                }
+            });
+        } else {
             Select query = SQLFactory.select(conn).from(_createTable(def)).limit(1);
             return JDBCUtils.getColumns(logSQL(query).fetch(), dialect.getExcludedColumns());
         }
@@ -667,7 +675,9 @@ public class SQLDataSetProvider implements DataSetProvider, DataSetDefRegistryLi
 
                     // Row limits
                     if (trim && postProcessingOps.isEmpty()) {
-                        totalRows = _query.fetchCount();
+                        if(def.isEstimateSize()) {
+                            totalRows = _query.fetchCount();
+                        }
                         _query.limit(lookup.getNumberOfRows()).offset(lookup.getRowOffset());
                     }
 
@@ -734,7 +744,9 @@ public class SQLDataSetProvider implements DataSetProvider, DataSetDefRegistryLi
                     // ... and the row limits.
                     // If post-processing then defer the trim operation in order to not leave out rows
                     if (trim && postProcessingOps.isEmpty()) {
-                        totalRows = _query.fetchCount();
+                        if (def.isEstimateSize()) {
+                            totalRows = _query.fetchCount();
+                        }
                         _query.limit(lookup.getNumberOfRows()).offset(lookup.getRowOffset());
                     }
 
@@ -742,7 +754,7 @@ public class SQLDataSetProvider implements DataSetProvider, DataSetDefRegistryLi
                     ResultSet _results = logSQL(_query).fetch();
                     List<DataColumn> columns = calculateColumns(groupOp);
                     DataSet dataSet = _buildDataSet(columns, _results);
-                    if (trim && postProcessingOps.isEmpty()) {
+                    if (trim && postProcessingOps.isEmpty() && def.isEstimateSize()) {
                         dataSet.setRowCountNonTrimmed(totalRows);
                     }
                     return dataSet;
