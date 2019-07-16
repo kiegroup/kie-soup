@@ -22,4 +22,5 @@
     <exclude name='Preconditions.java'/>
   </source>
   <source path="util"/>
+  <source path="cron"/>
 </module>
