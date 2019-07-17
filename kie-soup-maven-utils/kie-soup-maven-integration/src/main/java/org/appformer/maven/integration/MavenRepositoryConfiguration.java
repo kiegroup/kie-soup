@@ -155,6 +155,9 @@ public class MavenRepositoryConfiguration {
                                                      .addPassword( server.getPassword() )
                                                      .build() );
         }
+        if (settings.getActiveProxy() != null) {
+            remoteBuilder.setProxy(getActiveAetherProxyFromSettings(settings));
+        }
         return remoteBuilder;
 
     }
@@ -202,6 +205,29 @@ public class MavenRepositoryConfiguration {
             artifactRepository.setAuthentication( new Authentication( server.getUsername(),
                                                                       server.getPassword() ) );
         }
+        if (settings.getActiveProxy() != null) {
+            artifactRepository.setProxy(getActiveMavenProxyFromSettings(settings));
+        }
         return artifactRepository;
+    }
+
+    private static org.eclipse.aether.repository.Proxy getActiveAetherProxyFromSettings(final Settings settings) {
+        return new org.eclipse.aether.repository.Proxy(settings.getActiveProxy().getProtocol(),
+                                                       settings.getActiveProxy().getHost(),
+                                                       settings.getActiveProxy().getPort(),
+                                                       new AuthenticationBuilder()
+                                                               .addUsername(settings.getActiveProxy().getUsername())
+                                                               .addPassword(settings.getActiveProxy().getPassword())
+                                                               .build());
+    }
+
+    private static org.apache.maven.repository.Proxy getActiveMavenProxyFromSettings(final Settings settings) {
+        final org.apache.maven.repository.Proxy mavenProxy = new org.apache.maven.repository.Proxy();
+        mavenProxy.setProtocol(settings.getActiveProxy().getProtocol());
+        mavenProxy.setHost(settings.getActiveProxy().getHost());
+        mavenProxy.setPort(settings.getActiveProxy().getPort());
+        mavenProxy.setUserName(settings.getActiveProxy().getUsername());
+        mavenProxy.setPassword(settings.getActiveProxy().getPassword());
+        return mavenProxy;
     }
 }
