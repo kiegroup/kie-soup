@@ -28,6 +28,7 @@ import java.util.Map;
 
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
+import javax.transaction.UserTransaction;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dashbuilder.DataSetCore;
@@ -255,12 +256,24 @@ public class SQLDataSetProvider implements DataSetProvider, DataSetDefRegistryLi
 
     public DataSetMetadata getDataSetMetadata(DataSetDef def) throws Exception {
         SQLDataSetDef sqlDef = (SQLDataSetDef) def;
-        DataSource ds = dataSourceLocator.lookup(sqlDef);
-        Connection conn = ds.getConnection();
+        UserTransaction utx = null;
+        Connection conn = null;
         try {
-            return _getDataSetMetadata(sqlDef, conn, true);
+            utx = (UserTransaction) new InitialContext().lookup("java:comp/UserTransaction");
+            utx.begin();
+            DataSource ds = dataSourceLocator.lookup(sqlDef);
+            conn = ds.getConnection();
+
+            DataSetMetadata metadata = _getDataSetMetadata(sqlDef, conn, true);
+            utx.commit();
+            return metadata;
+        } catch (Exception e) {
+            utx.rollback();
+            throw e;
         } finally {
-            conn.close();
+            if (conn != null) {
+                conn.close();
+            }
         }
     }
 
