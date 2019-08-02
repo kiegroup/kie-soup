@@ -18,15 +18,14 @@ package org.appformer.maven.integration;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.DefaultSettingsBuilderFactory;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingException;
-import org.appformer.maven.integration.Aether;
-import org.appformer.maven.integration.MavenRepository;
-import org.appformer.maven.integration.MavenRepositoryConfiguration;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.Test;
 
@@ -53,11 +52,13 @@ public class MavenRepositoryTest {
         MavenRepositoryMock.setCustomSettingsFileName("settings_custom.xml");
         final MavenRepository repo = new MavenRepositoryMock(Aether.getAether());
         final Collection<RemoteRepository> remoteRepos = repo.getRemoteRepositoriesForRequest();
-        assertEquals(5, remoteRepos.size());
-        for (RemoteRepository remoteRepository : remoteRepos) {
-            if (remoteRepository.getId().equals("test-server")) {
-                assertNotNull(remoteRepository.getProxy());
-            }
+        final Set<RemoteRepository> testServerRepos = remoteRepos
+                .stream()
+                .filter(r -> r.getId().equals("test-server"))
+                .collect(Collectors.toSet());
+        assertEquals(2, testServerRepos.size());
+        for (RemoteRepository remoteRepository : testServerRepos) {
+            assertNotNull(remoteRepository.getProxy());
         }
     }
 
