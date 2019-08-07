@@ -412,7 +412,6 @@ public class SQLDataSetProvider implements DataSetProvider, DataSetDefRegistryLi
     protected List<Column> _getColumns(SQLDataSetDef def, Connection conn) throws Exception {
         Dialect dialect = JDBCUtils.dialect(conn);
         if (!StringUtils.isBlank(def.getDbSQL())) {
-            Select query = SQLFactory.select(conn).from(def.getDbSQL()).limit(1);
             return JDBCUtils.metadata(conn, def.getDbSQL(), meta -> {
                 try {
                     return JDBCUtils.getColumns(meta, dialect.getExcludedColumns());
