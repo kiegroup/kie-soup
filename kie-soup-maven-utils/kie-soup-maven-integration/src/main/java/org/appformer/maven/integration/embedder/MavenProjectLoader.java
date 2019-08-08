@@ -92,7 +92,7 @@ public class MavenProjectLoader {
             if (IS_FORCE_OFFLINE) {
                 final Set<Artifact> artifacts = new HashSet<>();
                 final RepositorySystemSession session = Aether.getAether().getSession();
-                for (Dependency dep : mavenProject.getDependencies()) {
+                for (Dependency dep : project.getDependencies()) {
                     Artifact artifact = new DefaultArtifact(dep.getGroupId(),
                                                             dep.getArtifactId(),
                                                             dep.getVersion(),
@@ -107,7 +107,7 @@ public class MavenProjectLoader {
                     }
                 }
                 if (!artifacts.isEmpty()) {
-                    mavenProject.setArtifacts(artifacts);
+                    project.setArtifacts(artifacts);
                 }
             }
             return project;
