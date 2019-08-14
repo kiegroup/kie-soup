@@ -43,7 +43,7 @@ public class MavenProjectLoader {
     private static final Logger log = LoggerFactory.getLogger(MavenProjectLoader.class);
 
     private static final String DUMMY_POM =
-            "    <project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                    "    <project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                     "      xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n" +
                     "      <modelVersion>4.0.0</modelVersion>\n" +
                     "     \n" +
