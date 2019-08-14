@@ -387,9 +387,6 @@ public class DefaultDialect implements Dialect {
         if (CoreFunctionType.NOT_EQUALS_TO.equals(type)) {
             return getNotEqualsToConditionSQL(columnSQL, params[0]);
         }
-        if (CoreFunctionType.NOT_EQUALS_TO.equals(type)) {
-            return getNotEqualsToConditionSQL(columnSQL, params[0]);
-        }
         if (CoreFunctionType.LIKE_TO.equals(type)) {
             return getLikeToConditionSQL(columnSQL, params[0]);
         }
@@ -951,10 +948,7 @@ public class DefaultDialect implements Dialect {
                     methods[i].setAccessible(true);
                     return methods[i].invoke(o, params);
                 }
-                catch (IllegalAccessException ex) {
-                    return null;
-                }
-                catch (InvocationTargetException ite) {
+                catch (IllegalAccessException | InvocationTargetException ex) {
                     return null;
                 }
             }
@@ -966,7 +960,7 @@ public class DefaultDialect implements Dialect {
         if (!column1.getName().equals(column2.getName())) {
             return false;
         }
-        if (!column1.getClass().getName().equals(column2.getClass().getName())) {
+        if (!column1.getClass().isAssignableFrom(column2.getClass())) {
             return false;
         }
         if (column1 instanceof DynamicDateColumn) {
