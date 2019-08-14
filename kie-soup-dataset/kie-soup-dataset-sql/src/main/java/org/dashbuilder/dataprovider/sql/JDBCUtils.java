@@ -23,7 +23,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,10 +70,7 @@ public class JDBCUtils {
 
     public static List<SQLDataSourceDef> listDatasourceDefs() {
         List<SQLDataSourceDef> result = new ArrayList<>();
-        String[] namespaces = {
-                "java:comp/env/jdbc/",
-                "java:jboss/datasources/"
-        };
+        String[] namespaces = {"java:comp/env/jdbc/", "java:jboss/datasources/"};
         for (String namespace : namespaces) {
             try {
                 InitialContext ctx = new InitialContext();
@@ -87,18 +83,19 @@ public class JDBCUtils {
                     result.add(dsDef);
                 }
             } catch (NamingException e) {
-                log.warn("JNDI namespace {} error: {}", namespace, e.getMessage());
+                log.warn("JNDI namespace " + namespace + " error: " + e.getMessage());
+                continue;
             }
         }
         return result;
     }
 
     public static void execute(Connection connection, String sql) throws SQLException {
-        try (Statement statement = connection.createStatement()) {
+        try {
             if (log.isDebugEnabled()) {
                 log.debug(sql);
             }
-            statement.execute(sql);
+            connection.createStatement().execute(sql);
         } catch (SQLException e) {
             log.error(sql);
             throw e;
@@ -118,11 +115,11 @@ public class JDBCUtils {
     }
 
     public static ResultSet executeQuery(Connection connection, String sql) throws SQLException {
-        try (Statement statement = connection.createStatement()) {
+        try {
             if (log.isDebugEnabled()) {
                 log.debug(sql);
             }
-            return statement.executeQuery(sql);
+            return connection.createStatement().executeQuery(sql);
         } catch (SQLException e) {
             log.error(sql);
             throw e;
@@ -140,7 +137,7 @@ public class JDBCUtils {
             return dialect(dbName.toLowerCase());
         }
         catch (SQLException e) {
-            log.error("Exception while getting dialect from connection: {]", e);
+            e.printStackTrace();
             return DEFAULT;
         }
     }
