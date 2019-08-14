@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,19 +84,18 @@ public class JDBCUtils {
                     result.add(dsDef);
                 }
             } catch (NamingException e) {
-                log.warn("JNDI namespace " + namespace + " error: " + e.getMessage());
-                continue;
+                log.warn("JNDI namespace {} error: {}", namespace, e.getMessage());
             }
         }
         return result;
     }
 
     public static void execute(Connection connection, String sql) throws SQLException {
-        try {
+        try (Statement statement = connection.createStatement()) {
             if (log.isDebugEnabled()) {
                 log.debug(sql);
             }
-            connection.createStatement().execute(sql);
+            statement.execute(sql);
         } catch (SQLException e) {
             log.error(sql);
             throw e;
@@ -137,7 +137,7 @@ public class JDBCUtils {
             return dialect(dbName.toLowerCase());
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Exception while getting dialect from connection: {}", e);
             return DEFAULT;
         }
     }
@@ -243,7 +243,7 @@ public class JDBCUtils {
                 return changeCaseExcludeQuotes(id, true);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("SQLException while fixing case of connection metadata.");
         }
         return id;
     }
