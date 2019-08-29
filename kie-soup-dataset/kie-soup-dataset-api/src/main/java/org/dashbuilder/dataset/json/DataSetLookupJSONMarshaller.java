@@ -56,12 +56,13 @@ public class DataSetLookupJSONMarshaller {
     private static final String ROWCOUNT = "rowCount";
     private static final String ROWOFFSET = "rowOffset";
 
-    private static final String COLUMN = "column";
+    protected static final String COLUMN = "column";
     private static final String SOURCE = "source";
     private static final String FILTEROPS = "filterOps";
 
-    private static final String FUNCTION_TYPE = "function";
-    private static final String FUNCTION_ARGS = "args";
+    protected static final String FUNCTION_TYPE = "function";
+    protected static final String FUNCTION_ARGS = "args";
+    protected static final String FUNCTION_LABEL_VALUE = "labelValue";
 
     private static final String GROUPOPS = "groupOps";
     private static final String COLUMNGROUP = "columnGroup";
@@ -74,7 +75,7 @@ public class DataSetLookupJSONMarshaller {
     private static final String FIRSTDAYOFWEEK = "firstDayOfWeek";
 
     private static final String GROUPFUNCTIONS = "groupFunctions";
-    private static final String FUNCTION = "function";
+    protected static final String FUNCTION = "function";
 
     private static final String SELECTEDINTERVALS = "selected";
     private static final String INTERVAL_NAME = "name";
@@ -93,6 +94,7 @@ public class DataSetLookupJSONMarshaller {
         _keysAliasMap.put(FUNCTION_ARGS, Arrays.asList(FUNCTION_ARGS, "terms"));
         _keysAliasMap.put(COLUMN, Arrays.asList(COLUMN, "columnId"));
         _keysAliasMap.put(SOURCE, Arrays.asList(SOURCE, "sourceId"));
+        _keysAliasMap.put(FUNCTION_LABEL_VALUE, Arrays.asList(FUNCTION_LABEL_VALUE, "labelValue"));
         _keysAliasMap.put(SELECTEDINTERVALS, Arrays.asList(SELECTEDINTERVALS, "selectedIntervals"));
     }
 
@@ -175,6 +177,7 @@ public class DataSetLookupJSONMarshaller {
             CoreFunctionFilter cff = (CoreFunctionFilter) columnFilter;
             colFilterJson.put(COLUMN, cff.getColumnId());
             colFilterJson.put(FUNCTION_TYPE, cff.getType().toString());
+            colFilterJson.put(FUNCTION_LABEL_VALUE, cff.getLabelValue());
             JsonArray paramsJsonArray = Json.createArray();
             int paramCounter = 0;
             for (Object param : cff.getParameters()) {
@@ -399,10 +402,12 @@ public class DataSetLookupJSONMarshaller {
         }
 
         if (isCoreFilter(functionType)) {
+            String labelValue = columnFilterJson.getString(keySet(FUNCTION_LABEL_VALUE));
             CoreFunctionFilter cff = new CoreFunctionFilter();
             cff.setColumnId(columnId);
             cff.setType(CoreFunctionType.getByName(functionType));
             cff.setParameters(parseCoreFunctionParameters(terms));
+            cff.setLabelValue(labelValue);
             return cff;
 
         } else if (isLogicalFilter(functionType)) {

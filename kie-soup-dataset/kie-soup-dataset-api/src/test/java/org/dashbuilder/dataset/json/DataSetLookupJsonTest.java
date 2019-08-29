@@ -14,14 +14,22 @@
 */
 package org.dashbuilder.dataset.json;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.dashbuilder.dataset.DataSetLookup;
 import org.dashbuilder.dataset.DataSetLookupFactory;
+import org.dashbuilder.dataset.filter.CoreFunctionFilter;
+import org.dashbuilder.dataset.filter.CoreFunctionType;
+import org.dashbuilder.dataset.filter.LogicalExprFilter;
+import org.dashbuilder.dataset.filter.LogicalExprType;
 import org.dashbuilder.dataset.group.AggregateFunctionType;
 import org.dashbuilder.dataset.group.DateIntervalType;
 import org.dashbuilder.dataset.sort.SortOrder;
+import org.dashbuilder.json.JsonArray;
 import org.dashbuilder.json.JsonBoolean;
+import org.dashbuilder.json.JsonFactory;
 import org.dashbuilder.json.JsonNull;
 import org.dashbuilder.json.JsonNumber;
 import org.dashbuilder.json.JsonObject;
@@ -38,6 +46,7 @@ import static org.dashbuilder.dataset.filter.FilterFactory.notEqualsTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.dashbuilder.dataset.json.DataSetLookupJSONMarshaller.*;
 
 public class DataSetLookupJsonTest {
 
@@ -92,5 +101,87 @@ public class DataSetLookupJsonTest {
         assertTrue(jsonNumber instanceof JsonNumber);
         assertTrue(jsonDate instanceof JsonString);
         assertTrue(jsonString instanceof JsonString);
+    }
+
+    @Test
+    public void testFormatColumnFilter() {
+        CoreFunctionFilter columnFilter = new CoreFunctionFilter();
+        columnFilter.setColumnId("test_id");
+        columnFilter.setLabelValue("test_label_value");
+        columnFilter.setType(CoreFunctionType.EQUALS_TO);
+        columnFilter.setParameters(Arrays.asList("param0", "param1", "param2"));
+        JsonObject columnFilterJsonObject = jsonMarshaller.formatColumnFilter(columnFilter);
+        assertColumnFilterFromJsonObject(columnFilterJsonObject);
+
+        LogicalExprFilter logicalExprFilter = new LogicalExprFilter();
+        logicalExprFilter.setColumnId("test_id");
+        logicalExprFilter.setLogicalOperator(LogicalExprType.AND);
+        logicalExprFilter.setLogicalTerms(Arrays.asList(columnFilter));
+        JsonObject logicalExprFilterJsonObject = jsonMarshaller.formatColumnFilter(logicalExprFilter);
+        assertEquals("test_id", logicalExprFilterJsonObject.getString(COLUMN));
+        assertEquals("AND", logicalExprFilterJsonObject.getString(FUNCTION));
+        assertColumnFilterFromJsonObject((JsonObject) logicalExprFilterJsonObject.getArray(FUNCTION_ARGS).get(0));
+    }
+
+    private void assertColumnFilterFromJsonObject(JsonObject columnFilterJsonObject) {
+        assertEquals("test_label_value", columnFilterJsonObject.getString(FUNCTION_LABEL_VALUE));
+        assertEquals("test_id", columnFilterJsonObject.getString(COLUMN));
+        assertEquals("EQUALS_TO", columnFilterJsonObject.getString(FUNCTION));
+        JsonArray columnFilterJsonArray = columnFilterJsonObject.getArray(FUNCTION_ARGS);
+        for (int i = 0; i < columnFilterJsonArray.length(); i++) {
+            assertEquals("param" + i, columnFilterJsonArray.get(i).asString());
+        }
+    }
+
+    @Test
+    public void testParseColumnFilter() {
+        JsonFactory jsonFactory = new JsonFactory();
+        JsonObject coreFunctionFilterJsonObject = jsonFactory.parse("{\n" +
+                                                                            "  \"column\": \"test_id\",\n" +
+                                                                            "  \"function\": \"EQUALS_TO\",\n" +
+                                                                            "  \"labelValue\": \"test_label_value\",\n" +
+                                                                            "  \"args\": [\n" +
+                                                                            "    \"param0\",\n" +
+                                                                            "    \"param1\",\n" +
+                                                                            "    \"param2\"\n" +
+                                                                            "  ]\n" +
+                                                                            "}");
+        CoreFunctionFilter coreFunctionFilter = (CoreFunctionFilter) jsonMarshaller.parseColumnFilter(coreFunctionFilterJsonObject);
+        assertColumnFilterFromColumnFilter(coreFunctionFilter);
+
+        JsonObject logicalExprFilterJsonObject = jsonFactory.parse("{\n" +
+                                                                           "  \"column\": \"test_id\",\n" +
+                                                                           "  \"function\": \"AND\",\n" +
+                                                                           "  \"args\": [\n" +
+                                                                           "    {\n" +
+                                                                           "      \"column\": \"test_id\",\n" +
+                                                                           "      \"function\": \"EQUALS_TO\",\n" +
+                                                                           "      \"labelValue\": \"test_label_value\",\n" +
+                                                                           "      \"args\": [\n" +
+                                                                           "        \"param0\",\n" +
+                                                                           "        \"param1\",\n" +
+                                                                           "        \"param2\"\n" +
+                                                                           "      ]\n" +
+                                                                           "    }\n" +
+                                                                           "  ]\n" +
+                                                                           "}");
+
+        LogicalExprFilter logicalExprFilter = (LogicalExprFilter) jsonMarshaller.parseColumnFilter(logicalExprFilterJsonObject);
+        assertEquals("test_id", logicalExprFilter.getColumnId());
+        assertEquals("AND", logicalExprFilter.getLogicalOperator().toString());
+
+        logicalExprFilter.getLogicalTerms().forEach(object -> {
+            assertColumnFilterFromColumnFilter((CoreFunctionFilter) object);
+        });
+    }
+
+    private void assertColumnFilterFromColumnFilter(CoreFunctionFilter coreFunctionFilter) {
+        assertEquals("test_label_value", coreFunctionFilter.getLabelValue());
+        assertEquals("test_id", coreFunctionFilter.getColumnId());
+        assertEquals("EQUALS_TO", coreFunctionFilter.getType().toString());
+        List<String> params = coreFunctionFilter.getParameters();
+        for (int i = 0; i < params.size(); i++) {
+            assertEquals("param" + i, params.get(i));
+        }
     }
 }
