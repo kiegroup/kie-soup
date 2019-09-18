@@ -284,12 +284,11 @@ public class MavenRepository {
 
     protected File bytesToFile(AFReleaseId releaseId, byte[] bytes, String extension ) {
         File file = new File( System.getProperty( "java.io.tmpdir" ), toFileName( releaseId, null ) + extension );
-        try {
-            FileOutputStream fos = new FileOutputStream( file );
+        try (FileOutputStream fos = new FileOutputStream( file )) {
             fos.write( bytes );
             fos.flush();
-            fos.close();
         } catch ( IOException e ) {
+            log.error("Error while converting bytes to file for releaseId: {} and extensions {}.", releaseId, extension);
             throw new RuntimeException( e );
         }
         return file;

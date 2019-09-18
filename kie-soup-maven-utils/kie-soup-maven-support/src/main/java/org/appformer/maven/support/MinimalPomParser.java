@@ -17,6 +17,8 @@
 package org.appformer.maven.support;
 
 import java.io.InputStream;
+
+import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -51,6 +53,7 @@ public class MinimalPomParser extends DefaultHandler {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             factory.setValidating( false );
             factory.setNamespaceAware( false );
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             
             SAXParser parser = factory.newSAXParser();
             parser.parse( is, handler );

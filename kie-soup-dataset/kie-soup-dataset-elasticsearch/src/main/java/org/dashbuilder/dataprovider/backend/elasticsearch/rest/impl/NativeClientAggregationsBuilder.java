@@ -353,10 +353,7 @@ public class NativeClientAggregationsBuilder {
                 } else {
 
                     // If interval size is not specified by the lookup group operation, calculate the current date limits for index document's date field and the interval size that fits..
-                    try {
-
-                        ElasticSearchClient anotherClient = clientFactory.newClient((ElasticSearchDataSetDef) metadata.getDefinition());
-
+                    try (ElasticSearchClient anotherClient = clientFactory.newClient((ElasticSearchDataSetDef) metadata.getDefinition())) {
                         Date[] limits = utils.calculateDateLimits(anotherClient,
                                                                   metadata,
                                                                   columnGroup.getSourceId(),
@@ -366,8 +363,6 @@ public class NativeClientAggregationsBuilder {
                                                                                      limits[1],
                                                                                      columnGroup);
                         }
-
-                        anotherClient.close();
                     } catch (Exception e) {
                         throw new ElasticSearchClientGenericException("Cannot calculate date limits.",
                                                                       e);
