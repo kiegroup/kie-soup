@@ -26,8 +26,12 @@ import org.dashbuilder.dataprovider.sql.JDBCUtils;
 import org.dashbuilder.dataprovider.sql.ResultSetConsumer;
 import org.dashbuilder.dataprovider.sql.ResultSetHandler;
 import org.dashbuilder.dataprovider.sql.dialect.Dialect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Select extends SQLStatement<Select> {
+    
+    Logger logger = LoggerFactory.getLogger(Select.class);
 
     protected List<Column> columns = new ArrayList<Column>();
     protected String fromSelect = null;
@@ -171,31 +175,24 @@ public class Select extends SQLStatement<Select> {
     // Fetch
     public int fetchCount() throws SQLException {
         String countSql = dialect.getCountQuerySQL(this);
-        ResultSetHandler handler = null;
-        try {
-            handler = JDBCUtils.executeQuery(connection, countSql);
+        try (ResultSetHandler handler = JDBCUtils.executeQuery(connection, countSql)) {
             ResultSet _rs = handler.getResultSet();
             return _rs.next() ? _rs.getInt(1) : 0;
-        } finally {
-            if (handler != null) {
-                handler.close();
-            }
-        }
+        } catch (Exception e) {
+            logger.debug("SQLException while fetching count with SQL command [{}]. Exception: [{}]", countSql, e);
+            throw e;
+        } 
     }
 
     public <R> R fetch(ResultSetConsumer<R> consumer) {
         try {
-            ResultSetHandler handler = null;
-            try {
-                String sql = getSQL();
-                handler = JDBCUtils.executeQuery(connection, sql);
+            String sql = getSQL();
+            try (ResultSetHandler handler = JDBCUtils.executeQuery(connection, sql)){
                 return consumer.consume(handler.getResultSet());
-            }
-            finally {
-                if (handler != null) {
-                    handler.close();
-                }
-            }
+            } catch (Exception e) {
+                logger.debug("SQLException while fetching results with SQL command [{}]. Exception: [{}]", sql, e);
+                throw e;
+            } 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

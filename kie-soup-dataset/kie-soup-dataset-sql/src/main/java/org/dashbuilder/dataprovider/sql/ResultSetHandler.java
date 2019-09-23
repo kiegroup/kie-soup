@@ -19,7 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class ResultSetHandler {
+public class ResultSetHandler implements AutoCloseable{
 
     private ResultSet resultSet;
     private Statement statement;
