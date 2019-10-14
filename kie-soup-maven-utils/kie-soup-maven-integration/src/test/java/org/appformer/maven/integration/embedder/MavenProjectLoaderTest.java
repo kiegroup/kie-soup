@@ -39,10 +39,6 @@ public class MavenProjectLoaderTest {
     private static final String ARTIFACT_ID = "myArtifactId";
     private static final String GROUP_ID = "myGroupId";
 
-    static {
-        System.setProperty(MavenProjectLoader.FORCE_OFFLINE, "true");
-    }
-   
     protected static final String PROJ =
             "    <project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                     "      xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n" +
@@ -79,6 +75,7 @@ public class MavenProjectLoaderTest {
     
     @Test
     public void shouldAddDependencyArtifactsTest() throws Exception {
+        MavenProjectLoader.IS_FORCE_OFFLINE = true;
         ByteArrayInputStream targetPom = new ByteArrayInputStream(PROJ.getBytes(StandardCharsets.UTF_8));
         MavenProject mavenProj = MavenProjectLoader.parseMavenPom(targetPom, true);
         assertEquals(1, mavenProj.getArtifacts().size());
