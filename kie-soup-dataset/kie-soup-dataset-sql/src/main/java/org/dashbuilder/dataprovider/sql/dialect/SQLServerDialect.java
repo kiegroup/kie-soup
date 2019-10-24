@@ -15,12 +15,11 @@
  */
 package org.dashbuilder.dataprovider.sql.dialect;
 
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
 
 import org.dashbuilder.dataprovider.sql.JDBCUtils;
 import org.dashbuilder.dataprovider.sql.model.Column;
@@ -122,10 +121,13 @@ public class SQLServerDialect extends DefaultDialect {
         try {
             // Disable limits & fetch results
             select.limit(0).offset(0);
-            return JDBCUtils.getColumns(select.fetch(), null);
-        }
-        catch (SQLException e) {
-            return Collections.emptyList();
+            return select.fetch(rs -> {
+                try {
+                    return JDBCUtils.getColumns(rs, null);
+                } catch (Exception e) {
+                    return Collections.emptyList();
+                }
+            });
         }
         finally {
             // Restore original limits

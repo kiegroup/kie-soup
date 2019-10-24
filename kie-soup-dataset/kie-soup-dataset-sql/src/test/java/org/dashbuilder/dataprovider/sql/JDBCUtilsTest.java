@@ -17,13 +17,16 @@ package org.dashbuilder.dataprovider.sql;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.StringReader;
 import java.sql.Clob;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.List;
 
@@ -40,6 +43,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class JDBCUtilsTest {
 
     @Mock
+    Connection connection;
+    
+    @Mock
+    Statement statement;
+
+    @Mock
     ResultSet resultSet;
     
     @Mock
@@ -50,8 +59,16 @@ public class JDBCUtilsTest {
     
     @Before
     public void setUp() throws Exception {
+        when(connection.createStatement()).thenReturn(statement);
         when(resultSet.getMetaData()).thenReturn(metaData);
     }
+    
+    @Test
+    public void testStatementClose() throws Exception {
+        JDBCUtils.execute(connection, "sql");
+        verify(statement).execute("sql");
+        verify(statement).close();
+    }    
 
     @Test
     public void testListDataSourceDefs() throws Exception {

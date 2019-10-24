@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,19 +84,18 @@ public class JDBCUtils {
                     result.add(dsDef);
                 }
             } catch (NamingException e) {
-                log.warn("JNDI namespace " + namespace + " error: " + e.getMessage());
-                continue;
+                log.warn("JNDI namespace {} error: {}", namespace, e.getMessage());
             }
         }
         return result;
     }
 
     public static void execute(Connection connection, String sql) throws SQLException {
-        try {
+        try (Statement statement = connection.createStatement()) {
             if (log.isDebugEnabled()) {
                 log.debug(sql);
             }
-            connection.createStatement().execute(sql);
+            statement.execute(sql);
         } catch (SQLException e) {
             log.error(sql);
             throw e;
@@ -114,12 +114,14 @@ public class JDBCUtils {
         }
     }
 
-    public static ResultSet executeQuery(Connection connection, String sql) throws SQLException {
+    public static ResultSetHandler executeQuery(Connection connection, String sql) throws SQLException {
         try {
             if (log.isDebugEnabled()) {
                 log.debug(sql);
             }
-            return connection.createStatement().executeQuery(sql);
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            return new ResultSetHandler(resultSet, statement);
         } catch (SQLException e) {
             log.error(sql);
             throw e;
@@ -137,7 +139,7 @@ public class JDBCUtils {
             return dialect(dbName.toLowerCase());
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Exception while getting dialect from connection: {}", e);
             return DEFAULT;
         }
     }
@@ -206,21 +208,18 @@ public class JDBCUtils {
         return DEFAULT;
     }
 
-    public static List<Column> getColumns(ResultSet resultSet, String[] exclude) throws SQLException {
-        return getColumns(resultSet.getMetaData(), exclude);        
-    }
-    
-    public static List<Column> getColumns(ResultSetMetaData meta, String[] exclude) throws SQLException {
-        List<Column> columnList = new ArrayList<Column>();
-        List<String> columnExcluded = exclude == null ? new ArrayList<String>() : Arrays.asList(exclude);
-
-        for (int i = 1; i <= meta.getColumnCount(); i++) {
+    public static List<Column> getColumns(ResultSet resultSet, String[] exclude) {
+        try {
+            List<Column> columnList = new ArrayList<>();
+            List<String> columnExcluded = exclude == null ? new ArrayList<String>() : Arrays.asList(exclude);
+        
+            ResultSetMetaData meta = resultSet.getMetaData();
+            for (int i = 1; i <= meta.getColumnCount(); i++) {
             String name = meta.getColumnName(i);
             String alias = meta.getColumnLabel(i);
             if (alias != null && !alias.trim().isEmpty()) {
                 name = alias.trim();
             }
-
             if (!columnExcluded.contains(name) && !columnExcluded.contains(alias)) {
                 ColumnType type = JDBCUtils.calculateType(meta.getColumnType(i));
                 if (type != null) {
@@ -229,8 +228,11 @@ public class JDBCUtils {
                     columnList.add(column);
                 }
             }
+             }
+            return columnList;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return columnList;
     }
 
     public static String fixCase(Connection connection, String id) {
@@ -243,7 +245,7 @@ public class JDBCUtils {
                 return changeCaseExcludeQuotes(id, true);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("SQLException while fixing case of connection metadata.");
         }
         return id;
     }
@@ -251,7 +253,7 @@ public class JDBCUtils {
     public static final String[] QUOTES = new String[]{"\"", "'", "`", "´"};
 
     public static List<String> getWordsBetweenQuotes(String s) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         if (s != null) {
             for (int i = 0; i < QUOTES.length; i++) {
                 String quote = QUOTES[i];

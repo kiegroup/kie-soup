@@ -23,9 +23,15 @@ import java.util.Collection;
 import java.util.List;
 
 import org.dashbuilder.dataprovider.sql.JDBCUtils;
+import org.dashbuilder.dataprovider.sql.ResultSetConsumer;
+import org.dashbuilder.dataprovider.sql.ResultSetHandler;
 import org.dashbuilder.dataprovider.sql.dialect.Dialect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Select extends SQLStatement<Select> {
+    
+    Logger logger = LoggerFactory.getLogger(Select.class);
 
     protected List<Column> columns = new ArrayList<Column>();
     protected String fromSelect = null;
@@ -167,19 +173,28 @@ public class Select extends SQLStatement<Select> {
     }
 
     // Fetch
-
     public int fetchCount() throws SQLException {
         String countSql = dialect.getCountQuerySQL(this);
-        ResultSet _rs = JDBCUtils.executeQuery(connection, countSql);
-        if (_rs.next()) {
-            return _rs.getInt(1);
-        } else {
-            return 0;
-        }
+        try (ResultSetHandler handler = JDBCUtils.executeQuery(connection, countSql)) {
+            ResultSet _rs = handler.getResultSet();
+            return _rs.next() ? _rs.getInt(1) : 0;
+        } catch (Exception e) {
+            logger.debug("SQLException while fetching count with SQL command [{}]. Exception: [{}]", countSql, e);
+            throw e;
+        } 
     }
 
-    public ResultSet fetch() throws SQLException {
-        String sql = getSQL();
-        return JDBCUtils.executeQuery(connection, sql);
+    public <R> R fetch(ResultSetConsumer<R> consumer) {
+        try {
+            String sql = getSQL();
+            try (ResultSetHandler handler = JDBCUtils.executeQuery(connection, sql)){
+                return consumer.consume(handler.getResultSet());
+            } catch (Exception e) {
+                logger.debug("SQLException while fetching results with SQL command [{}]. Exception: [{}]", sql, e);
+                throw e;
+            } 
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
