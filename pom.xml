@@ -55,7 +55,6 @@
     <version.org.elasticsearch>5.6.1</version.org.elasticsearch>
     <version.org.apache.lucene>6.6.1</version.org.apache.lucene>
     <version.io.netty.old>3.10.6.Final</version.io.netty.old>
-    <version.io.netty>4.1.16.Final</version.io.netty>
     <version.com.github.tdomzal.junit.docker>0.3</version.com.github.tdomzal.junit.docker>
     <version.com.spotify.docker.client>5.0.2</version.com.spotify.docker.client>
     <version.org.apache.logging.log4j>2.8.2</version.org.apache.logging.log4j>
