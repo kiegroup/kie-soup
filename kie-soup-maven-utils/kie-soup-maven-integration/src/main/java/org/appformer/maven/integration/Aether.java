@@ -103,7 +103,7 @@ public class Aether {
     }
 
     boolean isForcedOffline() {
-        return MavenProjectLoader.IS_FORCE_OFFLINE;
+        return MavenProjectLoader.isOffline();
     }
 
     private RepositorySystem newRepositorySystem() {

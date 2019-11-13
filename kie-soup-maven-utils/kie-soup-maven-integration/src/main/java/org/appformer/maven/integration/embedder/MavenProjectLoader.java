@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public class MavenProjectLoader {
 
     public static final String FORCE_OFFLINE = "kie.maven.offline.force";
-    public static final boolean IS_FORCE_OFFLINE = Boolean.valueOf(System.getProperty(FORCE_OFFLINE, "false"));
+    protected static boolean IS_FORCE_OFFLINE = Boolean.valueOf(System.getProperty(FORCE_OFFLINE, "false"));
 
     private static final Logger log = LoggerFactory.getLogger(MavenProjectLoader.class);
 
@@ -182,5 +182,9 @@ public class MavenProjectLoader {
             }
         }
         return mavenProject;
+    }
+    
+    public static boolean isOffline() {
+        return IS_FORCE_OFFLINE;
     }
 }
