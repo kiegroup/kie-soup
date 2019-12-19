@@ -20,10 +20,12 @@ pipeline {
             }
         }
         stage('Build upstream projects') {
-            dir("droolsjbpm-build-bootstrap") {
-                script {
-                    githubscm.checkoutIfExists('droolsjbpm-build-bootstrap', "$CHANGE_AUTHOR", "$CHANGE_BRANCH", 'kiegroup', "$CHANGE_TARGET")
-                    load("upstream.stages")
+            steps {
+                dir("droolsjbpm-build-bootstrap") {
+                    script {
+                        githubscm.checkoutIfExists('droolsjbpm-build-bootstrap', "$CHANGE_AUTHOR", "$CHANGE_BRANCH", 'kiegroup', "$CHANGE_TARGET")
+                        load("upstream.stages")
+                    }
                 }
             }
         }        
