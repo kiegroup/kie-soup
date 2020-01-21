@@ -201,6 +201,10 @@ public class MavenEmbedder {
             mavenExecutionRequest.setWorkspaceReader( mavenRequest.getWorkspaceReader() );
         }
 
+        if (mavenRequest.getBaseDirectory() != null) {
+            mavenExecutionRequest.setBaseDirectory(new File(mavenRequest.getBaseDirectory()));
+        }
+
         return mavenExecutionRequest;
     }
 
