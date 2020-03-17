@@ -29,7 +29,7 @@ pipeline {
                                     (JOB_NAME =~ /\/[a-z,A-Z\-]*\.downstream/).find() ? 'downstream.stages' :
                                     'upstream.stages'
                         println "Loading ${file} file..."
-                        load(file)
+                        load("${file}")
                     }
                 }
             }
