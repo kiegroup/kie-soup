@@ -19,12 +19,16 @@ pipeline {
 
             }
         }
-        stage('Build upstream projects') {
+        stage('Build projects') {
             steps {
                 dir("droolsjbpm-build-bootstrap") {
                     script {
                         githubscm.checkoutIfExists('droolsjbpm-build-bootstrap', "$CHANGE_AUTHOR", "$CHANGE_BRANCH", 'kiegroup', "$CHANGE_TARGET")
-                        load("upstream.stages")
+                        def file =  JOB_NAME.contains('downstream.production') ? 'downstream.production.stages' :
+                                    JOB_NAME.contains('downstream') ? 'downstream.stages' :
+                                    'upstream.stages'
+                        println "Loading ${file} file..."
+                        load(file)
                     }
                 }
             }
