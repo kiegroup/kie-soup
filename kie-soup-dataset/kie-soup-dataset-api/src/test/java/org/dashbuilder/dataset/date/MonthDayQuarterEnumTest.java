@@ -32,7 +32,7 @@ public class MonthDayQuarterEnumTest {
 
     @Test
     public void nextMonthIndex() {
-        assertEquals(2, Month.nextIndex(1));
+        assertEquals(2, Month.nextIndex(2));
         assertEquals(3, Month.nextIndex(2));
         assertEquals(4, Month.nextIndex(3));
         assertEquals(5, Month.nextIndex(4));
