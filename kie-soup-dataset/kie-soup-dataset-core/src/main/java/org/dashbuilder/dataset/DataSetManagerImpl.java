@@ -28,6 +28,7 @@ import org.dashbuilder.dataset.def.DataSetPostProcessor;
 import org.dashbuilder.dataset.def.DataSetPreprocessor;
 import org.dashbuilder.dataset.def.StaticDataSetDef;
 import org.dashbuilder.dataset.exception.DataSetLookupException;
+import org.dashbuilder.dataset.uuid.ActiveBranchUUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +45,7 @@ public class DataSetManagerImpl implements DataSetManager {
     protected boolean pushEnabled = false;
     protected int pushMaxSize = 1024;
     protected Logger log = LoggerFactory.getLogger(DataSetManagerImpl.class);
+    protected ActiveBranchUUID activeBranchUUID;
 
     public DataSetManagerImpl() {
     }
@@ -183,6 +185,7 @@ public class DataSetManagerImpl implements DataSetManager {
         }
 
         try {
+            dataSetDef.setProperty("activeBranch", activeBranchUUID.getActiveBranch());
             return resolveProvider(dataSetDef)
                     .getDataSetMetadata(dataSetDef);
         } catch (Exception e) {
@@ -203,5 +206,10 @@ public class DataSetManagerImpl implements DataSetManager {
         // If no provider is defined then return the static one
         log.warn("Please make sure the " + type + " provider has been added to the registry");
         return staticDataSetProvider;
+    }
+
+    @Override
+    public void activeBranchChanged(ActiveBranchUUID activeBranchUUID) {
+        this.activeBranchUUID = activeBranchUUID;
     }
 }

@@ -17,6 +17,7 @@ package org.dashbuilder.dataset;
 
 import java.util.List;
 import org.dashbuilder.dataset.def.DataSetPreprocessor;
+import org.dashbuilder.dataset.uuid.ActiveBranchUUID;
 
 /**
  * Main interface for handling data sets.
@@ -69,4 +70,9 @@ public interface DataSetManager {
      * @return A DataSetMetadata instance containing general information about the data set, or null if the data set can be retrieved.
      */
     DataSetMetadata getDataSetMetadata(String uuid);
+
+    /**
+     *  Keeps track of current active branch in client to fetch DataSetMetaData accordingly.
+     */
+    void activeBranchChanged(ActiveBranchUUID activeBranchUUID);
 }

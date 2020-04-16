@@ -15,6 +15,8 @@
  */
 package org.dashbuilder.dataprovider;
 
+import java.util.Map;
+
 import org.dashbuilder.dataset.DataColumn;
 import org.dashbuilder.dataset.DataSet;
 import org.dashbuilder.dataset.DataSetGenerator;
@@ -28,8 +30,11 @@ import org.slf4j.LoggerFactory;
 
 public class BeanDataSetProvider implements DataSetProvider, DataSetDefRegistryListener {
 
+    private static final String ACTIVE_BRANCH = "activeBranch";
+
     protected Logger log = LoggerFactory.getLogger(BeanDataSetProvider.class);
     protected StaticDataSetProvider staticDataSetProvider;
+    protected String activeBranch;
 
     public BeanDataSetProvider() {
     }
@@ -69,10 +74,14 @@ public class BeanDataSetProvider implements DataSetProvider, DataSetDefRegistryL
         DataSet dataSet = staticDataSetProvider.lookupDataSet(def.getUUID(), null);
 
         // If test mode or not exists then invoke the BEAN generator class
-        if ((lookup != null && lookup.testMode()) || dataSet == null) {
+        if ((lookup != null && lookup.testMode()) || dataSet == null || isBranchChanged(lookup)) {
             BeanDataSetDef beanDef = (BeanDataSetDef) def;
             DataSetGenerator dataSetGenerator = lookupGenerator(def);
-            dataSet = dataSetGenerator.buildDataSet(beanDef.getParamaterMap());
+            activeBranch = isBranchChanged(lookup) ?
+                    lookup.getMetadata(ACTIVE_BRANCH).toString() : def.getProperty(ACTIVE_BRANCH);
+            Map<String, String> paramMap = beanDef.getParamaterMap();
+            paramMap.put(ACTIVE_BRANCH, activeBranch);
+            dataSet = dataSetGenerator.buildDataSet(paramMap);
             dataSet.setUUID(def.getUUID());
             dataSet.setDefinition(def);
 
@@ -99,6 +108,13 @@ public class BeanDataSetProvider implements DataSetProvider, DataSetDefRegistryL
         }
         // Return the lookup results
         return dataSet;
+    }
+
+    protected boolean isBranchChanged(DataSetLookup lookup) {
+        if (lookup != null) {
+            return activeBranch == null || !activeBranch.equals(lookup.getMetadata(ACTIVE_BRANCH));
+        }
+        return false;
     }
 
     public boolean isDataSetOutdated(DataSetDef def) {

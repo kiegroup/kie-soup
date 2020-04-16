@@ -22,6 +22,7 @@ import org.dashbuilder.dataset.DataSetManager;
 import org.dashbuilder.dataset.DataSetMetadata;
 import org.dashbuilder.dataset.def.DataSetDef;
 import org.dashbuilder.dataset.def.DataSetDefRegistry;
+import org.dashbuilder.dataset.uuid.ActiveBranchUUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +33,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CustomProviderTest {
+    public static final String ACTIVE_BRANCH = "master";
 
     CustomDataSetProvider customProvider = spy(CustomDataSetProvider.get());
     DataSetProviderRegistry providerRegistry = DataSetCore.get().getDataSetProviderRegistry();
@@ -57,6 +59,7 @@ public class CustomProviderTest {
 
     @Test
     public void testMetadata() throws Exception {
+        dataSetManager.activeBranchChanged(new ActiveBranchUUID("test", ACTIVE_BRANCH));
         DataSetMetadata medatata = dataSetManager.getDataSetMetadata("test");
 
         verify(customProvider).getDataSetMetadata(customDef);

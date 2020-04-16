@@ -26,6 +26,7 @@ import org.dashbuilder.dataset.def.SQLDataSetDef;
 import org.dashbuilder.dataset.filter.FilterFactory;
 import org.dashbuilder.dataset.group.AggregateFunctionType;
 import org.dashbuilder.dataset.sort.SortOrder;
+import org.dashbuilder.dataset.uuid.ActiveBranchUUID;
 import org.junit.Test;
 
 import static org.dashbuilder.dataset.Assertions.assertDataSetValues;
@@ -39,6 +40,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 
 public class SQLDataSetDefTest extends SQLDataSetTestBase {
+
+    public static final String ACTIVE_BRANCH = "master";
 
     @Override
     public void testAll() throws Exception {
@@ -58,6 +61,7 @@ public class SQLDataSetDefTest extends SQLDataSetTestBase {
         SQLDataSetDef def = (SQLDataSetDef) jsonMarshaller.fromJson(json);
         dataSetDefRegistry.registerDataSetDef(def);
 
+        dataSetManager.activeBranchChanged(new ActiveBranchUUID("expense_reports_allcolumns", ACTIVE_BRANCH));
         DataSetMetadata metadata = dataSetManager.getDataSetMetadata("expense_reports_allcolumns");
         assertThat(metadata.getNumberOfColumns()).isEqualTo(6);
         assertThat(metadata.getEstimatedSize()).isEqualTo(6350);
@@ -72,6 +76,7 @@ public class SQLDataSetDefTest extends SQLDataSetTestBase {
         def.setEstimateSize(false);
         dataSetDefRegistry.registerDataSetDef(def);
 
+        dataSetManager.activeBranchChanged(new ActiveBranchUUID("expense_reports_allcolumns", ACTIVE_BRANCH));
         DataSetMetadata metadata = dataSetManager.getDataSetMetadata("expense_reports_allcolumns");
         assertThat(metadata.getNumberOfColumns()).isEqualTo(6);
         assertThat(metadata.getEstimatedSize()).isEqualTo(0);
@@ -86,6 +91,7 @@ public class SQLDataSetDefTest extends SQLDataSetTestBase {
         SQLDataSetDef def = (SQLDataSetDef) jsonMarshaller.fromJson(json);
         dataSetDefRegistry.registerDataSetDef(def);
 
+        dataSetManager.activeBranchChanged(new ActiveBranchUUID("expense_reports_sql", ACTIVE_BRANCH));
         DataSetMetadata metadata = dataSetManager.getDataSetMetadata("expense_reports_sql");
         assertThat(metadata.getNumberOfColumns()).isEqualTo(3);
         assertThat(metadata.getNumberOfRows()).isEqualTo(6);
@@ -116,6 +122,7 @@ public class SQLDataSetDefTest extends SQLDataSetTestBase {
         SQLDataSetDef def = (SQLDataSetDef) jsonMarshaller.fromJson(json);
         dataSetDefRegistry.registerDataSetDef(def);
 
+        dataSetManager.activeBranchChanged(new ActiveBranchUUID("expense_reports_columnset", ACTIVE_BRANCH));
         DataSetMetadata metadata = dataSetManager.getDataSetMetadata("expense_reports_columnset");
         assertThat(metadata.getNumberOfColumns()).isEqualTo(4);
         if (!testSettings.isMonetDB()) {
@@ -145,6 +152,7 @@ public class SQLDataSetDefTest extends SQLDataSetTestBase {
         dataSetDefRegistry.registerDataSetDef(def);
 
         String uuid = "expense_reports_columnalias";
+        dataSetManager.activeBranchChanged(new ActiveBranchUUID(uuid, ACTIVE_BRANCH));
         DataSetMetadata metadata = dataSetManager.getDataSetMetadata(uuid);
         assertThat(metadata.getNumberOfColumns()).isEqualTo(3);
         assertThat(metadata.getColumnId(0)).isEqualTo("Id");
@@ -177,6 +185,7 @@ public class SQLDataSetDefTest extends SQLDataSetTestBase {
         dataSetDefRegistry.registerDataSetDef(def);
 
         final String uuid = "expense_reports_filtered";
+        dataSetManager.activeBranchChanged(new ActiveBranchUUID(uuid, ACTIVE_BRANCH));
         DataSetMetadata metadata = dataSetManager.getDataSetMetadata(uuid);
         assertThat(metadata.getNumberOfColumns()).isEqualTo(5);
         if (!testSettings.isMonetDB()) {

@@ -18,6 +18,7 @@ package org.dashbuilder.dataset;
 import java.util.List;
 
 import org.dashbuilder.DataSetCore;
+import org.dashbuilder.dataset.uuid.ActiveBranchUUID;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,6 +28,7 @@ import static org.junit.Assert.*;
 public class DataSetColumnTest {
 
     public static final String EXPENSE_REPORTS = "expense_reports";
+    public static final String ACTIVE_BRANCH = "master";
 
     DataSetManager dataSetManager = DataSetCore.get().getDataSetManager();
 
@@ -82,6 +84,7 @@ public class DataSetColumnTest {
 
     @Test
     public void testDataSetMetadataColumns() throws Exception {
+        dataSetManager.activeBranchChanged(new ActiveBranchUUID(EXPENSE_REPORTS, ACTIVE_BRANCH));
         DataSetMetadata result = dataSetManager.getDataSetMetadata(EXPENSE_REPORTS);
 
         assertEquals(result.getNumberOfColumns(), 6);
