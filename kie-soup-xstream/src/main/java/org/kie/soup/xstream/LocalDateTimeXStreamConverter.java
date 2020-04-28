@@ -13,10 +13,10 @@
  * limitations under the License.
 */
 
-package org.kie.soup.commons.xstream;
+package org.kie.soup.xstream;
 
 import java.time.DateTimeException;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
@@ -32,38 +32,37 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
  *
  * @see <a href="https://github.com/x-stream/xstream/issues/75">XStream#75</a>
  */
-public class OffsetDateTimeXStreamConverter implements Converter {
+public class LocalDateTimeXStreamConverter implements Converter {
 
     private final DateTimeFormatter formatter;
 
-    public OffsetDateTimeXStreamConverter() {
+    public LocalDateTimeXStreamConverter() {
         formatter = new DateTimeFormatterBuilder()
                 .appendPattern( "uuuu-MM-dd'T'HH:mm:ss" )
                 .appendFraction( ChronoField.NANO_OF_SECOND, 0, 9, true )
-                .appendOffsetId()
                 .toFormatter();
     }
 
     @Override
-    public void marshal( Object localTimeObject, HierarchicalStreamWriter writer, MarshallingContext context ) {
-        OffsetDateTime offsetDateTime = (OffsetDateTime) localTimeObject;
-        writer.setValue( formatter.format( offsetDateTime ) );
+    public void marshal( Object localDateTimeObject, HierarchicalStreamWriter writer, MarshallingContext context ) {
+        LocalDateTime localDateTime = (LocalDateTime) localDateTimeObject;
+        writer.setValue( formatter.format( localDateTime ) );
     }
 
     @Override
     public Object unmarshal( HierarchicalStreamReader reader, UnmarshallingContext context ) {
-        String offsetDateTimeString = reader.getValue();
+        String localDateTimeString = reader.getValue();
         try {
-            return OffsetDateTime.from( formatter.parse( offsetDateTimeString ) );
+            return LocalDateTime.from( formatter.parse( localDateTimeString ) );
         } catch ( DateTimeException e ) {
-            throw new IllegalStateException( "Failed to convert string (" + offsetDateTimeString + ") to type ("
-                    + OffsetDateTime.class.getName() + ")." );
+            throw new IllegalStateException( "Failed to convert string (" + localDateTimeString + ") to type ("
+                    + LocalDateTime.class.getName() + ")." );
         }
     }
 
     @Override
     public boolean canConvert( Class type ) {
-        return OffsetDateTime.class.isAssignableFrom( type );
+        return LocalDateTime.class.isAssignableFrom( type );
     }
 
 }

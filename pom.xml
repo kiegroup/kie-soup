@@ -99,6 +99,7 @@
 
   <modules>
     <module>kie-soup-commons</module>
+    <module>kie-soup-xstream</module>
     <module>kie-soup-project-datamodel</module>
     <module>kie-soup-maven-utils</module>
     <module>kie-soup-dataset</module>
