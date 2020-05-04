@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.soup.commons.xstream;
+package org.kie.soup.xstream;
 
 import java.time.DateTimeException;
 import java.time.LocalTime;
