@@ -55,7 +55,7 @@
     <version.org.apache.lucene>6.6.1</version.org.apache.lucene>
     <version.com.github.tdomzal.junit.docker>0.3</version.com.github.tdomzal.junit.docker>
     <version.com.spotify.docker.client>5.0.2</version.com.spotify.docker.client>
-    <version.org.apache.logging.log4j>2.8.2</version.org.apache.logging.log4j>
+    <version.org.apache.logging.log4j>2.13.3</version.org.apache.logging.log4j>
   </properties>
 
   <repositories>
