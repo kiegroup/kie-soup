@@ -18,8 +18,11 @@ package org.kie.soup.commons.validation;
 
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
+import static org.kie.soup.commons.validation.PortablePreconditions.checkGreaterOrEqualTo;
+import static org.kie.soup.commons.validation.PortablePreconditions.checkGreaterThan;
 import static org.kie.soup.commons.validation.Preconditions.checkCondition;
 import static org.kie.soup.commons.validation.Preconditions.checkEachParameterNotNull;
 import static org.kie.soup.commons.validation.Preconditions.checkNotEmpty;
@@ -30,6 +33,13 @@ import static org.kie.soup.commons.validation.Preconditions.checkNullMandatory;
  * Test class for {@link Preconditions}
  */
 public class PreconditionsTest {
+
+    private static final String GREATER_THAN_NOT_MET_ERROR = "Parameter named '%s' must be greater than '%s'!";
+    private static final String GREATER_OR_EQUAL_TO_NOT_MET_ERROR = "Parameter named '%s' must be greater or equal to '%s'!";
+    private static final String PARAMETER_SHOULD_NOT_BE_NULL_ERROR = "Parameter named '%s' should be not null!";
+
+    private static final String NOT_NULLABLE = "notNullable";
+    private static final String NON_NULL_VALUE = "nonNullValue";
 
     @Test
     public void shouldDoNotThrowExceptionWhenGettingNotEmptyArray() {
@@ -140,5 +150,77 @@ public class PreconditionsTest {
         checkEachParameterNotNull("notNullable",
                                   "nonNull",
                                   null);
+    }
+
+    @Test
+    public void checkGreaterThanSuccessful() {
+        checkGreaterThan(NOT_NULLABLE, 1, 0);
+    }
+
+    @Test
+    public void checkGreaterThanNotMetWhenEqual() {
+        checkGreaterThanNotMet(1, 1);
+    }
+
+    @Test
+    public void checkGreaterThanNotMetWhenLower() {
+        checkGreaterThanNotMet(1, 2);
+    }
+
+    private <T> void checkGreaterThanNotMet(Comparable<T> param, T nonNullValue) {
+        assertThatThrownBy(() -> checkGreaterThan(NOT_NULLABLE,
+                                                  param,
+                                                  nonNullValue))
+                .hasMessageStartingWith(String.format(GREATER_THAN_NOT_MET_ERROR, NOT_NULLABLE, nonNullValue));
+    }
+
+    @Test
+    public void checkGreaterThanWhenNullParam() {
+        assertThatThrownBy(() -> checkGreaterThan(NOT_NULLABLE,
+                                                  null,
+                                                  1))
+                .hasMessageStartingWith(String.format(PARAMETER_SHOULD_NOT_BE_NULL_ERROR, NOT_NULLABLE));
+    }
+
+    @Test
+    public void checkGreaterThanWhenNullValueParam() {
+        assertThatThrownBy(() -> checkGreaterThan(NOT_NULLABLE,
+                                                  1,
+                                                  null))
+                .hasMessageStartingWith(String.format(PARAMETER_SHOULD_NOT_BE_NULL_ERROR, NON_NULL_VALUE));
+    }
+
+    @Test
+    public void checkGreaterOrEqualToWhenEqualSuccessful() {
+        checkGreaterOrEqualTo(NOT_NULLABLE, 1, 1);
+    }
+
+    @Test
+    public void checkGreaterOrEqualToWhenGreaterSuccessful() {
+        checkGreaterOrEqualTo(NOT_NULLABLE, 1, 0);
+    }
+
+    @Test
+    public void checkGreaterOrEqualToNotMet() {
+        assertThatThrownBy(() -> checkGreaterOrEqualTo(NOT_NULLABLE,
+                                                       0,
+                                                       1))
+                .hasMessageStartingWith(String.format(GREATER_OR_EQUAL_TO_NOT_MET_ERROR, NOT_NULLABLE, 1));
+    }
+
+    @Test
+    public void checkGreaterOrEqualToWhenNullParam() {
+        assertThatThrownBy(() -> checkGreaterOrEqualTo(NOT_NULLABLE,
+                                                       null,
+                                                       1))
+                .hasMessageStartingWith(String.format(PARAMETER_SHOULD_NOT_BE_NULL_ERROR, NOT_NULLABLE));
+    }
+
+    @Test
+    public void checkGreaterOrEqualToWhenNullValueParam() {
+        assertThatThrownBy(() -> checkGreaterOrEqualTo(NOT_NULLABLE,
+                                                       1,
+                                                       null))
+                .hasMessageStartingWith(String.format(PARAMETER_SHOULD_NOT_BE_NULL_ERROR, NON_NULL_VALUE));
     }
 }
