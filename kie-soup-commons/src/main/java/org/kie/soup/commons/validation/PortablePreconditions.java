@@ -145,4 +145,32 @@ public class PortablePreconditions {
             throw new IllegalArgumentException("Parameter named '" + name + "' should be null!");
         }
     }
+
+    /**
+     * Assert that this parameter is not null and greater than the nonNullValue.
+     * @param name of the parameter.
+     * @param parameter the parameter value.
+     * @param nonNullValue a non null value for executing the comparison.
+     */
+    public static <T> void checkGreaterThan(final String name, final Comparable<T> parameter, final T nonNullValue) {
+        checkNotNull(name, parameter);
+        checkNotNull("nonNullValue", nonNullValue);
+        if (parameter.compareTo(nonNullValue) <= 0) {
+            throw new IllegalArgumentException("Parameter named '" + name + "' must be greater than '" + nonNullValue + "'!");
+        }
+    }
+
+    /**
+     * Assert that this parameter is not null and greater or equal to the nonNullValue.
+     * @param name of the parameter.
+     * @param parameter the parameter value.
+     * @param nonNullValue a non null value for executing the comparison.
+     */
+    public static <T> void checkGreaterOrEqualTo(final String name, final Comparable<T> parameter, final T nonNullValue) {
+        checkNotNull(name, parameter);
+        checkNotNull("nonNullValue", nonNullValue);
+        if (parameter.compareTo(nonNullValue) < 0) {
+            throw new IllegalArgumentException("Parameter named '" + name + "' must be greater or equal to '" + nonNullValue + "'!");
+        }
+    }
 }
