@@ -22,7 +22,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -30,32 +29,67 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.project.MavenProject;
-import org.appformer.maven.support.AFReleaseId;
+import org.eclipse.aether.artifact.Artifact;
+import org.appformer.maven.integration.embedder.EmbeddedPomParser;
 import org.appformer.maven.support.DependencyFilter;
 import org.appformer.maven.support.MinimalPomParser;
 import org.appformer.maven.support.PomModel;
-import org.eclipse.aether.artifact.Artifact;
+import org.appformer.maven.support.AFReleaseId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.appformer.maven.integration.embedder.MavenProjectLoader.parseMavenPom;
 
-public abstract class ArtifactResolver {
+public class ArtifactResolver {
 
     private static final Logger log = LoggerFactory.getLogger(ArtifactResolver.class);
 
-    public static ArtifactResolver getResolverFor(ClassLoader classLoader, AFReleaseId releaseId, boolean allowDefaultPom) {
-        InJarArtifactResolver inJarResolver = new InJarArtifactResolver(classLoader, releaseId);
-        if (inJarResolver.isLoaded()) {
-            return inJarResolver;
-        }
+    private final PomParser pomParser;
 
-        ArtifactResolver resolver = getResolverFor(releaseId, allowDefaultPom);
-        if (resolver != null) {
-            return resolver;
-        }
+    private final MavenRepository mavenRepository;
 
-        return null;
+    public ArtifactResolver() {
+        mavenRepository = MavenRepository.getMavenRepository();
+        pomParser = new EmbeddedPomParser();
+    }
+
+    private ArtifactResolver(MavenProject mavenProject) {
+        mavenRepository = MavenRepository.getMavenRepository(mavenProject);
+        pomParser = new EmbeddedPomParser(mavenProject);
+    }
+
+    private ArtifactResolver(PomParser pomParser) {
+        mavenRepository = MavenRepository.getMavenRepository();
+        this.pomParser = pomParser;
+    }
+
+    public Artifact resolveArtifact(AFReleaseId releaseId ) {
+        return mavenRepository.resolveArtifact(releaseId);
+    }
+
+    public List<DependencyDescriptor> getArtifactDependecies( String artifactName ) {
+        return mavenRepository.getArtifactDependecies(artifactName);
+    }
+
+    public List<DependencyDescriptor> getPomDirectDependencies( DependencyFilter dependencyFilter ) {
+        return pomParser.getPomDirectDependencies(dependencyFilter);
+    }
+
+    public Collection<DependencyDescriptor> getAllDependecies() {
+        return getAllDependecies( (releaseId, scope) -> true );
+    }
+
+    public Collection<DependencyDescriptor> getAllDependecies( DependencyFilter dependencyFilter ) {
+        Set<DependencyDescriptor> dependencies = new HashSet<DependencyDescriptor>();
+        for (DependencyDescriptor dep : getPomDirectDependencies(dependencyFilter)) {
+            dependencies.add( dep );
+            for (DependencyDescriptor transitiveDep : getArtifactDependecies( dep.toString() )) {
+                if (dependencyFilter.accept( dep.getReleaseId(), dep.getScope() )) {
+                    dependencies.add( transitiveDep );
+                }
+            }
+        }
+        return dependencies;
     }
 
     public static ArtifactResolver getResolverFor(AFReleaseId releaseId, boolean allowDefaultPom) {
@@ -66,7 +100,7 @@ public abstract class ArtifactResolver {
                 return artifactResolver;
             }
         }
-        return allowDefaultPom ? new DefaultArtifactResolver() : null;
+        return allowDefaultPom ? new ArtifactResolver() : null;
     }
 
     public static ArtifactResolver getResolverFor(URI uri) {
@@ -75,12 +109,12 @@ public abstract class ArtifactResolver {
 
     public static ArtifactResolver getResolverFor(File pomFile) {
         try {
-            return new DefaultArtifactResolver(parseMavenPom(pomFile));
+            return new ArtifactResolver(parseMavenPom(pomFile));
         } catch (RuntimeException e) {
             log.warn("Cannot use native maven pom parser, fall back to the internal one", e);
             PomParser pomParser = createInternalPomParser(pomFile);
             if (pomParser != null) {
-                return new DefaultArtifactResolver(pomParser);
+                return new ArtifactResolver(pomParser);
             }
         }
         return null;
@@ -88,7 +122,7 @@ public abstract class ArtifactResolver {
 
     public static ArtifactResolver getResolverFor(InputStream pomStream) {
         MavenProject mavenProject = parseMavenPom(pomStream);
-        return new DefaultArtifactResolver(mavenProject);
+        return new ArtifactResolver(mavenProject);
     }
 
     private static File getPomFileForGAV(AFReleaseId releaseId, boolean allowDefaultPom) {
@@ -109,29 +143,27 @@ public abstract class ArtifactResolver {
 
     public static ArtifactResolver getResolverFor(PomModel pomModel ) {
         return pomModel instanceof MavenPomModelGenerator.MavenModel ?
-                new DefaultArtifactResolver(((MavenPomModelGenerator.MavenModel) pomModel).getMavenProject()) : new DefaultArtifactResolver();
+               new ArtifactResolver( ( (MavenPomModelGenerator.MavenModel) pomModel ).getMavenProject() ) :
+               new ArtifactResolver();
     }
 
-    private static InternalPomParser createInternalPomParser(File pomFile) {
+    private static InternalPomParser createInternalPomParser(File pomFile ) {
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(pomFile);
-            return new InternalPomParser(MinimalPomParser.parse(pomFile.getAbsolutePath(), fis));
+            return new InternalPomParser( MinimalPomParser.parse( pomFile.getAbsolutePath(), fis ));
         } catch (FileNotFoundException e) {
         } finally {
             if (fis != null) {
                 try {
                     fis.close();
-                } catch (IOException e) {
-                    log.error("Cannot create internal pom parser", e);
-                }
+                } catch (IOException e) { }
             }
         }
         return null;
     }
 
     private static class InternalPomParser implements PomParser {
-
         private final PomModel pomModel;
 
         private InternalPomParser(PomModel pomModel) {
@@ -139,70 +171,12 @@ public abstract class ArtifactResolver {
         }
 
         @Override
-        public List<DependencyDescriptor> getPomDirectDependencies(DependencyFilter filter) {
+        public List<DependencyDescriptor> getPomDirectDependencies( DependencyFilter filter ) {
             List<DependencyDescriptor> deps = new ArrayList<DependencyDescriptor>();
-            for (AFReleaseId rId : pomModel.getDependencies(filter)) {
+            for (AFReleaseId rId : pomModel.getDependencies(filter )) {
                 deps.add(new DependencyDescriptor(rId));
             }
             return deps;
         }
     }
-
-    public static ArtifactResolver create() {
-        return new DefaultArtifactResolver();
-    }
-
-    public Collection<DependencyDescriptor> getAllDependecies(DependencyFilter dependencyFilter) {
-        Set<DependencyDescriptor> dependencies = new HashSet<DependencyDescriptor>();
-        for (DependencyDescriptor dep : getPomDirectDependencies(dependencyFilter)) {
-            dependencies.add(dep);
-            for (DependencyDescriptor transitiveDep : getArtifactDependecies(dep.toString())) {
-                if (dependencyFilter.accept(dep.getReleaseId(), dep.getScope())) {
-                    dependencies.add(transitiveDep);
-                }
-            }
-        }
-        return dependencies;
-    }
-
-    public Collection<DependencyDescriptor> getAllDependecies() {
-        return getAllDependecies((releaseId, scope) -> true);
-    }
-
-    public abstract List<DependencyDescriptor> getPomDirectDependencies(DependencyFilter dependencyFilter);
-
-
-
-    public abstract Artifact resolveArtifact(AFReleaseId releaseId);
-
-    public abstract List<DependencyDescriptor> getArtifactDependecies(String artifactName);
-
-    public static class ArtifactLocation {
-
-        private boolean classPath;
-        private URL url;
-        private Artifact artifact;
-
-        public ArtifactLocation(Artifact artifact, URL url, boolean classPath) {
-            this.url = url;
-            this.artifact = artifact;
-            this.classPath = classPath;
-        }
-
-        public Artifact getArtifact() {
-            return artifact;
-        }
-
-
-        public URL toURL() {
-            return url;
-        }
-
-        public boolean isClassPath() {
-            return classPath;
-        }
-
-    }
-
-    public abstract ArtifactLocation resolveArtifactLocation(AFReleaseId releaseId);
 }
