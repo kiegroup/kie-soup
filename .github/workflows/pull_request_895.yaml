@@ -12,7 +12,7 @@ jobs:
         build-command: echo "pepe"
         workflow-file-name: "pull_request_895.yaml"
         env: |
-          TEMP_SECRET: "${{ secrets.TEMP_SECRET }}"
+          TEMP_SECRET: ${{ secrets.TEMP_SECRET }}
       env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           SONARCLOUD_TOKEN: "${{ secrets.SONARCLOUD_TOKEN }}"
