@@ -7,12 +7,14 @@ jobs:
     steps:
     - name: Build Chain
       id: build-chain
-      uses: kiegroup/github-action-build-chain@master
+      uses: kiegroup/github-action-build-chain@BXMSPROD-895
       with:
         build-command: |
           mvn -e -nsu -Dfull -Pwildfly clean install -Prun-code-coverage  -Dcontainer.profile=wildfly -Dcontainer=wildfly -Dintegration-tests=true -Dmaven.test.failure.ignore=true -DjvmArgs="-Xms1g -Xmx4g"
-          SONARCLOUD_TOKEN=${{ secrets.TEMP_SECRET }} mvn -nsu generate-resources -Psonarcloud-analysis -DjvmArgs="-Xms1g -Xmx4g"
+          mvn -nsu generate-resources -Psonarcloud-analysis -DjvmArgs="-Xms1g -Xmx4g"
         workflow-file-name: "pull_request_895.yaml"
+        env: |
+          TEMP_SECRET: "${{ secrets.TEMP_SECRET }}"
       env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           SONARCLOUD_TOKEN: "${{ secrets.SONARCLOUD_TOKEN }}"
