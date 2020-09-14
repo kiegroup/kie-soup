@@ -26,8 +26,10 @@ import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+
 import org.apache.maven.project.MavenProject;
 import org.appformer.maven.integration.embedder.EmbeddedPomParser;
+import org.appformer.maven.integration.embedder.MavenEmbedder;
 import org.appformer.maven.integration.embedder.MavenProjectLoader;
 import org.appformer.maven.support.AFReleaseId;
 import org.appformer.maven.support.AFReleaseIdImpl;
@@ -107,10 +109,12 @@ public class InJarArtifactResolver extends ArtifactResolver {
             return null;
         }
         try (InputStream pomStream = pomFile.openStream()) {
-            MavenProject mavenProject = MavenProjectLoader.parseMavenPom(pomStream);
+            // dependencies were resolved already so there is no need to resolve them again
+            MavenEmbedder mavenEmbedded = MavenProjectLoader.newMavenEmbedder(true);
+            MavenProject mavenProject = mavenEmbedded.readProject(pomStream);
             PomParser artifactPomParser = new EmbeddedPomParser(mavenProject);
             return artifactPomParser;
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Could not read pom in jar {}", pomFile);
             return null;
         }
