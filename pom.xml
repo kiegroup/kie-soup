@@ -55,7 +55,6 @@
     <version.org.apache.lucene>6.6.1</version.org.apache.lucene>
     <version.com.github.tdomzal.junit.docker>0.3</version.com.github.tdomzal.junit.docker>
     <version.com.spotify.docker.client>5.0.2</version.com.spotify.docker.client>
-    <version.org.apache.logging.log4j>2.8.2</version.org.apache.logging.log4j>
   </properties>
 
   <repositories>
@@ -627,18 +626,6 @@
         <groupId>com.github.tdomzal</groupId>
         <artifactId>junit-docker-rule</artifactId>
         <version>${version.com.github.tdomzal.junit.docker}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-core</artifactId>
-        <version>${version.org.apache.logging.log4j}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-api</artifactId>
-        <version>${version.org.apache.logging.log4j}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
