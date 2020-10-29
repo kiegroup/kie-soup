@@ -29,7 +29,7 @@ import org.junit.Test;
 import static org.dashbuilder.dataset.ColumnType.*;
 import static org.junit.Assert.*;
 
-public class DataSetLookupConstraintsTest {
+public class DataSetApiLookupConstraintsTest {
 
     public static final String OFFICE = "office";
     public static final String DEPARTMENT = "department";
