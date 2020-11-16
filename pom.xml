@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-parent</artifactId>
-    <version>7.46.0-SNAPSHOT</version>
+    <version>7.47.0-SNAPSHOT</version>
     <!-- Keep in sync with the parent version of kie-soup-bom/pom.xml -->
   </parent>
 
@@ -102,6 +102,7 @@
     <module>kie-soup-project-datamodel</module>
     <module>kie-soup-maven-utils</module>
     <module>kie-soup-dataset</module>
+    <module>kie-soup-security-utils</module>
   </modules>
 
   <build>
