@@ -20,8 +20,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -30,6 +32,11 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.appformer.maven.integration.Aether;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.CollectResult;
+import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.graph.DependencyVisitor;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.slf4j.Logger;
@@ -38,7 +45,10 @@ import org.slf4j.LoggerFactory;
 public class MavenProjectLoader {
 
     public static final String FORCE_OFFLINE = "kie.maven.offline.force";
+    public static final String RESOLVE_TRANSITVE = "kie.maven.offline.transitive.resolve";
+
     protected static boolean IS_FORCE_OFFLINE = Boolean.valueOf(System.getProperty(FORCE_OFFLINE, "false"));
+    protected static boolean IS_RESOLVE_TRANSITIVE = Boolean.valueOf(System.getProperty(RESOLVE_TRANSITVE, "false"));
 
     private static final Logger log = LoggerFactory.getLogger(MavenProjectLoader.class);
 
@@ -71,6 +81,7 @@ public class MavenProjectLoader {
             return hasPom ?
                     mavenEmbedder.readProject(pomFile) :
                     mavenEmbedder.readProject(new ByteArrayInputStream(DUMMY_POM.getBytes(StandardCharsets.UTF_8)));
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -102,9 +113,11 @@ public class MavenProjectLoader {
                                                             new DefaultArtifactHandler());
                     if (resolve(session, artifact)) {
                         artifacts.add(artifact);
+                        artifacts.addAll(collectTransitiveDependencies(session, dep));
                     } else {
                         log.error("Artifact can't be resolved {}'", artifact.toString());
                     }
+
                 }
                 if (!artifacts.isEmpty()) {
                     project.setArtifacts(artifacts);
@@ -124,11 +137,7 @@ public class MavenProjectLoader {
     private static boolean resolve(final RepositorySystemSession session,
                                    final Artifact artifact) {
         final ArtifactRequest artifactRequest = new ArtifactRequest();
-        final org.eclipse.aether.artifact.Artifact jarArtifact = new org.eclipse.aether.artifact.DefaultArtifact(artifact.getGroupId(),
-                                                                                                                 artifact.getArtifactId(),
-                                                                                                                 artifact.getClassifier(),
-                                                                                                                 "jar",
-                                                                                                                 artifact.getVersion());
+        final org.eclipse.aether.artifact.Artifact jarArtifact = toAetherArtifact(artifact);
 
         artifactRequest.setArtifact(jarArtifact);
         try {
@@ -139,6 +148,43 @@ public class MavenProjectLoader {
             log.info(are.getMessage(), are);
             return false;
         }
+    }
+
+    private static Set<Artifact> collectTransitiveDependencies(RepositorySystemSession session, Dependency dep) {
+        if (IS_RESOLVE_TRANSITIVE) {
+            try {
+                org.eclipse.aether.graph.Dependency root = new org.eclipse.aether.graph.Dependency(toAetherArtifact(dep),
+                                                                                                   dep.getScope());
+                CollectRequest request = new CollectRequest(root, Collections.emptyList());
+                CollectResult result = Aether.getAether().getSystem().collectDependencies(session, request);
+                Set<Artifact> transitiveDeps = new HashSet<>();
+                result.getRoot().accept(new DependencyVisitor() {
+
+                    @Override
+                    public boolean visitLeave(DependencyNode node) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean visitEnter(DependencyNode node) {
+                        if (!result.getRoot().equals(node)) {
+                            transitiveDeps.add(toArtifact(node.getDependency()));
+                        }
+                        return true;
+                    }
+
+                });
+
+                return transitiveDeps.stream()
+                                     .filter(tDep -> resolve(session, tDep))
+                                     .collect(Collectors.toSet());
+
+            } catch (DependencyCollectionException e) {
+                log.warn("Not able to collect dependencies for {}", dep.toString());
+                log.debug("Not able to collect dependencies.", e);
+            }
+        }
+        return Collections.emptySet();
     }
 
     public static MavenEmbedder newMavenEmbedder(boolean offline) {
@@ -183,8 +229,41 @@ public class MavenProjectLoader {
         }
         return mavenProject;
     }
-    
+
     public static boolean isOffline() {
         return IS_FORCE_OFFLINE;
+    }
+
+    private static Artifact toArtifact(org.eclipse.aether.graph.Dependency dependency) {
+        return new DefaultArtifact(dependency.getArtifact().getGroupId(),
+                                   dependency.getArtifact().getArtifactId(),
+                                   dependency.getArtifact().getVersion(),
+                                   dependency.getScope(),
+                                   "jar",
+                                   dependency.getArtifact().getClassifier(),
+                                   new DefaultArtifactHandler());
+    }
+
+    private static org.eclipse.aether.artifact.DefaultArtifact toAetherArtifact(final Artifact artifact) {
+        return aetherArtifact(artifact.getGroupId(),
+                              artifact.getArtifactId(),
+                              artifact.getClassifier(),
+                              "jar",
+                              artifact.getVersion());
+    }
+
+    private static org.eclipse.aether.artifact.DefaultArtifact toAetherArtifact(Dependency dep) {
+        return aetherArtifact(dep.getGroupId(), dep.getArtifactId(),
+                              dep.getClassifier(),
+                              "jar",
+                              dep.getVersion());
+    }
+
+    private static org.eclipse.aether.artifact.DefaultArtifact aetherArtifact(String groupId, String artifactId, String classifier, String ext, String version) {
+        return new org.eclipse.aether.artifact.DefaultArtifact(groupId,
+                                                               artifactId,
+                                                               classifier,
+                                                               ext,
+                                                               version);
     }
 }
