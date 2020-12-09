@@ -701,7 +701,7 @@ public class DefaultDialect implements Dialect {
         // Limits
         int limit = select.getLimit();
         int offset = select.getOffset();
-        if (limit > 0 || offset > 0) {
+        if (limit >= 0 || offset > 0) {
             String limitSql = getOffsetLimitSQL(select);
             if (!StringUtils.isBlank(limitSql)) {
                 sql.append(limitSql);
@@ -893,7 +893,7 @@ public class DefaultDialect implements Dialect {
         int offset = select.getOffset();
         int limit = select.getLimit();
         StringBuilder out = new StringBuilder();
-        if (limit > 0) out.append(" LIMIT ").append(limit);
+        if (limit >= 0) out.append(" LIMIT ").append(limit);
         if (offset > 0) out.append(" OFFSET ").append(offset);
         return out.toString();
     }
