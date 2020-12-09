@@ -72,7 +72,7 @@ public class DB2Dialect extends DefaultDialect {
         int offset = select.getOffset();
         int limit = select.getLimit();
 
-        if (limit > 0) {
+        if (limit >= 0) {
             sql += " FETCH FIRST " + (limit + (offset > 0 ? offset : 0)) + " ROWS ONLY";
         }
 
