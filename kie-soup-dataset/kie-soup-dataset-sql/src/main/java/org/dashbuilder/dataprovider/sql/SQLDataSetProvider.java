@@ -412,7 +412,7 @@ public class SQLDataSetProvider implements DataSetProvider, DataSetDefRegistryLi
     protected List<Column> _getColumns(SQLDataSetDef def, Connection conn) {
         final Dialect dialect = JDBCUtils.dialect(conn);
         Select q = SQLFactory.select(conn);
-        q = (!StringUtils.isBlank(def.getDbSQL()) ? q.from(def.getDbSQL()) : q.from(_createTable(def))).limit(1);
+        q = (!StringUtils.isBlank(def.getDbSQL()) ? q.from(def.getDbSQL()) : q.from(_createTable(def))).limit(0);
         return logSQL(q).fetch(new ResultSetConsumer<List<Column>>() {
             public List<Column> consume(ResultSet _rs) {
                 return JDBCUtils.getColumns(_rs, dialect.getExcludedColumns());
