@@ -42,6 +42,8 @@ public class SQLDataSetDef extends DataSetDef {
     
     protected boolean estimateSize = true;
 
+    protected boolean validate = true;
+
     public SQLDataSetDef() {
         super.setProvider(DataSetProviderType.SQL);
     }
@@ -102,6 +104,14 @@ public class SQLDataSetDef extends DataSetDef {
         return estimateSize;
     }
 
+    public void setValidate(boolean validate) {
+        this.validate = validate;
+    }
+
+    public boolean isValidate() {
+        return validate;
+    }
+
     @Override
     public boolean equals(Object obj) {
         try {
@@ -122,6 +132,9 @@ public class SQLDataSetDef extends DataSetDef {
                 return false;
             }
             if(estimateSize != other.estimateSize){
+                return false;
+            }
+            if(validate != other.validate){
                 return false;
             }
             return true;
@@ -148,6 +161,7 @@ public class SQLDataSetDef extends DataSetDef {
         def.setDbTable(getDbTable());
         def.setDbSQL(getDbSQL());
         def.setEstimateSize(isEstimateSize());
+        def.setValidate(isValidate());
         return def;
     }
 
@@ -170,6 +184,7 @@ public class SQLDataSetDef extends DataSetDef {
         out.append("Cache enabled=").append(cacheEnabled).append("\n");
         out.append("Cache max rows=").append(cacheMaxRows).append(" Kb\n");
         out.append("Estimate size=").append(estimateSize).append("\n");
+        out.append("Validate=").append(validate).append("\n");
         return out.toString();
     }
 }

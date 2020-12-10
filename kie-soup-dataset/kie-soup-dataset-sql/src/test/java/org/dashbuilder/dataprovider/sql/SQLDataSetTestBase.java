@@ -94,9 +94,7 @@ public class SQLDataSetTestBase {
         dataSetProviderRegistry.registerDataProvider(sqlDataSetProvider);
 
         // Register the SQL data set
-        URL fileURL = Thread.currentThread().getContextClassLoader().getResource(getExpenseReportsDsetFile());
-        String json = IOUtils.toString(fileURL, StandardCharsets.UTF_8);
-        SQLDataSetDef def = (SQLDataSetDef) jsonMarshaller.fromJson(json);
+        SQLDataSetDef def = getSqlDataSetDef();
         dataSetDefRegistry.registerDataSetDef(def);
 
         // Get a data source connection
@@ -111,6 +109,12 @@ public class SQLDataSetTestBase {
 
         // Populate the table
         populateDbTable();
+    }
+
+    protected SQLDataSetDef getSqlDataSetDef() throws Exception {
+        URL fileURL = Thread.currentThread().getContextClassLoader().getResource(getExpenseReportsDsetFile());
+        String json = IOUtils.toString(fileURL, StandardCharsets.UTF_8);
+        return (SQLDataSetDef) jsonMarshaller.fromJson(json);
     }
 
     @After

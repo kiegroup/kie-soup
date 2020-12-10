@@ -16,8 +16,6 @@
 
 package org.dashbuilder.dataprovider.sql;
 
-import static org.dashbuilder.dataprovider.sql.SQLFactory.dropTable;
-import static org.dashbuilder.dataprovider.sql.SQLFactory.table;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 

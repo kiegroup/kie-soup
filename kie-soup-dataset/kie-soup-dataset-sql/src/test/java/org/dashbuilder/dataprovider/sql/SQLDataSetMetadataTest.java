@@ -74,10 +74,10 @@ public class SQLDataSetMetadataTest {
                         .buildDef());
 
         List<String> columnIds = metadata.getColumnIds();
-        assertEquals(columnIds.size(), 3);
-        assertEquals(columnIds.get(0), "dbWins1");
-        assertEquals(columnIds.get(1), "dbWins2");
-        assertEquals(columnIds.get(2), "dbWins3");
+        assertEquals(3, columnIds.size());
+        assertEquals("dbWins1", columnIds.get(0));
+        assertEquals("dbWins2", columnIds.get(1));
+        assertEquals("dbWins3", columnIds.get(2));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -89,9 +89,9 @@ public class SQLDataSetMetadataTest {
                         .buildDef());
 
         List<String> columnIds = metadata.getColumnIds();
-        assertEquals(columnIds.size(), 2);
-        assertEquals(columnIds.get(0), "dbWins1");
-        assertEquals(columnIds.get(1), "dbWins2");
+        assertEquals(2, columnIds.size());
+        assertEquals("dbWins1", columnIds.get(0));
+        assertEquals("dbWins2", columnIds.get(1));
     }
 
     @Test
@@ -105,8 +105,25 @@ public class SQLDataSetMetadataTest {
                 .buildDef());
 
         List<String> columnIds = metadata.getColumnIds();
-        assertEquals(columnIds.size(), 2);
-        assertEquals(columnIds.get(0), "dbWins1");
-        assertEquals(columnIds.get(1), "dbWins2");
+        assertEquals(2, columnIds.size());
+        assertEquals("dbWins1", columnIds.get(0));
+        assertEquals("dbWins2", columnIds.get(1));
+    }
+
+    @Test
+    public void testColumnsWithoutValidate() throws Exception {
+        DataSetMetadata metadata = dataSetProvider.getDataSetMetadata(
+                DataSetDefFactory.newSQLDataSetDef()
+                        .uuid("test")
+                        .label("dbwins1")
+                        .label("DBWINS2")
+                        .dbTable("test", false)
+                        .validate(false)
+                        .buildDef());
+
+        List<String> columnIds = metadata.getColumnIds();
+        assertEquals(2, columnIds.size());
+        assertEquals("dbwins1", columnIds.get(0));
+        assertEquals("DBWINS2", columnIds.get(1));
     }
 }

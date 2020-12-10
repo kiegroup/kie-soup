@@ -51,4 +51,9 @@ public class SQLDataSetDefBuilderImpl extends AbstractDataSetDefBuilder<SQLDataS
         ((SQLDataSetDef) def).setEstimateSize(estimateSize);
         return this;
     }
+
+    public SQLDataSetDefBuilderImpl validate(boolean validate) {
+        ((SQLDataSetDef) def).setValidate(validate);
+        return this;
+    }
 }

@@ -18,7 +18,6 @@ package org.dashbuilder.dataprovider.sql;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -82,6 +81,8 @@ import org.dashbuilder.dataset.sort.DataSetSort;
 import org.dashbuilder.dataset.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  *  DataSetProvider implementation for JDBC-compliant data sources.
@@ -324,59 +325,71 @@ public class SQLDataSetProvider implements DataSetProvider, DataSetDefRegistryLi
             }
         }
 
-        // Fetch the DB columns from the table or sql
-        List<Column> dbColumns = _getColumns(def, conn);
-        List<String> targetDbColumnIds = new ArrayList<String>();
-        List<ColumnType> targetDbColumnTypes = new ArrayList<ColumnType>();
-        List<Integer> targetDbColumnsLength = new ArrayList<Integer>();
+        List<Column> dbColumns;
+        List<String> targetDbColumnIds;
+        List<ColumnType> targetDbColumnTypes;
+        List<Integer> targetDbColumnsLength;
+        
+        if(def.isValidate()) {
+            // Fetch the DB columns from the table or sql
+            dbColumns = _getColumns(def, conn);
+            targetDbColumnIds = new ArrayList<>();
+            targetDbColumnTypes = new ArrayList<>();
+            targetDbColumnsLength = new ArrayList<>();
 
-        // Check the definition columns match those in the DB
-        if (def.getColumns() != null) {
-            for (DataColumnDef column : def.getColumns()) {
-                Column dbColumn = _getDbColumn(dbColumns, column.getId());
-                if (dbColumn == null) {
-                    throw new IllegalArgumentException("The DataSetDef's column does not exist in DB: " + column.getId());
-                }
-                targetDbColumnIds.add(dbColumn.getName());
-                targetDbColumnTypes.add(column.getColumnType());
-                targetDbColumnsLength.add(dbColumn.getLength());
-            }
-        }
-
-        // Add or skip non-existing columns depending on the data set definition.
-        for (Column dbColumn : dbColumns) {
-            String dbColumnId = dbColumn.getName();
-            int columnIdx = targetDbColumnIds.indexOf(dbColumnId);
-            boolean columnExists  = columnIdx != -1;
-
-            if (!columnExists) {
-
-                // Add any table column
-                if (def.isAllColumnsEnabled()) {
-                    targetDbColumnIds.add(dbColumnId);
-                    targetDbColumnTypes.add(dbColumn.getType());
+            // Check the definition columns match those in the DB
+            if (def.getColumns() != null) {
+                for (DataColumnDef column : def.getColumns()) {
+                    Column dbColumn = _getDbColumn(dbColumns, column.getId());
+                    if (dbColumn == null) {
+                        throw new IllegalArgumentException("The DataSetDef's column does not exist in DB: " + column.getId());
+                    }
+                    targetDbColumnIds.add(dbColumn.getName());
+                    targetDbColumnTypes.add(column.getColumnType());
                     targetDbColumnsLength.add(dbColumn.getLength());
                 }
-                // Skip non existing columns
-                else {
-                    continue;
+            }
+
+            // Add or skip non-existing columns depending on the data set definition.
+            for (Column dbColumn : dbColumns) {
+                String dbColumnId = dbColumn.getName();
+                int columnIdx = targetDbColumnIds.indexOf(dbColumnId);
+                boolean columnExists = columnIdx != -1;
+
+                if (!columnExists) {
+
+                    // Add any table column
+                    if (def.isAllColumnsEnabled()) {
+                        targetDbColumnIds.add(dbColumnId);
+                        targetDbColumnTypes.add(dbColumn.getType());
+                        targetDbColumnsLength.add(dbColumn.getLength());
+                    }
+                    // Skip non existing columns
+                    else {
+                        continue;
+                    }
                 }
             }
-        }
 
-        // Ensure the column set is valid
-        if (targetDbColumnIds.isEmpty()) {
-            throw new IllegalArgumentException("No data set columns found: " + def);
+            // Ensure the column set is valid
+            if (targetDbColumnIds.isEmpty()) {
+                throw new IllegalArgumentException("No data set columns found: " + def);
+            }
+
+        } else {
+            dbColumns = def.getColumns().stream().map(c -> SQLFactory.column(c.getId(), c.getColumnType(), 0)).collect(toList());
+            targetDbColumnIds = dbColumns.stream().map(Column::getName).collect(toList());
+            targetDbColumnTypes = dbColumns.stream().map(Column::getType).collect(toList());
+            targetDbColumnsLength = dbColumns.stream().map(Column::getLength).collect(toList());
         }
 
         // Creates a brand new metadata holder instance
         MetadataHolder result = new MetadataHolder();
         result.columns = dbColumns;
         result.metadata = new DataSetMetadataImpl(def,
-                def.getUUID(), 0,
-                targetDbColumnIds.size(), targetDbColumnIds,
-                targetDbColumnTypes, 0);
-
+                                                  def.getUUID(), 0,
+                                                  targetDbColumnIds.size(), targetDbColumnIds,
+                                                  targetDbColumnTypes, 0);
 
         // Calculate the estimated size
         if(def.isEstimateSize()) {
@@ -391,7 +404,7 @@ public class SQLDataSetProvider implements DataSetProvider, DataSetDefRegistryLi
                     estimatedSize += MemSizeEstimator.sizeOf(Double.class) * rowCount;
                 } else {
                     int length = targetDbColumnsLength.get(i);
-                    estimatedSize += length / 2 * rowCount;
+                    estimatedSize += length == 0 ? 0 : length / 2 * rowCount;
                 }
             }
 
