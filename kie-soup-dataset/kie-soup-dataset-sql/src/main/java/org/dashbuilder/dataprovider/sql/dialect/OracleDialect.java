@@ -101,7 +101,7 @@ public class OracleDialect extends DefaultDialect {
         int limit = select.getLimit();
         StringBuilder out = new StringBuilder();
         if (offset > 0) out.append(" OFFSET ").append(offset).append(" ROWS");
-        if (limit > 0) out.append(" FETCH FIRST ").append(limit).append(" ROWS ONLY");
+        if (limit >= 0) out.append(" FETCH FIRST ").append(limit).append(" ROWS ONLY");
         return out.toString();
     }
 }

@@ -69,7 +69,7 @@ public class SQLServerDialect extends DefaultDialect {
     public String getCountQuerySQL(Select select) {
         int offset = select.getOffset();
         int limit = select.getLimit();
-        if (limit <= 0 && offset <= 0 && !select.getOrderBys().isEmpty()) {
+        if (limit < 0 && offset <= 0 && !select.getOrderBys().isEmpty()) {
             List<SortColumn> sortColumns = new ArrayList<SortColumn>();
             sortColumns.addAll(select.getOrderBys());
             try {
@@ -103,7 +103,7 @@ public class SQLServerDialect extends DefaultDialect {
     public String getSQL(Select select) {
         int offset = select.getOffset();
         int limit = select.getLimit();
-        if ((limit > 0 || offset > 0) && select.getOrderBys().isEmpty()) {
+        if ((limit >= 0 || offset > 0) && select.getOrderBys().isEmpty()) {
             List<Column> columns = select.getColumns();
             if (columns.isEmpty()) {
                 columns = fetchColumns(select);
@@ -139,7 +139,7 @@ public class SQLServerDialect extends DefaultDialect {
     public String getSelectStatement(Select select) {
         int offset = select.getOffset();
         int limit = select.getLimit();
-        if (offset <= 0 && limit > 0) {
+        if (offset <= 0 && limit >= 0) {
             return "SELECT TOP " + limit;
         } else {
             return "SELECT";
@@ -153,7 +153,7 @@ public class SQLServerDialect extends DefaultDialect {
         StringBuilder out = new StringBuilder();
         if (offset > 0) {
             if (offset > 0) out.append(" OFFSET ").append(offset).append(" ROWS");
-            if (limit > 0) out.append(" FETCH FIRST ").append(limit).append(" ROWS ONLY");
+            if (limit >= 0) out.append(" FETCH FIRST ").append(limit).append(" ROWS ONLY");
         }
         return out.toString();
     }

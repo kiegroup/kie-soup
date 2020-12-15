@@ -94,7 +94,7 @@ public class SybaseASEDialect extends DefaultDialect {
     public String getSelectStatement(Select select) {
         int offset = select.getOffset();
         int limit = select.getLimit();
-        if (offset > 0 && limit > 0) {
+        if (offset > 0 && limit >= 0) {
             select.setOffsetPostProcessing(true);
             return "SELECT TOP " + (offset + limit);
         }
