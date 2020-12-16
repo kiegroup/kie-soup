@@ -69,7 +69,7 @@ public class SQLServerDialect extends DefaultDialect {
     public String getCountQuerySQL(Select select) {
         int offset = select.getOffset();
         int limit = select.getLimit();
-        if (limit < 0 && offset <= 0 && !select.getOrderBys().isEmpty()) {
+        if (limit <= 0 && offset <= 0 && !select.getOrderBys().isEmpty()) {
             List<SortColumn> sortColumns = new ArrayList<SortColumn>();
             sortColumns.addAll(select.getOrderBys());
             try {
@@ -103,7 +103,7 @@ public class SQLServerDialect extends DefaultDialect {
     public String getSQL(Select select) {
         int offset = select.getOffset();
         int limit = select.getLimit();
-        if ((limit >= 0 || offset > 0) && select.getOrderBys().isEmpty()) {
+        if ((limit > 0 || offset > 0) && select.getOrderBys().isEmpty()) {
             List<Column> columns = select.getColumns();
             if (columns.isEmpty()) {
                 columns = fetchColumns(select);
