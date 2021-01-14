@@ -18,6 +18,7 @@ package org.kie.soup.xstream;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -226,6 +227,22 @@ public class XStreamUtils {
      */
     public static XStream createNonTrustingXStream(ReflectionProvider reflectionProvider, HierarchicalStreamDriver hierarchicalStreamDriver ) {
         return internalCreateNonTrustingXStream( new XStream(reflectionProvider, hierarchicalStreamDriver) );
+    }
+
+    /**
+     * Use for XML or JSON that might not come from a trusted source (such as REST services payloads, ...).
+     * Automatically whitelists all classes with an {@link XStreamAlias} annotation.
+     * Often requires whitelisting additional domain specific classes, which you'll need to expose in your API's.
+     */
+    public static XStream createNonTrustingXStream(ReflectionProvider reflectionProvider,
+                                                   HierarchicalStreamDriver hierarchicalStreamDriver,
+                                                   UnaryOperator<MapperWrapper> mapper) {
+        return internalCreateNonTrustingXStream(new XStream(reflectionProvider, hierarchicalStreamDriver) {
+            @Override
+            protected MapperWrapper wrapMapper(MapperWrapper next) {
+                return mapper.apply(next);
+            }
+        });
     }
 
     /**
