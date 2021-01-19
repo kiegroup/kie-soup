@@ -50,16 +50,16 @@ public class PrometheusDataSetProvider implements DataSetProvider, DataSetDefReg
     protected StaticDataSetProvider staticDataSetProvider;
     protected Logger log = LoggerFactory.getLogger(PrometheusDataSetProvider.class);
 
-    private static PrometheusDataSetProvider SINGLETON = null;
+    private static PrometheusDataSetProvider instance = null;
 
     public static PrometheusDataSetProvider get() {
-        if (SINGLETON == null) {
+        if (instance == null) {
             StaticDataSetProvider staticDataSetProvider = DataSetCore.get().getStaticDataSetProvider();
             DataSetDefRegistry dataSetDefRegistry = DataSetCore.get().getDataSetDefRegistry();
-            SINGLETON = new PrometheusDataSetProvider(staticDataSetProvider);
-            dataSetDefRegistry.addListener(SINGLETON);
+            instance = new PrometheusDataSetProvider(staticDataSetProvider);
+            dataSetDefRegistry.addListener(instance);
         }
-        return SINGLETON;
+        return instance;
     }
 
     public PrometheusDataSetProvider() {}
@@ -82,10 +82,6 @@ public class PrometheusDataSetProvider implements DataSetProvider, DataSetDefReg
     }
 
     public DataSet lookupDataSet(DataSetDef def, DataSetLookup lookup) throws Exception {
-
-        // TODO: Implement cache - if cache or test then return the dataset def from static 
-        // - otherwise go to the server and get the dataset
-        // Look first into the static data set provider since CSV data set are statically registered once loaded.
         String baseUrl = ((PrometheusDataSetDef) def).getServerUrl();
         String query = ((PrometheusDataSetDef) def).getQuery();
         QueryResponse response = new PrometheusClient(baseUrl).query(query);
@@ -131,7 +127,7 @@ public class PrometheusDataSetProvider implements DataSetProvider, DataSetDefReg
     }
 
     private Set<String> getMetricColumns(List<Result> results) {
-        return results.size() < 1 || results.get(0).getMetric() == null
+        return results.isEmpty() || results.get(0).getMetric() == null
                 ? Collections.emptySet()
                 : results.get(0).getMetric().keySet();
     }
@@ -159,7 +155,7 @@ public class PrometheusDataSetProvider implements DataSetProvider, DataSetDefReg
 
     @Override
     public boolean isDataSetOutdated(DataSetDef def) {
-        // perhaps check cache here
-        return false;
+        // consider that the dataset is always outdated because Prometheus is about realtime metrics 
+        return true;
     }
 }

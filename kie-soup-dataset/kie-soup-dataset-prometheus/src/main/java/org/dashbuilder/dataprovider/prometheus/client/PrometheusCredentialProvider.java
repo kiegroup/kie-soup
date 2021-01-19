@@ -18,18 +18,19 @@ package org.dashbuilder.dataprovider.prometheus.client;
 public class PrometheusCredentialProvider {
 
     public static final String PROMETHEUS_USER_PROP = "dashbuilder.prometheus.user";
-    public static final String PROMETHEUS_PSW_PROP = "dashbuilder.prometheus.password";
-    private static PrometheusCredentialProvider INSTANCE;
+    public static final String PROMETHEUS_PASSWORD_PROP = "dashbuilder.prometheus.password";
+
+    private static PrometheusCredentialProvider instance;
 
     private PrometheusCredentialProvider() {
         // empty
     }
 
     public static PrometheusCredentialProvider get() {
-        if (INSTANCE == null) {
-            INSTANCE = new PrometheusCredentialProvider();
+        if (instance == null) {
+            instance = new PrometheusCredentialProvider();
         }
-        return INSTANCE;
+        return instance;
 
     }
 
@@ -38,7 +39,7 @@ public class PrometheusCredentialProvider {
     }
 
     public String getPassword() {
-        return System.getProperty(PROMETHEUS_PSW_PROP);
+        return System.getProperty(PROMETHEUS_PASSWORD_PROP);
     }
 
 }

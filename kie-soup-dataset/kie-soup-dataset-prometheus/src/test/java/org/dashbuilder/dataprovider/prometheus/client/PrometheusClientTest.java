@@ -66,13 +66,13 @@ public class PrometheusClientTest {
     @Test
     public void testQueryResponseWithCredentials() {
         System.setProperty(PrometheusCredentialProvider.PROMETHEUS_USER_PROP, "usr");
-        System.setProperty(PrometheusCredentialProvider.PROMETHEUS_PSW_PROP, "psw");
+        System.setProperty(PrometheusCredentialProvider.PROMETHEUS_PASSWORD_PROP, "psw");
         prometheusClient.query("up");
         verify(httpClient).doGet(eq("http://localhost:9090/api/v1/query?query=up"),
                                  eq("usr"),
                                  eq("psw"));
         System.clearProperty(PrometheusCredentialProvider.PROMETHEUS_USER_PROP);
-        System.clearProperty(PrometheusCredentialProvider.PROMETHEUS_PSW_PROP);
+        System.clearProperty(PrometheusCredentialProvider.PROMETHEUS_PASSWORD_PROP);
     }
 
 }

@@ -23,7 +23,7 @@ import static org.dashbuilder.dataset.json.DataSetDefJSONMarshaller.isBlank;
 
 public class PrometheusDefJSONMarshaller implements DataSetDefJSONMarshallerExt<PrometheusDataSetDef> {
 
-    public static PrometheusDefJSONMarshaller INSTANCE = new PrometheusDefJSONMarshaller();
+    public static final PrometheusDefJSONMarshaller INSTANCE = new PrometheusDefJSONMarshaller();
 
     public static final String SERVER_URL = "serverUrl";
     public static final String QUERY = "query";

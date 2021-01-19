@@ -23,13 +23,13 @@ public class PrometheusDataSetDefBuilderImpl extends AbstractDataSetDefBuilder<P
 
     @Override
     public PrometheusDataSetDefBuilderImpl serverUrl(String serverUrl) {
-        ((PrometheusDataSetDef) def).setServerUrl(serverUrl);
+        ((PrometheusDataSetDef) super.def).setServerUrl(serverUrl);
         return this;
     }
 
     @Override
     public PrometheusDataSetDefBuilderImpl query(String query) {
-        ((PrometheusDataSetDef) def).setQuery(query);
+        ((PrometheusDataSetDef) super.def).setQuery(query);
         return this;
     }
 

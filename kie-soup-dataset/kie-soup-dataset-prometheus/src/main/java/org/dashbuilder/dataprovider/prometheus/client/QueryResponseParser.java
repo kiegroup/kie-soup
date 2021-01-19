@@ -44,20 +44,21 @@ public class QueryResponseParser {
 
     public QueryResponse parse(String responseStr) {
         JsonObject json = Json.parse(responseStr);
-        QueryResponse response = new QueryResponse();
+        QueryResponseBuilder response =  QueryResponseBuilder.newQueryResponseBuilder();
         
-        response.setStatus(Status.of(json.getString(STATUS_PROP)));
+        Status status = Status.of(json.getString(STATUS_PROP));
+        response.status(status);
         
-        if (response.getStatus() == Status.ERROR) {
-            response.setErrorType(json.getString(ERROR_TYPE_PROP));
-            response.setError(json.getString(ERROR_PROP));
-            return response;
+        if (status == Status.ERROR) {
+            response.errorType(json.getString(ERROR_TYPE_PROP));
+            response.error(json.getString(ERROR_PROP));
+            return response.build();
         }
 
         return fillSuccessResponse(json, response);
     }
 
-    private QueryResponse fillSuccessResponse(JsonObject json, QueryResponse response) {
+    private QueryResponse fillSuccessResponse(JsonObject json, QueryResponseBuilder response) {
         JsonObject data = json.getObject(DATA_PROP);
         ResultType resultType = ResultType.of(data.getString(RESULT_TYPE_PROP));
         JsonArray result = data.getArray(RESULT_PROP);
@@ -65,21 +66,21 @@ public class QueryResponseParser {
         switch (resultType) {
             case STRING:
             case SCALAR:
-                response.setResults(parseScalarResult(result));
+                response.results(parseScalarResult(result));
                 break;
             case MATRIX:
-                response.setResults(parseResults(result, this::parseMatrixResult));
+                response.results(parseResults(result, this::parseMatrixResult));
                 break;
             case VECTOR:
-                response.setResults(parseResults(result, this::parseVectorResult));
+                response.results(parseResults(result, this::parseVectorResult));
                 break;
             default:
                 break;
 
         }
-        response.setResultType(resultType);
+        response.resultType(resultType);
 
-        return response;
+        return response.build();
     }
 
     private List<Result> parseResults(JsonArray resultArray, Function<JsonObject, Result> resultParser) {
