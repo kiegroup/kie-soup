@@ -98,7 +98,9 @@ public class OperatorsOracleTest {
 
     @Test
     public void stringOperators() {
-        assertContainsAll(OperatorsOracle.STRING_OPERATORS, "==", "!=", "<", ">", "<=", ">=", "matches", "not matches", "soundslike", "not soundslike", "== null", "!= null");
+        assertContainsAll(OperatorsOracle.STRING_OPERATORS, "==", "!=", "<", ">", "<=", ">=",
+                          "contains", "not contains", "matches", "not matches", "soundslike", "not soundslike",
+                          "== null", "!= null");
     }
 
     public void assertContainsAll(final String[] list, String... items) {
