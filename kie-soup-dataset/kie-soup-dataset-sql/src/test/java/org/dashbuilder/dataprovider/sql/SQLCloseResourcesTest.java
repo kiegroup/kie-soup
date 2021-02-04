@@ -22,7 +22,6 @@ import java.sql.Statement;
 import java.util.Arrays;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -72,7 +71,7 @@ public class SQLCloseResourcesTest {
 
         PowerMockito.mockStatic(JDBCUtils.class);
         when(JDBCUtils.dialect(connection)).thenReturn(dialect);
-        when(JDBCUtils.executeQuery(any(Connection.class), anyString())).thenReturn(resultSetHandler);
+        when(JDBCUtils.executeQuery(any(Connection.class), any())).thenReturn(resultSetHandler);
     }
 
     @Test
