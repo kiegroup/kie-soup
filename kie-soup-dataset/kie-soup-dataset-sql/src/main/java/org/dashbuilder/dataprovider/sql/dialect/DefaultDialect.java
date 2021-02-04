@@ -17,7 +17,11 @@ package org.dashbuilder.dataprovider.sql.dialect;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -114,13 +118,23 @@ public class DefaultDialect implements Dialect {
     }
 
     @Override
-    public Date convertToDate(Object value) {
-        try {
-            return value == null ? null : (Date) value;
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("Not a java.util.Date: " + value + " (" + value.getClass().getName() + ")");
-        }
-    }
+	public Date convertToDate(Object value) {
+		if (value == null) {
+			return null;
+		} else if (value instanceof Date) {
+			return (Date) value;
+		} else if (value instanceof LocalDateTime) {
+			return Timestamp.valueOf((LocalDateTime) value);
+		} else if (value instanceof Number) {
+			return new Date(((Number) value).longValue());
+		} else {
+			try {
+				return DateFormat.getDateTimeInstance().parse(value.toString());
+			} catch (ParseException e) {
+				throw new IllegalArgumentException("Unable to convert " + value + " of type "+value.getClass()+" to date", e);
+			}
+		}
+	}
 
     @Override
     public String getTableSQL(SQLStatement<?> stmt) {
