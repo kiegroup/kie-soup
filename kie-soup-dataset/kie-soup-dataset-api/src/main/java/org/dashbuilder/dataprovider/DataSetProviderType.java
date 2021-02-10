@@ -32,6 +32,8 @@ public interface DataSetProviderType<T extends DataSetDef> {
     CSVProviderType CSV = new CSVProviderType();
 
     ELSProviderType ELASTICSEARCH = new ELSProviderType();
+    
+    PrometheusProviderType PROMETHEUS = new PrometheusProviderType();
 
     /**
      * The type's name. It must be unique and do not clash with other existing types.
