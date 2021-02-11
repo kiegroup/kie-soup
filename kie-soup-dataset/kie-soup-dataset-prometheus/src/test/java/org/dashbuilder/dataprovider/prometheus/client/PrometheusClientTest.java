@@ -44,7 +44,6 @@ public class PrometheusClientTest {
     @Before
     public void setup() {
         prometheusClient.setBaseUrl(BASE_URL);
-        when(httpClient.doGet(any())).thenReturn("{}");
     }
 
     @Test
