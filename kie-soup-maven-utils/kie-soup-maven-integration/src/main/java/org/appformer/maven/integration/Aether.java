@@ -45,13 +45,17 @@ import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.eclipse.aether.transport.http.HttpTransporterFactory;
 import org.eclipse.aether.transport.wagon.WagonProvider;
+import org.eclipse.aether.transport.wagon.WagonTransporterFactory;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.appformer.maven.integration.embedder.MavenProjectLoader.loadMavenProject;
 
 public class Aether {
+    public static final String S3_WAGON_CLASS = "kie.maven.s3.wagon.class";
+    private static final String S3_WAGON_CLASS_NAME = System.getProperty(S3_WAGON_CLASS);
 
     private static final Logger log = LoggerFactory.getLogger( Aether.class );
 
@@ -111,6 +115,7 @@ public class Aether {
         locator.addService( RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class );
         locator.addService( TransporterFactory.class, FileTransporterFactory.class );
         locator.addService( TransporterFactory.class, HttpTransporterFactory.class );
+        locator.addService( TransporterFactory.class, WagonTransporterFactory.class );
         locator.setServices( WagonProvider.class, new ManualWagonProvider() );
 
         return locator.getService( RepositorySystem.class );
@@ -220,6 +225,13 @@ public class Aether {
                     return (Wagon) Class.forName( "org.overlord.dtgov.jbpm.util.SrampWagonProxy" ).newInstance();
                 } catch ( ClassNotFoundException cnfe ) {
                     log.warn( "Cannot find sramp wagon implementation class", cnfe );
+                }
+            }
+            if ( "s3".equals( roleHint) && isNotEmpty( S3_WAGON_CLASS_NAME ) ) {
+                try {
+                    return (Wagon) Class.forName( S3_WAGON_CLASS_NAME ).newInstance();
+                } catch ( ClassNotFoundException cnfe ) {
+                    log.warn( "Cannot find s3 wagon implementation class", cnfe );
                 }
             }
             return null;
