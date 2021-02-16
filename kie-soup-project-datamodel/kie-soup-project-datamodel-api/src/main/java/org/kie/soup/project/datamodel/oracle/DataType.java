@@ -43,6 +43,7 @@ public class DataType {
     public static final String TYPE_BOOLEAN = "Boolean";
     public static final String TYPE_DATE = "Date";
     public static final String TYPE_LOCAL_DATE = "LocalDate";
+    public static final String TYPE_LOCAL_DATE_TIME = "LocalDateTime";
     public static final String TYPE_OBJECT = "Object";                                                                                                                                                      // for all other unknown
     public static final String TYPE_FINAL_OBJECT = "FinalObject";                                                                                                                                                 // for all other unknown
     public static final String TYPE_THIS = "this";
@@ -88,6 +89,6 @@ public class DataType {
     }
 
     public static boolean isDate(final String type) {
-        return Objects.equals(type, DataType.TYPE_DATE) || Objects.equals(type, DataType.TYPE_LOCAL_DATE);
+        return Objects.equals(type, DataType.TYPE_DATE) || Objects.equals(type, DataType.TYPE_LOCAL_DATE) || Objects.equals(type, DataType.TYPE_LOCAL_DATE_TIME);
     }
 }
