@@ -45,6 +45,7 @@ public class DataTypeTest {
                 { DataType.TYPE_COMPARABLE, false, false },
                 { DataType.TYPE_DATE, false, true },
                 { DataType.TYPE_LOCAL_DATE, false, true },
+                { DataType.TYPE_LOCAL_DATE_TIME, false, true },
                 { DataType.TYPE_FINAL_OBJECT, false, false },
                 { DataType.TYPE_OBJECT, false, false },
                 { DataType.TYPE_STRING, false, false },
