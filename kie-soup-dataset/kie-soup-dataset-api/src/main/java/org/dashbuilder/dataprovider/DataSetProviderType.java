@@ -15,7 +15,7 @@
  */
 package org.dashbuilder.dataprovider;
 
-import org.dashbuilder.dataset.def.*;
+import org.dashbuilder.dataset.def.DataSetDef;
 import org.dashbuilder.dataset.json.DataSetDefJSONMarshallerExt;
 
 /**
@@ -34,6 +34,8 @@ public interface DataSetProviderType<T extends DataSetDef> {
     ELSProviderType ELASTICSEARCH = new ELSProviderType();
     
     PrometheusProviderType PROMETHEUS = new PrometheusProviderType();
+    
+    KafkaProviderType KAFKA = new KafkaProviderType();
 
     /**
      * The type's name. It must be unique and do not clash with other existing types.

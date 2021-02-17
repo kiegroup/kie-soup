@@ -18,6 +18,8 @@ package org.dashbuilder.dataset.json;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.dashbuilder.dataprovider.DataSetProviderRegistry;
 import org.dashbuilder.dataprovider.DataSetProviderType;
@@ -53,20 +55,19 @@ public class DataSetDefJSONMarshaller {
     public static final String REFRESH_ALWAYS = "refreshAlways";
 
     public static final List<String> ROOT_KEYS = Arrays.asList(
-            UUID,
-            NAME,
-            PROVIDER,
-            ISPUBLIC,
-            PUSH_ENABLED,
-            PUSH_MAXSIZE,
-            COLUMNS,
-            FILTERS,
-            ALL_COLUMNS,
-            CACHE_ENABLED,
-            CACHE_MAXROWS,
-            REFRESH_TIME,
-            REFRESH_ALWAYS
-    );
+                                                               UUID,
+                                                               NAME,
+                                                               PROVIDER,
+                                                               ISPUBLIC,
+                                                               PUSH_ENABLED,
+                                                               PUSH_MAXSIZE,
+                                                               COLUMNS,
+                                                               FILTERS,
+                                                               ALL_COLUMNS,
+                                                               CACHE_ENABLED,
+                                                               CACHE_MAXROWS,
+                                                               REFRESH_TIME,
+                                                               REFRESH_ALWAYS);
 
     protected DataSetProviderRegistry dataSetProviderRegistry;
     protected DataSetLookupJSONMarshaller dataSetLookupJSONMarshaller;
@@ -91,8 +92,7 @@ public class DataSetDefJSONMarshaller {
         DataSetDefJSONMarshallerExt marshaller = type.getJsonMarshaller();
         if (marshaller != null) {
             marshaller.fromJson(dataSetDef, json);
-        }
-        else {
+        } else {
             for (String key : json.keys()) {
                 if (!ROOT_KEYS.contains(key)) {
                     String value = json.getString(key);
@@ -123,7 +123,7 @@ public class DataSetDefJSONMarshaller {
         String pushMaxSize = json.getString(PUSH_MAXSIZE);
         String cacheEnabled = json.getString(CACHE_ENABLED);
         String cacheMaxRows = json.getString(CACHE_MAXROWS);
-        String refreshTime  = json.getString(REFRESH_TIME);
+        String refreshTime = json.getString(REFRESH_TIME);
         String refreshAlways = json.getString(REFRESH_ALWAYS);
         String allColumns = json.getString(ALL_COLUMNS);
 
@@ -160,7 +160,7 @@ public class DataSetDefJSONMarshaller {
 
         if (json.has(COLUMNS)) {
             JsonArray array = json.getArray(COLUMNS);
-            for (int i=0; i<array.length(); i++) {
+            for (int i = 0; i < array.length(); i++) {
                 JsonObject column = array.getObject(i);
                 String columnId = column.getString(COLUMN_ID);
                 String columnType = column.getString(COLUMN_TYPE);
@@ -176,11 +176,9 @@ public class DataSetDefJSONMarshaller {
                 ColumnType type = ColumnType.TEXT;
                 if (columnType.equalsIgnoreCase("label")) {
                     type = ColumnType.LABEL;
-                }
-                else if (columnType.equalsIgnoreCase("date")) {
+                } else if (columnType.equalsIgnoreCase("date")) {
                     type = ColumnType.DATE;
-                }
-                else if (columnType.equalsIgnoreCase("number")) {
+                } else if (columnType.equalsIgnoreCase("number")) {
                     type = ColumnType.NUMBER;
                 }
 
@@ -200,7 +198,7 @@ public class DataSetDefJSONMarshaller {
     }
 
     public String toJsonString(final DataSetDef dataSetDef) throws JsonException {
-        return toJsonObject( dataSetDef ).toString();
+        return toJsonObject(dataSetDef).toString();
     }
 
     public JsonObject toJsonObject(final DataSetDef dataSetDef) throws JsonException {
@@ -217,7 +215,7 @@ public class DataSetDefJSONMarshaller {
 
         // Public.
         json.put(ISPUBLIC, dataSetDef.isPublic());
-        
+
         // Backend cache.
         json.put(CACHE_ENABLED, dataSetDef.isCacheEnabled());
         json.put(CACHE_MAXROWS, dataSetDef.getCacheMaxRows());
@@ -236,14 +234,12 @@ public class DataSetDefJSONMarshaller {
         if (marshaller != null) {
             marshaller.toJson(dataSetDef, json);
         }
-        
+
         // Data columns.
         final Collection<DataColumnDef> columns = dataSetDef.getColumns();
-        if (columns != null)
-        {
+        if (columns != null) {
             final JsonArray columnsArray = toJsonObject(columns, dataSetDef);
-            if (columnsArray != null)
-            {
+            if (columnsArray != null) {
                 json.put(COLUMNS, columnsArray);
             }
         }
@@ -274,7 +270,7 @@ public class DataSetDefJSONMarshaller {
     }
 
     protected JsonArray toJsonObject(final Collection<DataColumnDef> columnList,
-                                   final DataSetDef dataSetDef) throws JsonException {
+                                     final DataSetDef dataSetDef) throws JsonException {
         JsonArray result = null;
         if (columnList != null && !columnList.isEmpty()) {
             result = Json.createArray();
@@ -292,8 +288,12 @@ public class DataSetDefJSONMarshaller {
                 result.set(idx++, columnObject);
             }
         }
-        
+
         return result;
+    }
+
+    public static void transferStringValue(String key, JsonObject jsonObject, Consumer<String> setter) {
+        transferValue(key, jsonObject::getString, setter);
     }
 
     public static boolean isBlank(String str) {
@@ -307,5 +307,12 @@ public class DataSetDefJSONMarshaller {
             }
         }
         return true;
+    }
+    
+    private static <T> void transferValue(String key, Function<String, T> extractor, Consumer<T> setter) {
+        T value = extractor.apply(key);
+        if (value != null && !isBlank(value.toString())) {
+            setter.accept(value);
+        }
     }
 }
