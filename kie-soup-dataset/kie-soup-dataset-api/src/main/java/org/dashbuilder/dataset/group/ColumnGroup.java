@@ -32,6 +32,7 @@ public class ColumnGroup {
     protected boolean ascendingOrder = true;
     protected Month firstMonthOfYear;
     protected DayOfWeek firstDayOfWeek;
+    private boolean isPostEnabled = true;
 
     public ColumnGroup() {
     }
@@ -164,5 +165,13 @@ public class ColumnGroup {
         out.append("emptyIntervals=").append(emptyIntervals).append(" ");
         out.append("maxIntervals=").append(maxIntervals);
         return out.toString();
+    }
+
+    public boolean isPostEnabled() {
+        return isPostEnabled;
+    }
+
+    public void setPostEnabled(boolean isPostEnabled) {
+        this.isPostEnabled = isPostEnabled;
     }
 }

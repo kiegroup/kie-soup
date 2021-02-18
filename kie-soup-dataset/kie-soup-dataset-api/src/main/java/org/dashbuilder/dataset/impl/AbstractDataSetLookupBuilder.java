@@ -65,8 +65,14 @@ public abstract class AbstractDataSetLookupBuilder<T> implements DataSetLookupBu
     }
 
     public T group(String columnId, String newColumnId) {
+        return group(columnId, newColumnId, true);
+    }
+
+    public T group(String columnId, String newColumnId, boolean postEnabled) {
         DataSetGroup gOp = new DataSetGroup();
-        gOp.setColumnGroup(new ColumnGroup(columnId, newColumnId));
+        ColumnGroup cg = new ColumnGroup(columnId, newColumnId);
+        cg.setPostEnabled(postEnabled);
+        gOp.setColumnGroup(cg);
         dataSetLookup.addOperation(gOp);
         return (T) this;
     }
