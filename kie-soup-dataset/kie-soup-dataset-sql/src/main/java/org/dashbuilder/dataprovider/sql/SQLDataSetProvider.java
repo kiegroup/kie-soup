@@ -18,7 +18,6 @@ package org.dashbuilder.dataprovider.sql;
 import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -705,6 +704,7 @@ public class SQLDataSetProvider implements DataSetProvider, DataSetDefRegistryLi
                     if (groupOp != null) {
                         cg = groupOp.getColumnGroup();
                         if (cg != null) {
+                            groupColumnAdded &= cg.isPostEnabled();
                             _appendGroupBy(groupOp);
 
                             // The in-memory post processing requires that the group column is also included.
@@ -1014,7 +1014,7 @@ public class SQLDataSetProvider implements DataSetProvider, DataSetDefRegistryLi
                 _query.groupBy(SQLFactory.column(dbColumnId));
                 for (GroupFunction gf : groupOp.getGroupFunctions()) {
                     if (!sourceId.equals(gf.getSourceId()) && gf.getFunction() == null) {
-                        postProcessing = true;
+                        postProcessing = cg.isPostEnabled();
                     }
                 }
             }

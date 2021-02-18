@@ -15,12 +15,12 @@
  */
 package org.dashbuilder.dataset;
 
+import org.dashbuilder.dataset.date.DayOfWeek;
+import org.dashbuilder.dataset.date.Month;
 import org.dashbuilder.dataset.filter.ColumnFilter;
 import org.dashbuilder.dataset.group.AggregateFunctionType;
 import org.dashbuilder.dataset.group.DateIntervalType;
 import org.dashbuilder.dataset.sort.SortOrder;
-import org.dashbuilder.dataset.date.DayOfWeek;
-import org.dashbuilder.dataset.date.Month;
 
 /**
  * A DataSetLookupBuilder allows for the assembly of a DataSetLookup instance (i.e. a DataSet lookup request)
@@ -72,6 +72,8 @@ public interface DataSetLookupBuilder<T> {
      * @return The DataSetLookupBuilder instance that is being used to configure a DataSetLookup request.
      */
     T group(String columnId, String newColumnId);
+
+    T group(String columnId, String newColumnId, boolean b);
 
     /**
      * This call will operate only on a previously grouped data set (i.e. one of the group() methods has been called
@@ -371,4 +373,5 @@ public interface DataSetLookupBuilder<T> {
      * @return The DataSetLookup request instance that has been configured.
      */
     DataSetLookup buildLookup();
+
 }
