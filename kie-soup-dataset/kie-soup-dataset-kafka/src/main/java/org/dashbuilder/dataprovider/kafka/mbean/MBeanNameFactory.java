@@ -15,10 +15,10 @@
  */
 package org.dashbuilder.dataprovider.kafka.mbean;
 
-import org.dashbuilder.dataprovider.kafka.metrics.KafkaMetricColllector;
+import org.dashbuilder.dataprovider.kafka.metrics.KafkaMetricCollector;
 
 import static org.dashbuilder.dataprovider.kafka.mbean.MBeanDefinitions.TIME_MS_ATTRS;
-import static org.dashbuilder.dataprovider.kafka.metrics.MBeanMetricColllector.metricCollector;
+import static org.dashbuilder.dataprovider.kafka.metrics.MBeanMetricCollector.metricCollector;
 
 /**
  * Produce MBean metric collectors for monitoring Kafka
@@ -38,16 +38,16 @@ public class MBeanNameFactory {
         return kafkaControllerType.copy().name(name).build();
     }
 
-    public static KafkaMetricColllector[] withProduceFetchConsumerAndFetchFollowerRequest(ObjectNamePrototype kafkaControllerType) {
-        return new KafkaMetricColllector[]{
+    public static KafkaMetricCollector[] withProduceFetchConsumerAndFetchFollowerRequest(ObjectNamePrototype kafkaControllerType) {
+        return new KafkaMetricCollector[]{
                                            metricCollector(kafkaControllerType.copy().request("Produce").build(), TIME_MS_ATTRS),
                                            metricCollector(kafkaControllerType.copy().request("FetchConsumer").build(), TIME_MS_ATTRS),
                                            metricCollector(kafkaControllerType.copy().request("FetchFollower").build(), TIME_MS_ATTRS),
         };
     }
 
-    public static KafkaMetricColllector[] withProduceDelayedAndFetchDelayedOperation(ObjectNamePrototype kafkaControllerType) {
-        return new KafkaMetricColllector[]{
+    public static KafkaMetricCollector[] withProduceDelayedAndFetchDelayedOperation(ObjectNamePrototype kafkaControllerType) {
+        return new KafkaMetricCollector[]{
                                            metricCollector(kafkaControllerType.copy().delayedOperation("Produce").build()),
                                            metricCollector(kafkaControllerType.copy().delayedOperation("Fetch").build())
         };

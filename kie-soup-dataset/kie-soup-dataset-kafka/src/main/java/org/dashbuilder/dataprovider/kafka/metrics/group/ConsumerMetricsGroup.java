@@ -22,12 +22,12 @@ import java.util.List;
 import org.dashbuilder.dataprovider.kafka.mbean.MBeanDefinitions;
 import org.dashbuilder.dataprovider.kafka.mbean.ObjectNameBuilder;
 import org.dashbuilder.dataprovider.kafka.mbean.ObjectNamePrototype;
-import org.dashbuilder.dataprovider.kafka.metrics.KafkaMetricColllector;
+import org.dashbuilder.dataprovider.kafka.metrics.KafkaMetricCollector;
 import org.dashbuilder.dataprovider.kafka.model.KafkaMetricsRequest;
 
 import static org.dashbuilder.dataprovider.kafka.mbean.MBeanNameFactory.withProducerConsumerClientId;
 import static org.dashbuilder.dataprovider.kafka.mbean.ObjectNamePrototype.withDomainAndType;
-import static org.dashbuilder.dataprovider.kafka.metrics.MBeanMetricColllector.metricCollector;
+import static org.dashbuilder.dataprovider.kafka.metrics.MBeanMetricCollector.metricCollector;
 
 /**
  * Group of metrics for requests targeting Kafka Consumer
@@ -44,7 +44,7 @@ class ConsumerMetricsGroup implements MetricsCollectorGroup {
     private static final ObjectNamePrototype KAFKA_CONSUMER_TOPIC_FETCH_MANAGER = withDomainAndType(MBeanDefinitions.KAFKA_CONSUMER_DOMAIN, "consumer-fetch-manager-metrics");
 
     @Override
-    public List<KafkaMetricColllector> getMetricsCollectors(KafkaMetricsRequest request) {
+    public List<KafkaMetricCollector> getMetricsCollectors(KafkaMetricsRequest request) {
         String clientId = request.clientId().orElseThrow(() -> new IllegalArgumentException("Client Id is required to retrieve consumer metrics."));
 
         if (request.nodeId().isPresent()) {
@@ -59,7 +59,7 @@ class ConsumerMetricsGroup implements MetricsCollectorGroup {
             ObjectNameBuilder mbeanBuilder = KAFKA_CONSUMER_TOPIC_FETCH_MANAGER.copy()
                                                                                .hyfenClientId(clientId)
                                                                                .topic(request.topic().get());
-            request.partition().ifPresent(partition -> mbeanBuilder.partition(partition));
+            request.partition().ifPresent(mbeanBuilder::partition);
             return Collections.singletonList(metricCollector(mbeanBuilder.build()));
         }
 

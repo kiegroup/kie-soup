@@ -23,7 +23,7 @@ import org.dashbuilder.dataprovider.kafka.model.KafkaMetricsRequest;
 
 public class MBeanServerConnectionProvider {
 
-    private static String RMI_URL_TEMPLATE = "service:jmx:rmi:///jndi/rmi://%s:%s/jmxrmi";
+    private static final String RMI_URL_TEMPLATE = "service:jmx:rmi:///jndi/rmi://%s:%s/jmxrmi";
 
     private MBeanServerConnectionProvider() {
         // do nothing
@@ -54,7 +54,7 @@ public class MBeanServerConnectionProvider {
     private static boolean isInvalid(String port) {
         try {
             return port == null || Integer.parseInt(port) < 1024;
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             return true;
         }
     }

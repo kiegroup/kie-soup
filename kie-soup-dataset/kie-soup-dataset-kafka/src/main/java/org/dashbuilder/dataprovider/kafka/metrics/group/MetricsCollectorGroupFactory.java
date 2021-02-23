@@ -15,6 +15,7 @@
  */
 package org.dashbuilder.dataprovider.kafka.metrics.group;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,15 +27,15 @@ import org.dashbuilder.dataset.def.KafkaDataSetDef.MetricsTarget;
  */
 public class MetricsCollectorGroupFactory {
 
-    private static MetricsCollectorGroupFactory INSTANCE;
+    private static MetricsCollectorGroupFactory instance;
 
-    private static Map<MetricsTarget, MetricsCollectorGroup> GROUPS = new HashMap<>();
+    private static EnumMap<MetricsTarget, MetricsCollectorGroup> groups = new EnumMap<>(MetricsTarget.class);
 
     static {
-        INSTANCE = new MetricsCollectorGroupFactory();
-        GROUPS.put(MetricsTarget.BROKER, new BrokerMetricsGroup());
-        GROUPS.put(MetricsTarget.CONSUMER, new ConsumerMetricsGroup());
-        GROUPS.put(MetricsTarget.PRODUCER, new ProducerMetricsGroup());
+        instance = new MetricsCollectorGroupFactory();
+        groups.put(MetricsTarget.BROKER, new BrokerMetricsGroup());
+        groups.put(MetricsTarget.CONSUMER, new ConsumerMetricsGroup());
+        groups.put(MetricsTarget.PRODUCER, new ProducerMetricsGroup());
     }
 
     MetricsCollectorGroupFactory() {
@@ -42,11 +43,11 @@ public class MetricsCollectorGroupFactory {
     }
 
     public static MetricsCollectorGroupFactory get() {
-        return INSTANCE;
+        return instance;
     }
 
     public MetricsCollectorGroup forTarget(MetricsTarget target) {
-        return GROUPS.get(target);
+        return groups.get(target);
     }
 
 }

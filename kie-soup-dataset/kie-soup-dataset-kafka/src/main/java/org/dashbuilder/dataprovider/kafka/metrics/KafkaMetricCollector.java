@@ -25,7 +25,7 @@ import org.dashbuilder.dataprovider.kafka.model.KafkaMetric;
  * Collects a group of metrics from Kafka
  *
  */
-public interface KafkaMetricColllector {
+public interface KafkaMetricCollector {
 
     List<KafkaMetric> collect(MBeanServerConnection mbsc);
 

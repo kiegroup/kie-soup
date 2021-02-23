@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.dashbuilder.dataprovider.kafka.metrics.KafkaMetricColllector;
+import org.dashbuilder.dataprovider.kafka.metrics.KafkaMetricCollector;
 import org.dashbuilder.dataprovider.kafka.model.KafkaMetricsRequest;
 
 public interface MetricsCollectorGroup {
 
-    List<KafkaMetricColllector> getMetricsCollectors(KafkaMetricsRequest request);
+    List<KafkaMetricCollector> getMetricsCollectors(KafkaMetricsRequest request);
 
     public static String[] mergeAttrs(String[] a, String[] b) {
         return Stream.of(a, b)
@@ -33,7 +33,7 @@ public interface MetricsCollectorGroup {
                      .toArray(String[]::new);
     }
 
-    public static List<KafkaMetricColllector> merge(KafkaMetricColllector[]... collectors) {
+    public static List<KafkaMetricCollector> merge(KafkaMetricCollector[]... collectors) {
         return Stream.of(collectors)
                      .flatMap(Stream::of)
                      .distinct().collect(Collectors.toList());

@@ -20,8 +20,8 @@ import java.util.List;
 
 import org.dashbuilder.dataprovider.kafka.mbean.MBeanDefinitions;
 import org.dashbuilder.dataprovider.kafka.mbean.ObjectNamePrototype;
-import org.dashbuilder.dataprovider.kafka.metrics.KafkaMetricColllector;
-import org.dashbuilder.dataprovider.kafka.metrics.MBeanMetricColllector;
+import org.dashbuilder.dataprovider.kafka.metrics.KafkaMetricCollector;
+import org.dashbuilder.dataprovider.kafka.metrics.MBeanMetricCollector;
 import org.dashbuilder.dataprovider.kafka.model.KafkaMetricsRequest;
 
 import static org.dashbuilder.dataprovider.kafka.mbean.ObjectNamePrototype.withDomainAndType;
@@ -37,7 +37,7 @@ class ProducerMetricsGroup implements MetricsCollectorGroup {
     private static final ObjectNamePrototype KAFKA_PRODUCER = withDomainAndType(MBeanDefinitions.KAFKA_PRODUCER_DOMAIN, "producer-metrics");
 
     @Override
-    public List<KafkaMetricColllector> getMetricsCollectors(KafkaMetricsRequest request) {
+    public List<KafkaMetricCollector> getMetricsCollectors(KafkaMetricsRequest request) {
         String clientId = request.clientId().orElseThrow(() -> new IllegalArgumentException("Client Id is required to retrieve producer metrics."));
 
         if (request.topic().isPresent()) {
@@ -45,7 +45,7 @@ class ProducerMetricsGroup implements MetricsCollectorGroup {
                                                    .hyfenClientId(clientId)
                                                    .topic(request.topic().get())
                                                    .build();
-            return Collections.singletonList(MBeanMetricColllector.metricCollector(mbeanName));
+            return Collections.singletonList(MBeanMetricCollector.metricCollector(mbeanName));
         }
 
         if (request.nodeId().isPresent()) {
@@ -53,13 +53,13 @@ class ProducerMetricsGroup implements MetricsCollectorGroup {
                                                   .hyfenClientId(clientId)
                                                   .hyfenNodeId(request.nodeId().get())
                                                   .build();
-            return Collections.singletonList(MBeanMetricColllector.metricCollector(mbeanName));
+            return Collections.singletonList(MBeanMetricCollector.metricCollector(mbeanName));
         }
 
         String mbeanName = KAFKA_PRODUCER.copy()
                                          .hyfenClientId(clientId)
                                          .build();
-        return Collections.singletonList(MBeanMetricColllector.metricCollector(mbeanName));
+        return Collections.singletonList(MBeanMetricCollector.metricCollector(mbeanName));
     }
     
 }

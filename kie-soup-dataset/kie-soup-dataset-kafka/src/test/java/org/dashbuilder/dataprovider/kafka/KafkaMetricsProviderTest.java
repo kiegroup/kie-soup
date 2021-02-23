@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.dashbuilder.dataprovider.kafka.metrics.KafkaMetricColllector;
+import org.dashbuilder.dataprovider.kafka.metrics.KafkaMetricCollector;
 import org.dashbuilder.dataprovider.kafka.metrics.group.MetricsCollectorGroup;
 import org.dashbuilder.dataprovider.kafka.metrics.group.MetricsCollectorGroupFactory;
 import org.dashbuilder.dataprovider.kafka.model.KafkaMetricsRequest;
@@ -32,7 +32,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -56,41 +55,35 @@ public class KafkaMetricsProviderTest {
         doReturn(Arrays.asList(mockCollector("abc"),
                                mockCollector("def"),
                                mockCollector("ghi"),
-                               mockCollector("adg"))).when(group).getMetricsCollectors(eq(request));
+                               mockCollector("adg"))).when(group).getMetricsCollectors(request);
 
-        when(groupsFactory.forTarget(eq(MetricsTarget.BROKER))).thenReturn(group);
+        when(groupsFactory.forTarget(MetricsTarget.BROKER)).thenReturn(group);
     }
 
     @Test
     public void testCollectorsFor() {
         when(request.filter()).thenReturn(Optional.empty());
-        List<KafkaMetricColllector> selectedCollectors = provider.collectorsFor(request);
+        List<KafkaMetricCollector> selectedCollectors = provider.collectorsFor(request);
         assertEquals(4, selectedCollectors.size());
-    }
-
-    @Test
-    public void testCollectorsForWithFilter() {
         when(request.filter()).thenReturn(Optional.of("a"));
-        List<KafkaMetricColllector> selectedCollectors = provider.collectorsFor(request);
+        
+        selectedCollectors = provider.collectorsFor(request);
         assertEquals(2, selectedCollectors.size());
-    }
-
-    @Test
-    public void testCollectorsForEmptyFilter() {
         when(request.filter()).thenReturn(Optional.of("  "));
-        List<KafkaMetricColllector> selectedCollectors = provider.collectorsFor(request);
+        
+        selectedCollectors = provider.collectorsFor(request);
         assertEquals(4, selectedCollectors.size());
     }
 
     @Test
     public void testCollectorsForWithFilterCase() {
         when(request.filter()).thenReturn(Optional.of("AbC"));
-        List<KafkaMetricColllector> selectedCollectors = provider.collectorsFor(request);
+        List<KafkaMetricCollector> selectedCollectors = provider.collectorsFor(request);
         assertEquals(1, selectedCollectors.size());
     }
 
-    private KafkaMetricColllector mockCollector(String name) {
-        KafkaMetricColllector collector = mock(KafkaMetricColllector.class);
+    private KafkaMetricCollector mockCollector(String name) {
+        KafkaMetricCollector collector = mock(KafkaMetricCollector.class);
         when(collector.getName()).thenReturn(name);
         return collector;
     }

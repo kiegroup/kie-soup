@@ -15,7 +15,7 @@
  */
 package org.dashbuilder.dataprovider.kafka.mbean;
 
-public abstract class ObjectNamePrototype {
+public interface ObjectNamePrototype {
 
     public static ObjectNamePrototype withDomainAndType(String domain, String type) {
         return new ObjectNameWithDomainAndTypePrototype(domain, type);
@@ -25,7 +25,7 @@ public abstract class ObjectNamePrototype {
         return new ObjectNameWithDomainTypeAndNamePrototype(domain, type, name);
     }
 
-    private static class ObjectNameWithDomainAndTypePrototype extends ObjectNamePrototype {
+    public static class ObjectNameWithDomainAndTypePrototype implements ObjectNamePrototype {
 
         private String domain;
         private String type;
@@ -41,7 +41,7 @@ public abstract class ObjectNamePrototype {
         }
     }
 
-    private static class ObjectNameWithDomainTypeAndNamePrototype extends ObjectNameWithDomainAndTypePrototype {
+    public static class ObjectNameWithDomainTypeAndNamePrototype extends ObjectNameWithDomainAndTypePrototype {
 
         private String name;
 

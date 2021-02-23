@@ -18,7 +18,7 @@ package org.dashbuilder.dataprovider.kafka.metrics.group;
 import java.util.List;
 
 import org.dashbuilder.dataprovider.kafka.mbean.ObjectNamePrototype;
-import org.dashbuilder.dataprovider.kafka.metrics.KafkaMetricColllector;
+import org.dashbuilder.dataprovider.kafka.metrics.KafkaMetricCollector;
 import org.dashbuilder.dataprovider.kafka.model.KafkaMetricsRequest;
 
 import static org.dashbuilder.dataprovider.kafka.mbean.MBeanDefinitions.KAFKA_CONTROLLER_DOMAIN;
@@ -32,7 +32,7 @@ import static org.dashbuilder.dataprovider.kafka.mbean.MBeanNameFactory.withProd
 import static org.dashbuilder.dataprovider.kafka.mbean.MBeanNameFactory.withProduceFetchConsumerAndFetchFollowerRequest;
 import static org.dashbuilder.dataprovider.kafka.mbean.ObjectNamePrototype.withDomainAndType;
 import static org.dashbuilder.dataprovider.kafka.mbean.ObjectNamePrototype.withDomainTypeAndName;
-import static org.dashbuilder.dataprovider.kafka.metrics.MBeanMetricColllector.metricCollector;
+import static org.dashbuilder.dataprovider.kafka.metrics.MBeanMetricCollector.metricCollector;
 import static org.dashbuilder.dataprovider.kafka.metrics.group.MetricsCollectorGroup.merge;
 import static org.dashbuilder.dataprovider.kafka.metrics.group.MetricsCollectorGroup.mergeAttrs;
 
@@ -61,11 +61,11 @@ class BrokerMetricsGroup implements MetricsCollectorGroup {
     private static final ObjectNamePrototype REQUEST_METRICS_REQUEST_QUEUE_TIME_MS = withDomainTypeAndName(KAFKA_NETWORK_DOMAIN, REQUEST_METRICS, "RequestQueueTimeMs");
     private static final ObjectNamePrototype DELAYED_OPERATION_PURGATORY_PURGATORY_SIZE = withDomainTypeAndName(KAFKA_SERVER_DOMAIN, "DelayedOperationPurgatory", "PurgatorySize");
 
-    private static final List<KafkaMetricColllector> COLLECTORS;
+    private static final List<KafkaMetricCollector> COLLECTORS;
 
     static {
 
-        KafkaMetricColllector[] collectors = {
+        KafkaMetricCollector[] collectors = {
                                               metricCollector(withName(KAFKA_CONTROLLER_TYPE, "GlobalPartitionCount")),
                                               metricCollector(withName(KAFKA_CONTROLLER_TYPE, "ActiveControllerCount")),
                                               metricCollector(withName(KAFKA_CONTROLLER_TYPE, "OfflinePartitionsCount")),
@@ -113,7 +113,7 @@ class BrokerMetricsGroup implements MetricsCollectorGroup {
     }
 
     @Override
-    public List<KafkaMetricColllector> getMetricsCollectors(KafkaMetricsRequest request) {
+    public List<KafkaMetricCollector> getMetricsCollectors(KafkaMetricsRequest request) {
         return COLLECTORS;
     }
 

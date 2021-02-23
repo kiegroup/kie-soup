@@ -27,7 +27,7 @@ public class ObjectNameBuilderTest {
                                              .type("MyType")
                                              .name("MyName")
                                              .build();
-        assertEquals(objectName, "my.domain:type=MyType,name=MyName");
+        assertEquals("my.domain:type=MyType,name=MyName", objectName);
     }
 
     @Test
@@ -37,7 +37,7 @@ public class ObjectNameBuilderTest {
                                              .name("MyName")
                                              .request("MyRequest")
                                              .build();
-        assertEquals(objectName, "my.domain:type=MyType,name=MyName,request=MyRequest");
+        assertEquals("my.domain:type=MyType,name=MyName,request=MyRequest", objectName);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class ObjectNameBuilderTest {
                                              .request("MyRequest")
                                              .delayedOperation("MyOp")
                                              .build();
-        assertEquals(objectName, "my.domain:type=MyType,name=MyName,request=MyRequest,delayedOperation=MyOp");
+        assertEquals("my.domain:type=MyType,name=MyName,request=MyRequest,delayedOperation=MyOp", objectName);
     }
 
     @Test
@@ -60,7 +60,7 @@ public class ObjectNameBuilderTest {
                                              .delayedOperation("MyOp")
                                              .clientId("MyClientId")
                                              .build();
-        assertEquals(objectName, "my.domain:type=MyType,name=MyName,request=MyRequest,delayedOperation=MyOp,clientId=MyClientId");
+        assertEquals("my.domain:type=MyType,name=MyName,request=MyRequest,delayedOperation=MyOp,clientId=MyClientId", objectName);
     }
 
     @Test
@@ -70,7 +70,7 @@ public class ObjectNameBuilderTest {
                                              .clientId("MyClientId")
                                              .topic("MyTopic")
                                              .build();
-        assertEquals(objectName, "my.domain:type=MyType,clientId=MyClientId,topic=MyTopic");
+        assertEquals("my.domain:type=MyType,clientId=MyClientId,topic=MyTopic", objectName);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class ObjectNameBuilderTest {
                                              .clientId("MyClientId")
                                              .nodeId("MyNode")
                                              .build();
-        assertEquals(objectName, "my.domain:type=MyType,clientId=MyClientId,nodeId=MyNode");
+        assertEquals("my.domain:type=MyType,clientId=MyClientId,nodeId=MyNode", objectName);
     }
 
     @Test
@@ -89,25 +89,24 @@ public class ObjectNameBuilderTest {
                                              .type("MyType")
                                              .hyfenClientId("MyClientId")
                                              .build();
-        assertEquals(objectName, "my.domain:type=MyType,client-id=MyClientId");
+        assertEquals("my.domain:type=MyType,client-id=MyClientId", objectName);
     }
-    
+
     @Test
     public void testWithHyfenNodeId() {
         String objectName = ObjectNameBuilder.create("my.domain")
                                              .type("MyType")
                                              .hyfenNodeId("MyNodeId")
                                              .build();
-        assertEquals(objectName, "my.domain:type=MyType,node-id=MyNodeId");
+        assertEquals("my.domain:type=MyType,node-id=MyNodeId", objectName);
     }
-    
-    
+
     @Test
     public void testWithPartition() {
         String objectName = ObjectNameBuilder.create("my.domain")
                                              .type("MyType")
                                              .partition("0")
                                              .build();
-        assertEquals(objectName, "my.domain:type=MyType,partition=0");
+        assertEquals("my.domain:type=MyType,partition=0", objectName);
     }
 }

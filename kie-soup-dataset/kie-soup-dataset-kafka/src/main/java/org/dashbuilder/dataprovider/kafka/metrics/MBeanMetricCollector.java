@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanFeatureInfo;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -35,27 +36,27 @@ import org.slf4j.LoggerFactory;
  * Collects the mapped simple attributes of a MBean 
  *
  */
-public class MBeanMetricColllector implements KafkaMetricColllector {
+public class MBeanMetricCollector implements KafkaMetricCollector {
 
-    protected Logger LOGGER = LoggerFactory.getLogger(MBeanMetricColllector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MBeanMetricCollector.class);
 
     private static final String[] NAME_KEYS = {"name", "request", "delayedOperation"};
 
     private String name;
     private String[] attributes;
 
-    public static MBeanMetricColllector metricCollector(String name) {
+    public static MBeanMetricCollector metricCollector(String name) {
         return metricCollector(name, new String[0]);
     }
 
-    public static MBeanMetricColllector metricCollector(String name, String[] attributes) {
-        MBeanMetricColllector collector = new MBeanMetricColllector();
+    public static MBeanMetricCollector metricCollector(String name, String[] attributes) {
+        MBeanMetricCollector collector = new MBeanMetricCollector();
         collector.name = name;
         collector.attributes = attributes;
         return collector;
     }
 
-    private MBeanMetricColllector() {
+    private MBeanMetricCollector() {
         // do nothing
     }
 
@@ -83,8 +84,8 @@ public class MBeanMetricColllector implements KafkaMetricColllector {
         Object attrValue = readAttribute(mbsc, objectName, attrName);
         return Optional.ofNullable(attrValue)
                        .map(attr -> KafkaMetric.from(objectName.getDomain(),
-                                                     buildName(objectName),
                                                      objectName.getKeyProperty("type"),
+                                                     buildName(objectName),
                                                      attrName,
                                                      attr));
     }
@@ -98,7 +99,7 @@ public class MBeanMetricColllector implements KafkaMetricColllector {
         try {
             return Arrays.stream(mbsc.getMBeanInfo(objectName).getAttributes())
                          .filter(MBeanAttributeInfo::isReadable)
-                         .map(attr -> attr.getName()).toArray(String[]::new);
+                         .map(MBeanFeatureInfo::getName).toArray(String[]::new);
         } catch (Exception e) {
             LOGGER.info("Not able to read attributes for MBean {}", this.name);
             LOGGER.debug("Not able read MBean attributes", e);
@@ -107,12 +108,12 @@ public class MBeanMetricColllector implements KafkaMetricColllector {
     }
 
     private String buildName(ObjectName objectName) {
-        String name = Arrays.stream(NAME_KEYS)
-                            .map(objectName::getKeyProperty)
-                            .filter(Objects::nonNull)
-                            .collect(Collectors.joining());
+        String metricName = Arrays.stream(NAME_KEYS)
+                                  .map(objectName::getKeyProperty)
+                                  .filter(Objects::nonNull)
+                                  .collect(Collectors.joining());
 
-        return name.trim().isEmpty() ? objectName.getKeyProperty("type") : name;
+        return metricName.trim().isEmpty() ? objectName.getKeyProperty("type") : metricName;
     }
 
     private Object readAttribute(MBeanServerConnection mbsc, ObjectName name, String attr) {

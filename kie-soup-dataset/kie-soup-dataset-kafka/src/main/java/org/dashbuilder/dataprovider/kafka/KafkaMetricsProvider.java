@@ -24,7 +24,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXConnector;
 
 import org.dashbuilder.dataprovider.kafka.mbean.MBeanServerConnectionProvider;
-import org.dashbuilder.dataprovider.kafka.metrics.KafkaMetricColllector;
+import org.dashbuilder.dataprovider.kafka.metrics.KafkaMetricCollector;
 import org.dashbuilder.dataprovider.kafka.metrics.group.MetricsCollectorGroupFactory;
 import org.dashbuilder.dataprovider.kafka.model.KafkaMetric;
 import org.dashbuilder.dataprovider.kafka.model.KafkaMetricsRequest;
@@ -37,15 +37,15 @@ import org.slf4j.LoggerFactory;
  */
 public class KafkaMetricsProvider {
 
-    protected Logger LOGGER = LoggerFactory.getLogger(KafkaMetricsProvider.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(KafkaMetricsProvider.class);
 
-    private static KafkaMetricsProvider INSTANCE;
+    private static KafkaMetricsProvider instance;
 
     MetricsCollectorGroupFactory metricsCollectorGroupFactory;
 
     static {
         MetricsCollectorGroupFactory metricsCollectorGroupFactory = MetricsCollectorGroupFactory.get();
-        INSTANCE = new KafkaMetricsProvider(metricsCollectorGroupFactory);
+        instance = new KafkaMetricsProvider(metricsCollectorGroupFactory);
     }
 
     KafkaMetricsProvider(MetricsCollectorGroupFactory metricsCollectorGroupFactory) {
@@ -53,15 +53,15 @@ public class KafkaMetricsProvider {
     }
 
     public static KafkaMetricsProvider get() {
-        return INSTANCE;
+        return instance;
     }
 
     public List<KafkaMetric> getMetrics(KafkaMetricsRequest request) {
-        List<KafkaMetricColllector> extractors = collectorsFor(request);
+        List<KafkaMetricCollector> extractors = collectorsFor(request);
         JMXConnector connector = MBeanServerConnectionProvider.newConnection(request);
         try {
             MBeanServerConnection mbsc = connector.getMBeanServerConnection();
-            return extractMetrics(mbsc, extractors, request);
+            return extractMetrics(mbsc, extractors);
         } catch (Exception e) {
             LOGGER.warn("Error reading metrics for request {}", request);
             LOGGER.debug("Error reading metrics for request", e);
@@ -76,21 +76,21 @@ public class KafkaMetricsProvider {
         }
     }
 
-    List<KafkaMetricColllector> collectorsFor(KafkaMetricsRequest request) {
-        List<KafkaMetricColllector> collectors = metricsCollectorGroupFactory.forTarget(request.getMetricsTarget())
+    List<KafkaMetricCollector> collectorsFor(KafkaMetricsRequest request) {
+        List<KafkaMetricCollector> collectors = metricsCollectorGroupFactory.forTarget(request.getMetricsTarget())
                                                                              .getMetricsCollectors(request);
         return request.filter()
                       .map(f -> filtering(collectors, f))
                       .orElse(collectors);
     }
 
-    List<KafkaMetricColllector> filtering(List<KafkaMetricColllector> collectors, String filter) {
+    List<KafkaMetricCollector> filtering(List<KafkaMetricCollector> collectors, String filter) {
         return filter.trim().isEmpty() ? collectors : collectors.stream()
                                                                 .filter(c -> c.getName().toLowerCase().contains(filter.toLowerCase()))
                                                                 .collect(Collectors.toList());
     }
 
-    private List<KafkaMetric> extractMetrics(MBeanServerConnection mbsc, List<KafkaMetricColllector> extractors, KafkaMetricsRequest request) {
+    private List<KafkaMetric> extractMetrics(MBeanServerConnection mbsc, List<KafkaMetricCollector> extractors) {
         return extractors.stream()
                          .flatMap(e -> e.collect(mbsc).stream())
                          .collect(Collectors.toList());
