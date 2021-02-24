@@ -32,7 +32,7 @@ jobs:
           (New-Object System.Net.WebClient).DownloadFile("https://repo1.maven.org/maven2/io/takari/takari-filemanager/0.8.3/takari-filemanager-0.8.3.jar", "$Env:M2_HOME\lib\ext\takari-filemanager-0.8.3.jar")
           (New-Object System.Net.WebClient).DownloadFile("https://repo1.maven.org/maven2/io/takari/maven/takari-smart-builder/0.6.1/takari-smart-builder-0.6.1.jar", "$Env:M2_HOME\lib\ext\takari-smart-builder-0.6.1.jar")
         env:
-          M2_HOME: /usr/share/apache-maven-3.6.3
+          M2_HOME: C:\ProgramData\chocolatey\lib\maven\apache-maven-3.6.3
       # See https://docs.github.com/en/actions/guides/building-and-testing-java-with-maven#caching-dependencies
       - name: Cache Maven packages
         uses: actions/cache@v2
