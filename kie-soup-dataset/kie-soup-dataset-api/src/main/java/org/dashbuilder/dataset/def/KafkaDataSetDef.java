@@ -15,6 +15,9 @@
  */
 package org.dashbuilder.dataset.def;
 
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -29,12 +32,15 @@ public class KafkaDataSetDef extends DataSetDef {
         CONSUMER;
     }
 
-    @Size(min = 7, groups = {KafkaDataSetDefValidation.class})
     @NotNull(groups = {KafkaDataSetDefValidation.class})
+    @Size(min = 7, groups = {KafkaDataSetDefValidation.class})
     protected String host;
 
-    @Size(min = 4, groups = {KafkaDataSetDefValidation.class})
     @NotNull(groups = {KafkaDataSetDefValidation.class})
+    @Min(value = 1024, groups = {KafkaDataSetDefValidation.class})
+    @Max(value = 65535, groups = {KafkaDataSetDefValidation.class})
+    @Size(min = 4, max = 5, groups = {KafkaDataSetDefValidation.class})
+    @Digits(fraction = 0, integer = 5, message = "Max number of digits is 5.", groups = {KafkaDataSetDefValidation.class})
     protected String port;
 
     protected MetricsTarget target;
