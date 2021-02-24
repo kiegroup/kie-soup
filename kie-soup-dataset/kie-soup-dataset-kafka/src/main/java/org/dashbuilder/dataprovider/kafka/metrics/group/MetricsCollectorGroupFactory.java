@@ -16,8 +16,6 @@
 package org.dashbuilder.dataprovider.kafka.metrics.group;
 
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.dashbuilder.dataset.def.KafkaDataSetDef.MetricsTarget;
 

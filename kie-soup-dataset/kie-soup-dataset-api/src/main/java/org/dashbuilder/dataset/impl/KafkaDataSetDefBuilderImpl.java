@@ -72,7 +72,7 @@ public class KafkaDataSetDefBuilderImpl extends AbstractDataSetDefBuilder<KafkaD
 
     @Override
     protected DataSetDef createDataSetDef() {
-        return this.buildDef();
+        return new KafkaDataSetDef();
     }
 
 }

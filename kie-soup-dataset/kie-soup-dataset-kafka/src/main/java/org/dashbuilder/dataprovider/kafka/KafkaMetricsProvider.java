@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class KafkaMetricsProvider {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(KafkaMetricsProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaMetricsProvider.class);
 
     private static KafkaMetricsProvider instance;
 

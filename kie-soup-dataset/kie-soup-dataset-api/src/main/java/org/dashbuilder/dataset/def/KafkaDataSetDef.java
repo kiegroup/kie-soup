@@ -23,7 +23,7 @@ import org.dashbuilder.dataset.validation.groups.KafkaDataSetDefValidation;
 
 public class KafkaDataSetDef extends DataSetDef {
 
-    public static enum MetricsTarget {
+    public enum MetricsTarget {
         BROKER,
         PRODUCER,
         CONSUMER;
