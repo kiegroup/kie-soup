@@ -75,13 +75,13 @@ public class SybaseASEDialect extends DefaultDialect {
      * Sybase ASE pagination queries are resolved as follows:
      *
      * <ul>
-     *      <li>1. offset <= 0 limit > 0</li>
+     *      <li>1. offset <= 0 limit >= 0</li>
      *      <p>SELECT <b>TOP limit</b> * FROM "EXPENSE_REPORTS" ORDER BY DEPARTMENT ASC</p>
      *
-     *      <li>2. offset > 0 limit > 0</li>
+     *      <li>2. offset > 0 limit >= 0</li>
      *      <p>SELECT <b>TOP limit+offset</b> * FROM "EXPENSE_REPORTS" ORDER BY DEPARTMENT ASC
      *
-     *      <li>3. offset > 0 limit <= 0</li>
+     *      <li>3. offset > 0 limit < 0</li>
      *      <p>SELECT * FROM "EXPENSE_REPORTS" ORDER BY DEPARTMENT ASC
      * </ul>
      *
@@ -94,18 +94,19 @@ public class SybaseASEDialect extends DefaultDialect {
     public String getSelectStatement(Select select) {
         int offset = select.getOffset();
         int limit = select.getLimit();
-        if (offset > 0 && limit >= 0) {
-            select.setOffsetPostProcessing(true);
-            return "SELECT TOP " + (offset + limit);
-        }
-        if (offset > 0 && limit <= 0) {
-            select.setOffsetPostProcessing(true);
+        if (limit >= 0) {
+            if (offset > 0) {
+                select.setOffsetPostProcessing(true);
+                return "SELECT TOP " + (offset + limit);
+            } else {
+                return "SELECT TOP " + limit;
+            }
+        } else {
+            if (offset > 0) {
+                select.setOffsetPostProcessing(true);
+            }
             return "SELECT";
         }
-        if (offset <= 0 && limit > 0) {
-            return "SELECT TOP " + limit;
-        }
-        return "SELECT";
     }
 
     @Override
