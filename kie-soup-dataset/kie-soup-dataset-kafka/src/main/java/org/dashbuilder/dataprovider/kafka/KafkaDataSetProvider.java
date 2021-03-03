@@ -16,6 +16,7 @@
 package org.dashbuilder.dataprovider.kafka;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.dashbuilder.DataSetCore;
 import org.dashbuilder.dataprovider.DataSetProvider;
@@ -82,8 +83,7 @@ public class KafkaDataSetProvider implements DataSetProvider, DataSetDefRegistry
 
     public DataSet lookupDataSet(DataSetDef def, DataSetLookup lookup) throws Exception {
         KafkaMetricsRequest request = buildRequestFromDef(def);
-        List<KafkaMetric> metrics = KafkaMetricsProvider.get().getMetrics(request);
-
+        List<KafkaMetric> metrics = loadMetrics(request);
         DataSet dataSet = toDataSet(metrics);
         dataSet.setUUID(def.getUUID());
         dataSet.setDefinition(def);
@@ -91,9 +91,37 @@ public class KafkaDataSetProvider implements DataSetProvider, DataSetDefRegistry
         return staticDataSetProvider.lookupDataSet(def, lookup);
     }
 
+    List<KafkaMetric> loadMetrics(KafkaMetricsRequest request) {
+        List<KafkaMetric> metrics;
+        try {
+            metrics = KafkaMetricsProvider.get().getMetrics(request);
+        } catch (Exception e) {
+            log.error("Error retrieving metrics from Kafka: {}", e.getMessage());
+            log.debug("Error retrieving metrics from Kafka", e);
+            throw new RuntimeException("Error connecting to Kafka, check if the host/port is correct and the server is running. See logs for more details.");
+        }
+
+        if (metrics.isEmpty()) {
+            throw new RuntimeException(noMetricsErrorMessage(request));
+        }
+        
+        return metrics;
+    }
+
+    String noMetricsErrorMessage(KafkaMetricsRequest request) {
+        StringBuilder sb = new StringBuilder("No metrics were found. Check if ");
+        Consumer<String> appendParamCheck = s -> sb.append(String.format(", %s is correct", s));
+        sb.append("the " + request.getMetricsTarget().name() + " has available metrics");
+        request.clientId().ifPresent(c -> appendParamCheck.accept("client id " + c));
+        request.nodeId().ifPresent(c -> appendParamCheck.accept("node id " + c));
+        request.topic().ifPresent(c -> appendParamCheck.accept("topic " + c));
+        sb.append(" and the filter matches any metrics");
+        return sb.toString();
+    }
+
     private KafkaMetricsRequest buildRequestFromDef(DataSetDef def) {
         if (!(def instanceof KafkaDataSetDef)) {
-            throw new IllegalArgumentException("Not a kafka dataset definition");
+            throw new IllegalArgumentException("Not a Kafka data set definition");
         }
 
         KafkaDataSetDef kafkaDef = (KafkaDataSetDef) def;

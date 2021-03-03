@@ -33,12 +33,10 @@ public class KafkaDataSetDef extends DataSetDef {
     }
 
     @NotNull(groups = {KafkaDataSetDefValidation.class})
-    @Size(min = 7, groups = {KafkaDataSetDefValidation.class})
+    @Size(min = 1, groups = {KafkaDataSetDefValidation.class})
     protected String host;
 
     @NotNull(groups = {KafkaDataSetDefValidation.class})
-    @Min(value = 1024, groups = {KafkaDataSetDefValidation.class})
-    @Max(value = 65535, groups = {KafkaDataSetDefValidation.class})
     @Size(min = 4, max = 5, groups = {KafkaDataSetDefValidation.class})
     @Digits(fraction = 0, integer = 5, message = "Max number of digits is 5.", groups = {KafkaDataSetDefValidation.class})
     protected String port;

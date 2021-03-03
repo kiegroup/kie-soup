@@ -12,14 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */                              
+ */
 package org.dashbuilder.dataprovider.kafka;
 
 import java.util.List;
 
 import org.dashbuilder.dataprovider.kafka.model.KafkaMetric;
+import org.dashbuilder.dataprovider.kafka.model.KafkaMetricsRequest;
 import org.dashbuilder.dataset.DataColumn;
 import org.dashbuilder.dataset.DataSet;
+import org.dashbuilder.dataset.def.KafkaDataSetDef.MetricsTarget;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
@@ -59,6 +61,31 @@ public class KafkaDataSetProviderTest {
         KafkaDataSetProvider provider = new KafkaDataSetProvider();
         DataSet dataset = provider.toDataSet(emptyList());
         assertEquals(0, dataset.getRowCount());
+    }
+
+    @Test
+    public void testNoMetricsErrorMessage() {
+        KafkaDataSetProvider provider = new KafkaDataSetProvider();
+
+        KafkaMetricsRequest request = KafkaMetricsRequest.Builder.newBuilder("", "").build();
+        String message = provider.noMetricsErrorMessage(request);
+        assertEquals("No metrics were found. Check if the BROKER has available metrics and the filter matches any metrics", message);
+
+        request = KafkaMetricsRequest.Builder.newBuilder("", "").target(MetricsTarget.PRODUCER).clientId("c").build();
+        message = provider.noMetricsErrorMessage(request);
+        assertEquals("No metrics were found. Check if the PRODUCER has available metrics, client id c is correct and the filter matches any metrics", message);
+
+        request = KafkaMetricsRequest.Builder.newBuilder("", "").target(MetricsTarget.CONSUMER).clientId("c").build();
+        message = provider.noMetricsErrorMessage(request);
+        assertEquals("No metrics were found. Check if the CONSUMER has available metrics, client id c is correct and the filter matches any metrics", message);
+
+        request = KafkaMetricsRequest.Builder.newBuilder("", "").target(MetricsTarget.CONSUMER).nodeId("n").build();
+        message = provider.noMetricsErrorMessage(request);
+        assertEquals("No metrics were found. Check if the CONSUMER has available metrics, node id n is correct and the filter matches any metrics", message);
+
+        request = KafkaMetricsRequest.Builder.newBuilder("", "").target(MetricsTarget.CONSUMER).topic("t").build();
+        message = provider.noMetricsErrorMessage(request);
+        assertEquals("No metrics were found. Check if the CONSUMER has available metrics, topic t is correct and the filter matches any metrics", message);
     }
 
 }
