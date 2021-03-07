@@ -55,7 +55,6 @@ import static org.appformer.maven.integration.embedder.MavenProjectLoader.loadMa
 
 public class Aether {
     public static final String S3_WAGON_CLASS = "kie.maven.s3.wagon.class";
-    private static final String S3_WAGON_CLASS_NAME = System.getProperty(S3_WAGON_CLASS);
 
     private static final Logger log = LoggerFactory.getLogger( Aether.class );
 
@@ -227,9 +226,10 @@ public class Aether {
                     log.warn( "Cannot find sramp wagon implementation class", cnfe );
                 }
             }
-            if ( "s3".equals( roleHint) && isNotEmpty( S3_WAGON_CLASS_NAME ) ) {
+            final String s3WagonClassName = System.getProperty( S3_WAGON_CLASS );
+            if ( "s3".equals( roleHint ) && isNotEmpty( s3WagonClassName ) ) {
                 try {
-                    return (Wagon) Class.forName( S3_WAGON_CLASS_NAME ).newInstance();
+                    return (Wagon) Class.forName( s3WagonClassName ).newInstance();
                 } catch ( ClassNotFoundException cnfe ) {
                     log.warn( "Cannot find s3 wagon implementation class", cnfe );
                 }
