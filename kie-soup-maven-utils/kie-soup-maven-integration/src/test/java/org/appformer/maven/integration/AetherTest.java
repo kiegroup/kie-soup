@@ -117,28 +117,6 @@ public class AetherTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenWagonClassNotFound() {
-        final RemoteRepository s3repository = new RemoteRepository.Builder( "central", "default", "s3://amazon-s3-repository-bucket/" ).build();
-        final List<RemoteRepository> remoteRepositories = Collections.singletonList(s3repository);
-
-        final MavenProject mavenProject = mock(MavenProject.class);
-        when(mavenProject.getRemoteProjectRepositories()).thenReturn(remoteRepositories);
-        final ArtifactRequest request = new ArtifactRequest(new DefaultArtifact("org.test:fake:0.0.1"), remoteRepositories, null);
-
-        try {
-            System.setProperty(Aether.S3_WAGON_CLASS, "com.acme.fake.s3wagon.class");
-
-            final Aether aether = new Aether(mavenProject);
-            final RepositorySystemSession session = aether.getSession();
-
-            assertThatCode(() -> aether.getSystem().resolveArtifact(session, request)).hasCauseInstanceOf(ArtifactTransferException.class);
-
-        } finally {
-            System.clearProperty( Aether.S3_WAGON_CLASS );
-        }
-    }
-
-    @Test
     public void shouldUseWagonClass() throws ArtifactResolutionException {
         final RepositoryPolicy repositoryPolicy = new RepositoryPolicy(true, RepositoryPolicy.UPDATE_POLICY_NEVER, RepositoryPolicy.CHECKSUM_POLICY_IGNORE);
         final RemoteRepository s3repository = new RemoteRepository.Builder("central", "default", "s3://amazon-s3-repository-bucket/")
@@ -165,6 +143,37 @@ public class AetherTest {
         } finally {
             System.clearProperty(Aether.S3_WAGON_CLASS);
             MavenSettings.reinitSettings();
+        }
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenWagonClassNotFound() {
+        shouldThrowExceptionForWagonClass("com.acme.fake.s3wagon.class");
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenWagonClassWasNotProvided() {
+        shouldThrowExceptionForWagonClass("");
+    }
+
+    private void shouldThrowExceptionForWagonClass(final String s3WagonClass) {
+        final RemoteRepository s3repository = new RemoteRepository.Builder( "central", "default", "s3://amazon-s3-repository-bucket/" ).build();
+        final List<RemoteRepository> remoteRepositories = Collections.singletonList(s3repository);
+
+        final MavenProject mavenProject = mock(MavenProject.class);
+        when(mavenProject.getRemoteProjectRepositories()).thenReturn(remoteRepositories);
+        final ArtifactRequest request = new ArtifactRequest(new DefaultArtifact("org.test:fake:0.0.1"), remoteRepositories, null);
+
+        try {
+            System.setProperty(Aether.S3_WAGON_CLASS, s3WagonClass);
+
+            final Aether aether = new Aether(mavenProject);
+            final RepositorySystemSession session = aether.getSession();
+
+            assertThatCode(() -> aether.getSystem().resolveArtifact(session, request)).hasCauseInstanceOf(ArtifactTransferException.class);
+
+        } finally {
+            System.clearProperty( Aether.S3_WAGON_CLASS );
         }
     }
 

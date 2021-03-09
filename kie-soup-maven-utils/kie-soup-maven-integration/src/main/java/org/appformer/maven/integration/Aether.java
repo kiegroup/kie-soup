@@ -50,7 +50,6 @@ import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.appformer.maven.integration.embedder.MavenProjectLoader.loadMavenProject;
 
 public class Aether {
@@ -227,7 +226,7 @@ public class Aether {
                 }
             }
             final String s3WagonClassName = System.getProperty( S3_WAGON_CLASS );
-            if ( "s3".equals( roleHint ) && isNotEmpty( s3WagonClassName ) ) {
+            if ( "s3".equals( roleHint ) && s3WagonClassName != null && s3WagonClassName.trim().length() > 0 ) {
                 try {
                     return (Wagon) Class.forName( s3WagonClassName ).newInstance();
                 } catch ( ClassNotFoundException cnfe ) {
