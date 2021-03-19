@@ -24,6 +24,8 @@ import org.dashbuilder.dataset.def.BeanDataSetDef;
 import org.dashbuilder.dataset.def.CSVDataSetDef;
 import org.dashbuilder.dataset.def.DataColumnDef;
 import org.dashbuilder.dataset.def.DataSetDef;
+import org.dashbuilder.dataset.def.KafkaDataSetDef;
+import org.dashbuilder.dataset.def.KafkaDataSetDef.MetricsTarget;
 import org.dashbuilder.dataset.filter.ColumnFilter;
 import org.dashbuilder.dataset.filter.CoreFunctionFilter;
 import org.dashbuilder.dataset.filter.CoreFunctionType;
@@ -51,6 +53,7 @@ public class DataSetDefJsonTest {
     private static final String FILTER_DEF_PATH = "dataSetDefFilter.dset";
     private static final String EXPENSES_DEF_PATH = "expenseReports.dset";
     private static final String CSV_DEF_PATH = "csvDataSetDef.dset";
+    private static final String KAFKA_DEF_PATH = "kafkaDataSetDef.dset";
     private static final String CUSTOM_DEF_PATH = "customDataSetDef.dset";
 
     private static final DataSetProviderType CUSTOM_PROVIDER_TYPE = new DefaultProviderType("CUSTOM");
@@ -74,6 +77,8 @@ public class DataSetDefJsonTest {
                     return DataSetProviderType.CSV;
                 case "SQL":
                     return DataSetProviderType.SQL;
+                case "KAFKA":
+                    return DataSetProviderType.KAFKA;                    
                 case "CUSTOM":
                     return CUSTOM_PROVIDER_TYPE;
             }
@@ -150,6 +155,20 @@ public class DataSetDefJsonTest {
         catch (ClassCastException e) {
             fail("Not a CSV dataset def");
         }
+    }
+    
+    @Test
+    public void testKafka() throws Exception {
+        String json = getFileAsString(KAFKA_DEF_PATH);
+        KafkaDataSetDef def = (KafkaDataSetDef) jsonMarshaller.fromJson(json);
+        assertEquals("127.0.0.1", def.getHost());
+        assertEquals("1234", def.getPort());
+        assertEquals(MetricsTarget.CONSUMER, def.getTarget());
+        assertEquals("testFilter", def.getFilter());
+        assertEquals("testClientId", def.getClientId());
+        assertEquals("testNodeId", def.getNodeId());
+        assertEquals("testTopic", def.getTopic());
+        assertEquals("testPartition", def.getPartition());
     }
 
     @Test

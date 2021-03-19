@@ -35,7 +35,7 @@ public class PrometheusDataSetDefBuilderImpl extends AbstractDataSetDefBuilder<P
 
     @Override
     protected DataSetDef createDataSetDef() {
-        return this.buildDef();
+        return new PrometheusDataSetDef();
     }
 
 }

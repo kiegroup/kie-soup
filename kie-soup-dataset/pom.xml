@@ -42,6 +42,7 @@
     <module>kie-soup-dataset-csv</module>
     <module>kie-soup-dataset-elasticsearch</module>
     <module>kie-soup-dataset-prometheus</module>
+    <module>kie-soup-dataset-kafka</module>
   </modules>
 
 

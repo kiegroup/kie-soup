@@ -15,27 +15,27 @@
  */
 package org.dashbuilder.dataprovider;
 
-import org.dashbuilder.dataset.def.PrometheusDataSetDef;
+import org.dashbuilder.dataset.def.KafkaDataSetDef;
 import org.dashbuilder.dataset.json.DataSetDefJSONMarshallerExt;
-import org.dashbuilder.dataset.json.PrometheusDefJSONMarshaller;
+import org.dashbuilder.dataset.json.KafkaDefJSONMarshaller;
 
 /**
- * For accessing data sets that are the result of a Prometheus Query
+ * For accessing data sets that are the result of Kafka metrics collection
  */
-public class PrometheusProviderType extends AbstractProviderType<PrometheusDataSetDef> {
+public class KafkaProviderType extends AbstractProviderType<KafkaDataSetDef> {
 
     @Override
     public String getName() {
-        return "Prometheus";
+        return "Kafka";
     }
 
     @Override
-    public PrometheusDataSetDef createDataSetDef() {
-        return new PrometheusDataSetDef();
+    public KafkaDataSetDef createDataSetDef() {
+        return new KafkaDataSetDef();
     }
 
     @Override
-    public DataSetDefJSONMarshallerExt<PrometheusDataSetDef> getJsonMarshaller() {
-        return PrometheusDefJSONMarshaller.INSTANCE;
+    public DataSetDefJSONMarshallerExt<KafkaDataSetDef> getJsonMarshaller() {
+        return KafkaDefJSONMarshaller.INSTANCE;
     }
 }

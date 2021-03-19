@@ -35,4 +35,5 @@ public interface DataSetDefJSONMarshallerExt<T extends DataSetDef> {
      * Writes into the given json object the status of the data set def instance.
      */
     void toJson(T dataSetDef, JsonObject jsonObject);
+
 }
