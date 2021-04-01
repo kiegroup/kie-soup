@@ -15,8 +15,9 @@
  */
 package org.dashbuilder.dataprovider.kafka.mbean;
 
+import java.util.Collections;
+
 import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 import org.dashbuilder.dataprovider.kafka.model.KafkaMetricsRequest;
@@ -24,6 +25,7 @@ import org.dashbuilder.dataprovider.kafka.model.KafkaMetricsRequest;
 public class MBeanServerConnectionProvider {
 
     private static final String RMI_URL_TEMPLATE = "service:jmx:rmi:///jndi/rmi://%s:%s/jmxrmi";
+    private static final JMXRMIConnectorProvider PROVIDER = new JMXRMIConnectorProvider();
 
     private MBeanServerConnectionProvider() {
         // do nothing
@@ -36,7 +38,9 @@ public class MBeanServerConnectionProvider {
             validateParams(host, port);
             String formattedUrl = String.format(RMI_URL_TEMPLATE, host, port);
             JMXServiceURL url = new JMXServiceURL(formattedUrl);
-            return JMXConnectorFactory.connect(url);
+            JMXConnector connector = PROVIDER.newJMXConnector(url, Collections.emptyMap());
+            connector.connect();
+            return connector;
         } catch (Exception e) {
             throw new IllegalArgumentException("Not able to connect to provided server.", e);
         }
