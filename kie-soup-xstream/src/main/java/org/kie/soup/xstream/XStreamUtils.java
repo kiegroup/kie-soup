@@ -33,12 +33,18 @@ import static com.thoughtworks.xstream.XStream.setupDefaultSecurity;
 
 public class XStreamUtils {
 
-    private static final String[] WHITELISTED_PACKAGES = new String[] {
+    private static final String[] ALLOWLISTED_PACKAGES = new String[] {
+        "org.kie.soup.project.datamodel.imports.Import",
         "org.drools.core.command.**",
         "org.drools.core.runtime.impl.ExecutionResultImpl",
         "org.drools.core.runtime.rule.impl.FlatQueryResults",
+        "org.drools.core.factmodel.Fact",
+        "org.drools.core.factmodel.Field",
         "org.drools.core.common.DefaultFactHandle",
-        "org.drools.core.common.EventFactHandle"
+        "org.drools.core.common.EventFactHandle",
+        "org.drools.core.rule.KieModuleMetaInfo",
+        "org.drools.core.rule.TypeMetaInfo",
+        "org.drools.core.runtime.help.impl.XStreamXMLTest$Message"
     };
 
     /**
@@ -175,8 +181,8 @@ public class XStreamUtils {
 
     /**
      * Use for XML or JSON that might not come from a trusted source (such as REST services payloads, ...).
-     * Automatically whitelists all classes with an {@link XStreamAlias} annotation.
-     * Often requires whitelisting additional domain specific classes, which you'll need to expose in your API's.
+     * Automatically allowlists all classes with an {@link XStreamAlias} annotation.
+     * Often requires allowlisting additional domain specific classes, which you'll need to expose in your API's.
      */
     public static XStream createNonTrustingXStream() {
         return internalCreateNonTrustingXStream( new XStream() );
@@ -184,8 +190,8 @@ public class XStreamUtils {
 
     /**
      * Use for XML or JSON that might not come from a trusted source (such as REST services payloads, ...).
-     * Automatically whitelists all classes with an {@link XStreamAlias} annotation.
-     * Often requires whitelisting additional domain specific classes, which you'll need to expose in your API's.
+     * Automatically allowlists all classes with an {@link XStreamAlias} annotation.
+     * Often requires allowlisting additional domain specific classes, which you'll need to expose in your API's.
      */
     public static XStream createNonTrustingXStream(HierarchicalStreamDriver hierarchicalStreamDriver) {
         return internalCreateNonTrustingXStream( new XStream(hierarchicalStreamDriver) );
@@ -193,8 +199,8 @@ public class XStreamUtils {
 
     /**
      * Use for XML or JSON that might not come from a trusted source (such as REST services payloads, ...).
-     * Automatically whitelists all classes with an {@link XStreamAlias} annotation.
-     * Often requires whitelisting additional domain specific classes, which you'll need to expose in your API's.
+     * Automatically allowlists all classes with an {@link XStreamAlias} annotation.
+     * Often requires allowlisting additional domain specific classes, which you'll need to expose in your API's.
      */
     public static XStream createNonTrustingXStream(HierarchicalStreamDriver hierarchicalStreamDriver, ClassLoader classLoader) {
         return internalCreateNonTrustingXStream( new XStream(null, hierarchicalStreamDriver, new ClassLoaderReference( classLoader )) );
@@ -202,8 +208,8 @@ public class XStreamUtils {
 
     /**
      * Use for XML or JSON that might not come from a trusted source (such as REST services payloads, ...).
-     * Automatically whitelists all classes with an {@link XStreamAlias} annotation.
-     * Often requires whitelisting additional domain specific classes, which you'll need to expose in your API's.
+     * Automatically allowlists all classes with an {@link XStreamAlias} annotation.
+     * Often requires allowlisting additional domain specific classes, which you'll need to expose in your API's.
      */
     public static XStream createNonTrustingXStream(HierarchicalStreamDriver hierarchicalStreamDriver,
                                                    ClassLoader classLoader,
@@ -213,8 +219,8 @@ public class XStreamUtils {
 
     /**
      * Use for XML or JSON that might not come from a trusted source (such as REST services payloads, ...).
-     * Automatically whitelists all classes with an {@link XStreamAlias} annotation.
-     * Often requires whitelisting additional domain specific classes, which you'll need to expose in your API's.
+     * Automatically allowlists all classes with an {@link XStreamAlias} annotation.
+     * Often requires allowlisting additional domain specific classes, which you'll need to expose in your API's.
      */
     public static XStream createNonTrustingXStream(ReflectionProvider reflectionProvider ) {
         return internalCreateNonTrustingXStream( new XStream(reflectionProvider) );
@@ -222,8 +228,8 @@ public class XStreamUtils {
     
     /**
      * Use for XML or JSON that might not come from a trusted source (such as REST services payloads, ...).
-     * Automatically whitelists all classes with an {@link XStreamAlias} annotation.
-     * Often requires whitelisting additional domain specific classes, which you'll need to expose in your API's.
+     * Automatically allowlists all classes with an {@link XStreamAlias} annotation.
+     * Often requires allowlisting additional domain specific classes, which you'll need to expose in your API's.
      */
     public static XStream createNonTrustingXStream(ReflectionProvider reflectionProvider, HierarchicalStreamDriver hierarchicalStreamDriver ) {
         return internalCreateNonTrustingXStream( new XStream(reflectionProvider, hierarchicalStreamDriver) );
@@ -231,8 +237,8 @@ public class XStreamUtils {
 
     /**
      * Use for XML or JSON that might not come from a trusted source (such as REST services payloads, ...).
-     * Automatically whitelists all classes with an {@link XStreamAlias} annotation.
-     * Often requires whitelisting additional domain specific classes, which you'll need to expose in your API's.
+     * Automatically allowlists all classes with an {@link XStreamAlias} annotation.
+     * Often requires allowlisting additional domain specific classes, which you'll need to expose in your API's.
      */
     public static XStream createNonTrustingXStream(ReflectionProvider reflectionProvider,
                                                    HierarchicalStreamDriver hierarchicalStreamDriver,
@@ -247,8 +253,8 @@ public class XStreamUtils {
 
     /**
      * Use for XML or JSON that might not come from a trusted source (such as REST services payloads, ...).
-     * Automatically whitelists all classes with an {@link XStreamAlias} annotation.
-     * Often requires whitelisting additional domain specific classes, which you'll need to expose in your API's.
+     * Automatically allowlists all classes with an {@link XStreamAlias} annotation.
+     * Often requires allowlisting additional domain specific classes, which you'll need to expose in your API's.
      */
     public static XStream createNonTrustingXStream(ReflectionProvider reflectionProvider, Function<MapperWrapper, MapperWrapper> mapper ) {
         return internalCreateNonTrustingXStream( new XStream(reflectionProvider) {
@@ -260,18 +266,18 @@ public class XStreamUtils {
 
     /**
      * Use for XML or JSON that might not come from a trusted source (such as REST services payloads, ...).
-     * Automatically whitelists all classes with an {@link XStreamAlias} annotation.
-     * Often requires whitelisting additional domain specific classes, which you'll need to expose in your API's.
+     * Automatically allowlists all classes with an {@link XStreamAlias} annotation.
+     * Often requires allowlisting additional domain specific classes, which you'll need to expose in your API's.
      */
     private static XStream internalCreateNonTrustingXStream( XStream xstream ) {
         setupDefaultSecurity(xstream);
         // TODO remove if setupDefaultSecurity already does this.
         // See comment in https://github.com/x-stream/xstream/pull/99
         xstream.addPermission( new AnyAnnotationTypePermission());
-        xstream.addPermission( new WildcardTypePermission( WHITELISTED_PACKAGES ) );
+        xstream.addPermission( new WildcardTypePermission( ALLOWLISTED_PACKAGES ) );
         // Do not add root permissions for "java", "org.kie" or the like here because that creates a security problem.
         // For more information, see http://x-stream.github.io/security.html and various xstream dev list conversations.
-        // Instead, embrace a whitelist approach and expose that in your API's.
+        // Instead, embrace a allowlist approach and expose that in your API's.
         return xstream;
     }
 
