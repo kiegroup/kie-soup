@@ -16,8 +16,6 @@
 
 package org.appformer.maven.integration.embedder;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -25,65 +23,127 @@ import java.util.Collections;
 
 import org.apache.maven.project.MavenProject;
 import org.appformer.maven.integration.Aether;
+import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.installation.InstallRequest;
 import org.eclipse.aether.installation.InstallationException;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class MavenProjectLoaderTest {
-    
+
     private static final String VERSION = "1.0-SNAPSHOT";
-    private static final String ARTIFACT_ID = "myArtifactId";
     private static final String GROUP_ID = "myGroupId";
 
-    protected static final String PROJ =
+    private static final String TRANSITIVE_ARTIFACT_ID = "transitiveDepArtifactId";
+    private static final String DEP_ARTIFACT_ID = "depArtifactId";
+
+    protected static final String PROJ_POM =
             "    <project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                     "      xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n" +
                     "      <modelVersion>4.0.0</modelVersion>\n" +
                     "     \n" +
                     "      <groupId>myGroupId</groupId>\n" +
-                    "      <artifactId>myArtifactId2</artifactId>\n" +
+                    "      <artifactId>myproject</artifactId>\n" +
                     "      <version>1.0-SNAPSHOT</version>\n" +
                     "      <dependencies>" +
                     "          <dependency>" +
-                    "             <groupId>myGroupId</groupId>\n"   + 
-                    "              <artifactId>myArtifactId</artifactId>" +
-                    "              <version>1.0-SNAPSHOT</version>" +
+                    "             <groupId>" + GROUP_ID + "</groupId>\n" +
+                    "              <artifactId>" + DEP_ARTIFACT_ID + "</artifactId>" +
+                    "              <version>" + VERSION + "</version>" +
                     "          </dependency>" +
-                    "      </dependencies>" +                    
+                    "      </dependencies>" +
                     "    </project>";
     
-    @BeforeClass
-    public static void installDependency() throws InstallationException {
+    static void installDependencies(boolean addTransitive) throws InstallationException {
         String repoRoot = MavenProjectLoaderTest.class.getResource("/").getFile();
         MavenSettings.reinitSettingsFromString(settings(repoRoot));
-        String jarURL = MavenProjectLoaderTest.class.getResource("/assets/myArtifactId").getFile();
-        Artifact artifact = new DefaultArtifact(GROUP_ID, 
-                                                ARTIFACT_ID, 
-                                                "", 
-                                                "jar", 
-                                                VERSION,
-                                                Collections.emptyMap(),
-                                                new File(jarURL));
-        InstallRequest request = new InstallRequest().addArtifact(artifact);
+
+        String depJarURL = MavenProjectLoaderTest.class.getResource("/assets/depArtifactId").getFile();
+        String depPomURL = MavenProjectLoaderTest.class.getResource("/assets/depArtifactId.pom").getFile();
+
+        String depPomURLWithTransitive = MavenProjectLoaderTest.class.getResource("/assets/depArtifactId-transitive.pom").getFile();
+
         RepositorySystemSession session = Aether.getAether().getSession();
-        Aether.getAether().getSystem().install(session, request);
-    }    
-    
+        RepositorySystem repo = Aether.getAether().getSystem();
+
+        InstallRequest installRequest = new InstallRequest();
+
+        installRequest.addArtifact(new DefaultArtifact(GROUP_ID,
+                                                       TRANSITIVE_ARTIFACT_ID,
+                                                       "",
+                                                       "jar",
+                                                       VERSION,
+                                                       Collections.emptyMap(),
+                                                       new File(depJarURL)));
+
+        installRequest.addArtifact(new DefaultArtifact(GROUP_ID,
+                                                       DEP_ARTIFACT_ID,
+                                                       "",
+                                                       "pom",
+                                                       VERSION,
+                                                       Collections.emptyMap(),
+                                                       new File(addTransitive ? depPomURLWithTransitive : depPomURL)));
+
+        installRequest.addArtifact(new DefaultArtifact(GROUP_ID,
+                                                       DEP_ARTIFACT_ID,
+                                                       "",
+                                                       "jar",
+                                                       VERSION,
+                                                       Collections.emptyMap(),
+                                                       new File(depJarURL)));
+
+        repo.install(session, installRequest);
+    }
+
     @Test
-    public void shouldAddDependencyArtifactsTest() throws Exception {
+    public void shouldAddDependencyWithoutTransitiveTest() throws Exception {
+        installDependencies(false);
         MavenProjectLoader.IS_FORCE_OFFLINE = true;
-        ByteArrayInputStream targetPom = new ByteArrayInputStream(PROJ.getBytes(StandardCharsets.UTF_8));
+        ByteArrayInputStream targetPom = new ByteArrayInputStream(PROJ_POM.getBytes(StandardCharsets.UTF_8));
         MavenProject mavenProj = MavenProjectLoader.parseMavenPom(targetPom, true);
         assertEquals(1, mavenProj.getArtifacts().size());
         org.apache.maven.artifact.Artifact dependencyArtifact = mavenProj.getArtifacts().iterator().next();
-        assertEquals(ARTIFACT_ID, dependencyArtifact.getArtifactId());
+        assertEquals(DEP_ARTIFACT_ID, dependencyArtifact.getArtifactId());
         assertEquals(GROUP_ID, dependencyArtifact.getGroupId());
         assertEquals(VERSION, dependencyArtifact.getVersion());
-        
+    }
+
+    @Test
+    public void shouldAddDependencyWithTransitiveTest() throws Exception {
+        installDependencies(true);
+        MavenProjectLoader.IS_FORCE_OFFLINE = true;
+        MavenProjectLoader.IS_RESOLVE_TRANSITIVE = true;
+        ByteArrayInputStream targetPom = new ByteArrayInputStream(PROJ_POM.getBytes(StandardCharsets.UTF_8));
+        MavenProject mavenProj = MavenProjectLoader.parseMavenPom(targetPom, true);
+        assertEquals(2, mavenProj.getArtifacts().size());
+
+        org.apache.maven.artifact.Artifact dependencyArtifact = mavenProj.getArtifacts().stream()
+                                                                         .filter(a -> a.getArtifactId().equals(DEP_ARTIFACT_ID))
+                                                                         .findFirst().get();
+        org.apache.maven.artifact.Artifact transitiveArtifact = mavenProj.getArtifacts().stream()
+                                                                         .filter(a -> a.getArtifactId().equals(TRANSITIVE_ARTIFACT_ID))
+                                                                         .findFirst().get();
+
+        assertEquals(DEP_ARTIFACT_ID, dependencyArtifact.getArtifactId());
+        assertEquals(GROUP_ID, dependencyArtifact.getGroupId());
+        assertEquals(VERSION, dependencyArtifact.getVersion());
+
+        assertEquals(TRANSITIVE_ARTIFACT_ID, transitiveArtifact.getArtifactId());
+        assertEquals(GROUP_ID, transitiveArtifact.getGroupId());
+        assertEquals(VERSION, transitiveArtifact.getVersion());
+    }
+
+    @Test
+    public void shouldNotResolveTransitiveTest() throws Exception {
+        installDependencies(true);
+        MavenProjectLoader.IS_FORCE_OFFLINE = true;
+        MavenProjectLoader.IS_RESOLVE_TRANSITIVE = false;
+        ByteArrayInputStream targetPom = new ByteArrayInputStream(PROJ_POM.getBytes(StandardCharsets.UTF_8));
+        MavenProject mavenProj = MavenProjectLoader.parseMavenPom(targetPom, true);
+        assertEquals(1, mavenProj.getArtifacts().size());
     }
 
     static String settings(String localRepo) {
