@@ -35,6 +35,7 @@ public class XStreamUtils {
 
     private static final String[] ALLOWLISTED_PACKAGES = new String[] {
         "org.kie.soup.project.datamodel.imports.Import",
+        "org.drools.workbench.models.datamodel.imports.Import",
         "org.drools.core.command.**",
         "org.drools.core.runtime.impl.ExecutionResultImpl",
         "org.drools.core.runtime.rule.impl.FlatQueryResults",
