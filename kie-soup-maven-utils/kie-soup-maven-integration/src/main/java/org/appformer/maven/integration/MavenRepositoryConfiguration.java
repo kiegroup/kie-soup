@@ -19,6 +19,8 @@ package org.appformer.maven.integration;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -156,7 +158,15 @@ public class MavenRepositoryConfiguration {
                                                      .build() );
         }
         if (settings.getActiveProxy() != null) {
-            remoteBuilder.setProxy(getActiveAetherProxyFromSettings(settings));
+            if (null == settings.getActiveProxy().getNonProxyHosts()) {
+                remoteBuilder.setProxy(getActiveAetherProxyFromSettings(settings));
+            } else {
+                Pattern p = Pattern.compile(settings.getActiveProxy().getNonProxyHosts());
+                Matcher m = p.matcher(remoteBuilder.build().getUrl());
+                if(!m.find()) {
+                    remoteBuilder.setProxy(getActiveAetherProxyFromSettings(settings));
+                }
+            }
         }
         return remoteBuilder;
 
@@ -206,7 +216,15 @@ public class MavenRepositoryConfiguration {
                                                                       server.getPassword() ) );
         }
         if (settings.getActiveProxy() != null) {
-            artifactRepository.setProxy(getActiveMavenProxyFromSettings(settings));
+            if (null == settings.getActiveProxy().getNonProxyHosts()) {
+                artifactRepository.setProxy(getActiveMavenProxyFromSettings(settings));
+            } else {
+                Pattern p = Pattern.compile(settings.getActiveProxy().getNonProxyHosts());
+                Matcher m = p.matcher(artifactRepository.getUrl());
+                if(!m.find()) {
+                    artifactRepository.setProxy(getActiveMavenProxyFromSettings(settings));
+                }
+            }
         }
         return artifactRepository;
     }
@@ -228,6 +246,7 @@ public class MavenRepositoryConfiguration {
         mavenProxy.setPort(settings.getActiveProxy().getPort());
         mavenProxy.setUserName(settings.getActiveProxy().getUsername());
         mavenProxy.setPassword(settings.getActiveProxy().getPassword());
+        mavenProxy.setNonProxyHosts(settings.getActiveProxy().getNonProxyHosts());
         return mavenProxy;
     }
 }
