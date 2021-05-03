@@ -148,6 +148,7 @@ public class MavenRepositoryConfiguration {
                                                                        String id,
                                                                        String layout,
                                                                        String url ) {
+        final Proxy activeProxy = settings.getActiveProxy();
         RemoteRepository.Builder remoteBuilder = new RemoteRepository.Builder( id,
                                                                                layout,
                                                                                url );
@@ -157,19 +158,15 @@ public class MavenRepositoryConfiguration {
                                                      .addPassword( server.getPassword() )
                                                      .build() );
         }
-        if (settings.getActiveProxy() != null) {
-            if (null == settings.getActiveProxy().getNonProxyHosts()) {
-                remoteBuilder.setProxy(getActiveAetherProxyFromSettings(settings));
-            } else {
-                Pattern p = Pattern.compile(settings.getActiveProxy().getNonProxyHosts());
-                Matcher m = p.matcher(remoteBuilder.build().getUrl());
-                if(!m.find()) {
-                    remoteBuilder.setProxy(getActiveAetherProxyFromSettings(settings));
-                }
+
+        if ( activeProxy != null ) {
+            if ( null == activeProxy.getNonProxyHosts() ) {
+                remoteBuilder.setProxy( getActiveAetherProxyFromSettings( settings ) );
+            } else if ( ! addProxy( settings.getActiveProxy().getNonProxyHosts(), remoteBuilder.build().getUrl() ) ) {
+                remoteBuilder.setProxy( getActiveAetherProxyFromSettings( settings ) );
             }
         }
         return remoteBuilder;
-
     }
 
     private static void setPolicy( RemoteRepository.Builder builder,
@@ -191,6 +188,7 @@ public class MavenRepositoryConfiguration {
     private ArtifactRepository toArtifactRepository( RemoteRepository remoteRepository ) {
         final String id = remoteRepository.getId();
         final String url = remoteRepository.getUrl();
+        final Proxy activeProxy = settings.getActiveProxy();
         final ArtifactRepositoryLayout layout = new DefaultRepositoryLayout();
         ArtifactRepositoryPolicy snapshots = new ArtifactRepositoryPolicy();
         ArtifactRepositoryPolicy releases = new ArtifactRepositoryPolicy();
@@ -215,18 +213,22 @@ public class MavenRepositoryConfiguration {
             artifactRepository.setAuthentication( new Authentication( server.getUsername(),
                                                                       server.getPassword() ) );
         }
-        if (settings.getActiveProxy() != null) {
-            if (null == settings.getActiveProxy().getNonProxyHosts()) {
-                artifactRepository.setProxy(getActiveMavenProxyFromSettings(settings));
-            } else {
-                Pattern p = Pattern.compile(settings.getActiveProxy().getNonProxyHosts());
-                Matcher m = p.matcher(artifactRepository.getUrl());
-                if(!m.find()) {
-                    artifactRepository.setProxy(getActiveMavenProxyFromSettings(settings));
-                }
+
+        if ( activeProxy != null ) {
+            if ( null == activeProxy.getNonProxyHosts() ) {
+                artifactRepository.setProxy( getActiveMavenProxyFromSettings( settings ) );
+            } else if( ! addProxy( settings.getActiveProxy().getNonProxyHosts(), artifactRepository.getUrl() ) ) {
+                artifactRepository.setProxy( getActiveMavenProxyFromSettings( settings) );
             }
         }
+
         return artifactRepository;
+    }
+
+    private static boolean addProxy ( String nonProxyHosts, String artifactURL ) {
+        Pattern p = Pattern.compile( nonProxyHosts );
+        Matcher m = p.matcher( artifactURL );
+        return m.find();
     }
 
     private static org.eclipse.aether.repository.Proxy getActiveAetherProxyFromSettings(final Settings settings) {
