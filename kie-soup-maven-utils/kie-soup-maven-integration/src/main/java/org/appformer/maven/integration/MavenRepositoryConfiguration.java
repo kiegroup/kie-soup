@@ -16,6 +16,8 @@
 
 package org.appformer.maven.integration;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -159,10 +161,10 @@ public class MavenRepositoryConfiguration {
                                                      .build() );
         }
 
-        if ( activeProxy != null ) {
-            if ( null == activeProxy.getNonProxyHosts() ) {
-                remoteBuilder.setProxy( getActiveAetherProxyFromSettings( settings ) );
-            } else if ( ! addProxy( settings.getActiveProxy().getNonProxyHosts(), remoteBuilder.build().getUrl() ) ) {
+        if (activeProxy != null) {
+            if (null == activeProxy.getNonProxyHosts()) {
+                remoteBuilder.setProxy( getActiveAetherProxyFromSettings(settings));
+            } else if (!repositoryUrlMatchNonProxyHosts(settings.getActiveProxy().getNonProxyHosts(), remoteBuilder.build().getUrl())) {
                 remoteBuilder.setProxy( getActiveAetherProxyFromSettings( settings ) );
             }
         }
@@ -214,21 +216,26 @@ public class MavenRepositoryConfiguration {
                                                                       server.getPassword() ) );
         }
 
-        if ( activeProxy != null ) {
-            if ( null == activeProxy.getNonProxyHosts() ) {
-                artifactRepository.setProxy( getActiveMavenProxyFromSettings( settings ) );
-            } else if( ! addProxy( settings.getActiveProxy().getNonProxyHosts(), artifactRepository.getUrl() ) ) {
-                artifactRepository.setProxy( getActiveMavenProxyFromSettings( settings) );
+        if (activeProxy != null) {
+            if (null == activeProxy.getNonProxyHosts()) {
+                artifactRepository.setProxy(getActiveMavenProxyFromSettings(settings));
+            } else if (!repositoryUrlMatchNonProxyHosts(settings.getActiveProxy().getNonProxyHosts(), artifactRepository.getUrl())) {
+                artifactRepository.setProxy(getActiveMavenProxyFromSettings(settings));
             }
         }
 
         return artifactRepository;
     }
 
-    private static boolean addProxy ( String nonProxyHosts, String artifactURL ) {
-        Pattern p = Pattern.compile( nonProxyHosts );
-        Matcher m = p.matcher( artifactURL );
-        return m.find();
+    private static boolean repositoryUrlMatchNonProxyHosts (String nonProxyHosts, String artifactURL) {
+        try {
+            Pattern p = Pattern.compile(nonProxyHosts);
+            URL url = new URL(artifactURL);
+            return p.matcher(url.getHost()).find();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private static org.eclipse.aether.repository.Proxy getActiveAetherProxyFromSettings(final Settings settings) {
