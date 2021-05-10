@@ -21,7 +21,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -39,9 +38,12 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MavenRepositoryConfiguration {
 
+    private final static Logger log = LoggerFactory.getLogger(MavenRepositoryConfiguration.class);
     private final Settings settings;
     private final Collection<RemoteRepository> extraRepositories;
     private final Collection<RemoteRepository> remoteRepositoriesForRequest;
@@ -233,7 +235,7 @@ public class MavenRepositoryConfiguration {
             URL url = new URL(artifactURL);
             return p.matcher(url.getHost()).find();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            log.warn("Failed to parse URL proxy {}, cause {}", artifactURL, e.getMessage());
             return false;
         }
     }
