@@ -44,7 +44,7 @@ public class HttpClient {
                 return br.readLine();
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error performing HTTP Request.", e);
+            throw new RuntimeException("Error performing HTTP Request: " + e.getMessage(), e);
         }
     }
 

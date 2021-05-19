@@ -58,7 +58,7 @@ public class DataSetDefJsonTest {
 
     private static final DataSetProviderType CUSTOM_PROVIDER_TYPE = new DefaultProviderType("CUSTOM");
 
-    DataSetDefJSONMarshaller jsonMarshaller = new DataSetDefJSONMarshaller(new DataSetProviderRegistry() {
+    static DataSetDefJSONMarshaller jsonMarshaller = new DataSetDefJSONMarshaller(new DataSetProviderRegistry() {
         @Override
         public void registerDataProvider(DataSetProvider dataProvider) {
 
