@@ -31,6 +31,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class MavenRepositoryTest {
@@ -59,6 +60,29 @@ public class MavenRepositoryTest {
         assertEquals(2, testServerRepos.size());
         for (RemoteRepository remoteRepository : testServerRepos) {
             assertNotNull(remoteRepository.getProxy());
+        }
+    }
+
+    @Test
+    public void testProxyWithNonHostsProxyProperty() {
+        MavenRepositoryMock.setCustomSettingsFileName("settings_with_proxy.xml");
+        final MavenRepository repo = new MavenRepositoryMock(Aether.getAether());
+        final Collection<RemoteRepository> remoteRepos = repo.getRemoteRepositoriesForRequest();
+        final Set<RemoteRepository> proxiedRepos = remoteRepos.stream()
+                .filter(r -> r.getId().contains("kie-wb-m2-repo"))
+                .collect(Collectors.toSet());
+
+        assertEquals(2, proxiedRepos.size());
+
+        for (RemoteRepository r : proxiedRepos) {
+            if (r.getId().equals("kie-wb-m2-repo-1")) {
+                assertEquals("http://localhost:8080/business-central/maven2", r.getUrl());
+                assertNull(r.getProxy());
+            }
+            if (r.getId().equals("kie-wb-m2-repo-2" )) {
+                assertEquals("http://www.foo.org", r.getUrl());
+                assertEquals("10.10.10.10:3128",r.getProxy().toString());
+            }
         }
     }
 
