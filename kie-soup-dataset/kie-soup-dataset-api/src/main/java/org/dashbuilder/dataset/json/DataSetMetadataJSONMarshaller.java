@@ -57,8 +57,8 @@ public class DataSetMetadataJSONMarshaller {
         String uuid = json.getString(UUID);
         int numberOfRows = json.getNumber(NUMBER_OF_ROWS).intValue();
         int numberOfColumns = json.getNumber(NUMBER_OF_COLUMNS).intValue();
-        JsonArray columnIdsArray = json.getArray(COLUMN_IDS);
-        JsonArray columnTypesArray = json.getArray(COLUMN_TYPES);
+        JsonArray columnIdsArray = getArray(json, COLUMN_IDS);
+        JsonArray columnTypesArray = getArray(json, COLUMN_TYPES);
         int estimatedSize = json.getNumber(ESTIMATED_SIZE).intValue();
 
         List<String> columnIds = IntStream.range(0, columnIdsArray.length())
@@ -112,6 +112,11 @@ public class DataSetMetadataJSONMarshaller {
         for (int i = 0; i < list.size(); i++) {
             columnIdsJsonArray.set(i, list.get(i).toString());
         }
+    }
+
+    private JsonArray getArray(JsonObject json, String fieldName) {
+        JsonArray array = json.getArray(fieldName);
+        return array == null ? Json.createArray() : array;
     }
 
 }

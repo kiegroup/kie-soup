@@ -114,7 +114,6 @@ public class CSVDataSetProvider implements DataSetProvider, DataSetDefRegistryLi
 
     protected boolean hasCSVFileChanged(DataSet dataSet, CSVDataSetDef def) {
         if (StringUtils.isBlank(def.getFilePath())) {
-            // TODO: Check timestamp here for URLs
             return false;
         }
         File f = new File(def.getFilePath());
