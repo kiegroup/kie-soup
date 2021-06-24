@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class DataSetMetadataJSONMarshallerTest {
 
@@ -50,6 +51,19 @@ public class DataSetMetadataJSONMarshallerTest {
                            "    \"refreshAlways\": false\n" +
                            "  }\n" +
                            "}";
+
+    String METADATA_JSON_WITH_NULL_VALUES = "{\n" +
+                                           "  \"definition\": {\n" +
+                                           "    \"provider\": \"BEAN\",\n" +
+                                           "    \"isPublic\": true,\n" +
+                                           "    \"cacheEnabled\": false,\n" +
+                                           "    \"cacheMaxRows\": 1000,\n" +
+                                           "    \"pushEnabled\": false,\n" +
+                                           "    \"pushMaxSize\": 1024,\n" +
+                                           "    \"refreshAlways\": false\n" +
+                                           "  }\n" +
+                                           "}";
+
     private DataSetMetadataJSONMarshaller marshaller;
 
     @Before
@@ -79,6 +93,18 @@ public class DataSetMetadataJSONMarshallerTest {
         assertEquals(Arrays.asList("TEST"), meta.getColumnIds());
         assertEquals(Arrays.asList(ColumnType.TEXT), meta.getColumnTypes());
         assertEquals(10, meta.getEstimatedSize());
+        assertNotNull(meta.getDefinition());
+    }
+    
+    @Test
+    public void toJsonWithNullValuesTest() {
+        DataSetMetadata meta = marshaller.fromJSON(METADATA_JSON_WITH_NULL_VALUES);
+        assertEquals(null, meta.getUUID());
+        assertEquals(0, meta.getNumberOfRows());
+        assertEquals(0, meta.getNumberOfColumns());
+        assertTrue(meta.getColumnIds().isEmpty());
+        assertTrue(meta.getColumnTypes().isEmpty());
+        assertEquals(0, meta.getEstimatedSize());
         assertNotNull(meta.getDefinition());
     }
 
