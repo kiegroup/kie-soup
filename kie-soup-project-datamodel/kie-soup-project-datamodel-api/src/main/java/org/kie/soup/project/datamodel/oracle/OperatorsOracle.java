@@ -28,19 +28,19 @@ import java.util.Map;
 public class OperatorsOracle {
 
     // The operators that are used at different times (based on type).
-    public static final String[] STANDARD_OPERATORS = new String[]{ "==", "!=", "== null", "!= null" };
+    public static final String[] STANDARD_OPERATORS = new String[]{ "==", "!=", "== null", "!= null", "memberOf", "not memberOf" };
 
-    public static final String[] STANDARD_CONNECTIVES = new String[]{ "|| ==", "|| !=", "&& !=" };
+    public static final String[] STANDARD_CONNECTIVES = new String[]{ "|| ==", "|| !=", "&& !=", "memberOf", "not memberOf" };
 
-    public static final String[] COMPARABLE_OPERATORS = new String[]{ "==", "!=", "<", ">", "<=", ">=", "== null", "!= null" };
+    public static final String[] COMPARABLE_OPERATORS = new String[]{ "==", "!=", "<", ">", "<=", ">=", "== null", "!= null", "memberOf", "not memberOf" };
 
     public static final String[] COMPARABLE_CONNECTIVES = new String[]{ "|| ==", "|| !=", "&& !=", "&& >", "&& <", "|| >", "|| <", "&& >=", "&& <=", "|| <=", "|| >=" };
 
     public static final String[] STRING_OPERATORS = new String[]{"==", "!=", "<", ">", "<=", ">=",
             "contains", "not contains", "matches", "not matches", "soundslike", "not soundslike",
-            "== null", "!= null"};
+            "memberOf", "not memberOf", "== null", "!= null"};
 
-    public static final String[] STRING_CONNECTIVES = new String[]{ "|| ==", "|| !=", "&& !=", "&& >", "&& <", "|| >", "|| <", "&& >=", "&& <=", "|| <=", "|| >=", "&& matches", "|| matches" };
+    public static final String[] STRING_CONNECTIVES = new String[]{ "|| ==", "|| !=", "&& !=", "&& >", "&& <", "|| >", "|| <", "&& >=", "&& <=", "|| <=", "|| >=", "&& matches", "|| matches", "memberOf", "not memberOf" };
 
     public static final String[] COLLECTION_OPERATORS = new String[]{ "contains", "excludes", "==", "!=", "== null", "!= null" };
 
