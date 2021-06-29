@@ -27,22 +27,22 @@ public class OperatorsOracleTest {
 
     @Test
     public void stringConnectives() {
-        assertContainsAll(OperatorsOracle.STRING_CONNECTIVES, "|| ==", "|| !=", "&& !=", "&& >", "&& <", "|| >", "|| <", "&& >=", "&& <=", "|| <=", "|| >=", "&& matches", "|| matches");
+        assertContainsAll(OperatorsOracle.STRING_CONNECTIVES, "|| ==", "|| !=", "&& !=", "&& >", "&& <", "|| >", "|| <", "&& >=", "&& <=", "|| <=", "|| >=", "&& matches", "|| matches", "memberOf", "not memberOf");
     }
 
     @Test
     public void STANDARD_OPERATORS() {
-        assertContainsAll(OperatorsOracle.STANDARD_OPERATORS, "==", "!=", "== null", "!= null");
+        assertContainsAll(OperatorsOracle.STANDARD_OPERATORS, "==", "!=", "== null", "!= null", "memberOf", "not memberOf");
     }
 
     @Test
     public void standardConnectives() {
-        assertContainsAll(OperatorsOracle.STANDARD_CONNECTIVES, "|| ==", "|| !=", "&& !=");
+        assertContainsAll(OperatorsOracle.STANDARD_CONNECTIVES, "|| ==", "|| !=", "&& !=", "memberOf", "not memberOf");
     }
 
     @Test
     public void comparableOperators() {
-        assertContainsAll(OperatorsOracle.COMPARABLE_OPERATORS, "==", "!=", "<", ">", "<=", ">=", "== null", "!= null");
+        assertContainsAll(OperatorsOracle.COMPARABLE_OPERATORS, "==", "!=", "<", ">", "<=", ">=", "== null", "!= null", "memberOf", "not memberOf");
     }
 
     @Test
@@ -100,7 +100,7 @@ public class OperatorsOracleTest {
     public void stringOperators() {
         assertContainsAll(OperatorsOracle.STRING_OPERATORS, "==", "!=", "<", ">", "<=", ">=",
                           "contains", "not contains", "matches", "not matches", "soundslike", "not soundslike",
-                          "== null", "!= null");
+                          "== null", "!= null", "memberOf", "not memberOf");
     }
 
     public void assertContainsAll(final String[] list, String... items) {
