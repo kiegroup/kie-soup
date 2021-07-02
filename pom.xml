@@ -51,7 +51,7 @@
     <!-- Required since support for ELS 2.x. Keep in sync with kie-parent or remove when those
           two versions are being updated on the IP BOM.-->
     <version.com.googlecode.jsonsimple>1.1.1</version.com.googlecode.jsonsimple>
-    <version.org.elasticsearch>5.6.1</version.org.elasticsearch>
+    <version.org.elasticsearch>6.8.15</version.org.elasticsearch>
     <version.org.apache.lucene>6.6.1</version.org.apache.lucene>
     <version.com.github.tdomzal.junit.docker>0.3</version.com.github.tdomzal.junit.docker>
     <version.com.spotify.docker.client>5.0.2</version.com.spotify.docker.client>
