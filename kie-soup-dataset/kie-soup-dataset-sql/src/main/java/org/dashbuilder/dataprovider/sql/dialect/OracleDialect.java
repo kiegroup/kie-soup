@@ -99,9 +99,17 @@ public class OracleDialect extends DefaultDialect {
         // Leverage the new limit clauses introduced in Oracle 12c
         int offset = select.getOffset();
         int limit = select.getLimit();
-        StringBuilder out = new StringBuilder();
-        if (offset > 0) out.append(" OFFSET ").append(offset).append(" ROWS");
-        if (limit >= 0) out.append(" FETCH FIRST ").append(limit).append(" ROWS ONLY");
-        return out.toString();
+        if (limit == 0) {
+            return " OFFSET 0 ROWS FETCH FIRST 0 ROWS ONLY";
+        } else {
+            StringBuilder out = new StringBuilder();
+            if (offset> 0) {
+                out.append(" OFFSET ").append(offset).append(" ROWS");
+            }
+            if (limit > 0) {
+                out.append(" FETCH FIRST ").append(limit).append(" ROWS ONLY");
+            }
+            return out.toString();
+        }
     }
 }
