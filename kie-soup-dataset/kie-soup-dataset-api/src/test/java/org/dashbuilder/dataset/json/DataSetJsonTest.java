@@ -14,6 +14,7 @@
 */
 package org.dashbuilder.dataset.json;
 
+import org.dashbuilder.dataset.DataColumn;
 import org.dashbuilder.dataset.DataSet;
 import org.dashbuilder.dataset.DataSetFactory;
 import org.dashbuilder.json.JsonObject;
@@ -25,6 +26,24 @@ import static org.dashbuilder.dataset.date.Month.*;
 public class DataSetJsonTest {
 
     DataSetJSONMarshaller datasetJsonMarshaller = DataSetJSONMarshaller.get();
+    
+    
+    public static final String CONFLICTING_ID_DS_JSON = "{\n" + 
+            "  \"column.0\": {\n" + 
+            "    \"id\": \"ID\",\n" + 
+            "    \"type\": \"NUMBER\",\n" + 
+            "    \"values\": [\n" + 
+            "      \"0.0\"\n" + 
+            "    ]\n" + 
+            "  },\n" + 
+            "  \"column.1\": {\n" + 
+            "    \"id\": \"ID\",\n" + 
+            "    \"type\": \"NUMBER\",\n" + 
+            "    \"values\": [\n" + 
+            "      \"265.0\"\n" + 
+            "    ]\n" + 
+            "  }\n" + 
+            "}";
 
     @Test
     public void testDataSetMarshalling() {
@@ -52,5 +71,21 @@ public class DataSetJsonTest {
 
         DataSet unmarshalled = datasetJsonMarshaller.fromJson(_jsonObj);
         assertEquals(unmarshalled, original);
+    }
+    
+    @Test
+    public void testDoubleNumberColumnJsonUnmarshall() {
+        DataSet dataset = datasetJsonMarshaller.fromJson(CONFLICTING_ID_DS_JSON);
+        
+        assertEquals(2, dataset.getColumns().size());
+        DataColumn cl0 = dataset.getColumns().get(0);
+        assertEquals(0.0, cl0.getValues().get(0));
+        assertEquals("ID", cl0.getId());
+        
+        DataColumn cl1 = dataset.getColumns().get(1);
+        assertEquals(265.0, cl1.getValues().get(0));
+        assertEquals("ID", cl1.getId());
+        
+        
     }
 }

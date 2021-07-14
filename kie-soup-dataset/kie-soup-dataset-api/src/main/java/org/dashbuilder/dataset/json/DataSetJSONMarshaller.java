@@ -25,6 +25,7 @@ import org.dashbuilder.dataset.DataSetFactory;
 import org.dashbuilder.json.Json;
 import org.dashbuilder.json.JsonArray;
 import org.dashbuilder.json.JsonException;
+import org.dashbuilder.json.JsonNull;
 import org.dashbuilder.json.JsonObject;
 
 public class DataSetJSONMarshaller {
@@ -33,6 +34,9 @@ public class DataSetJSONMarshaller {
     private static final String DATASET_COLUMN_ID = "id";
     private static final String DATASET_COLUMN_TYPE = "type";
     private static final String DATASET_COLUMN_VALUES = "values";
+    
+    
+    private static final String NULL_VALUE = "";
 
     private static DataSetJSONMarshaller SINGLETON = new DataSetJSONMarshaller();
 
@@ -66,6 +70,10 @@ public class DataSetJSONMarshaller {
         if ( values != null ) {
             int i = 0;
             for (Object value : values) {
+                if (value == null) {
+                    valuesJson.set(i++, JsonNull.NULL_INSTANCE);
+                    continue;
+                }
                 switch (dataColumn.getColumnType()) {
                     case DATE: {
                         String l = Long.toString(((Date) value).getTime());
@@ -97,12 +105,12 @@ public class DataSetJSONMarshaller {
         DataSet dataSet = DataSetFactory.newEmptyDataSet();
         for (int i = 0; i < dataSetJson.size(); i++) {
             JsonObject columnJson = dataSetJson.getObject(DATASET_COLUMN + "." + Integer.toString(i));
-            parseDataColumn(dataSet, columnJson);
+            parseDataColumn(dataSet, columnJson, i);
         }
         return dataSet;
     }
 
-    private void parseDataColumn( DataSet dataSet, JsonObject columnJson ) throws JsonException {
+    private void parseDataColumn( DataSet dataSet, JsonObject columnJson, int i) throws JsonException {
         if ( columnJson != null) {
             String columnId = columnJson.getString(DATASET_COLUMN_ID);
             String columnType = columnJson.getString(DATASET_COLUMN_TYPE);
@@ -110,7 +118,7 @@ public class DataSetJSONMarshaller {
             if ( columnId == null || columnType == null ) throw new RuntimeException("Dataset column id or type not specified");
 
             dataSet.addColumn(columnId, ColumnType.valueOf(columnType));
-            DataColumn dataColumn = dataSet.getColumnById(columnId);
+            DataColumn dataColumn = dataSet.getColumnByIndex(i);
             parseColumnValues( dataColumn, columnJson );
         }
     }
@@ -121,6 +129,10 @@ public class DataSetJSONMarshaller {
             List values = dataColumn.getValues();
             for ( int i = 0; i < valueArray.length(); i++ ) {
                 String stringJson = valueArray.getString(i);
+                if (isJsonNull(stringJson)) {
+                    values.add(null);
+                    continue;
+                } 
                 switch ( dataColumn.getColumnType() ) {
                     case DATE: values.add( parseDateValue(stringJson)); break;
                     case NUMBER: values.add( parseNumberValue(stringJson)); break;
@@ -129,6 +141,11 @@ public class DataSetJSONMarshaller {
                 }
             }
         }
+    }
+
+    private boolean isJsonNull(String stringJson) {
+        return stringJson == null || 
+                JsonNull.NULL_INSTANCE.asString().equals(stringJson);
     }
 
     private Date parseDateValue(String stringValue) {

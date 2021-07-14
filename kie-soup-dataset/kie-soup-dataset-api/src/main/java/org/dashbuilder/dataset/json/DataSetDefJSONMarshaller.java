@@ -80,9 +80,13 @@ public class DataSetDefJSONMarshaller {
         this.dataSetProviderRegistry = dataSetProviderRegistry;
         this.dataSetLookupJSONMarshaller = dataSetLookupJSONMarshaller;
     }
-
+    
     public DataSetDef fromJson(String jsonString) throws Exception {
         JsonObject json = Json.parse(jsonString);
+        return fromJsonObj(json);
+    }
+
+    public DataSetDef fromJsonObj(JsonObject json) throws Exception {
         DataSetProviderType type = readProviderType(json);
         DataSetDef dataSetDef = type.createDataSetDef();
         dataSetDef.setProvider(type);
