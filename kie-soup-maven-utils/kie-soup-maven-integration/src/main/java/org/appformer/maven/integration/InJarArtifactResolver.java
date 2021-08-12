@@ -21,12 +21,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.DefaultModelReader;
 import org.apache.maven.project.MavenProject;
 import org.appformer.maven.integration.embedder.EmbeddedPomParser;
 import org.appformer.maven.integration.embedder.MavenEmbedder;
@@ -48,11 +52,14 @@ public class InJarArtifactResolver extends ArtifactResolver {
 
     private ClassLoader classLoader;
     private List<URL> jarRepository;
+    private List<URL> effectivePoms;
     private PomParser pomParser;
+
 
     InJarArtifactResolver(ClassLoader classLoader, AFReleaseId releaseId) {
         this.classLoader = classLoader;
         this.jarRepository = new ArrayList<>();
+        this.effectivePoms = new ArrayList<>();
         init(releaseId);
     }
 
@@ -61,11 +68,12 @@ public class InJarArtifactResolver extends ArtifactResolver {
     }
     // initialize in jar repository
     private void init(AFReleaseId releaseId) {
-        jarRepository = buildResources();
+        jarRepository = buildResources(name -> isInJarFolder(name, "jar"));
+        effectivePoms = buildResources(name -> isInJarFolder(name, "pom"));
         pomParser = buildPomParser(releaseId);
     }
 
-    private List<URL> buildResources() {
+    private List<URL> buildResources(Predicate<String> predicate) {
         URL resourceURL = this.classLoader.getResource("");
         if (resourceURL == null) {
             return emptyList();
@@ -76,7 +84,7 @@ public class InJarArtifactResolver extends ArtifactResolver {
 
             ZipEntry entry = null;
             while ((entry = stream.getNextEntry()) != null) {
-                if (isInJarFolder(entry.getName())) {
+                if (predicate.test(entry.getName())) {
                     resources.add(classLoader.getResource(entry.getName()));
                 }
             }
@@ -88,10 +96,10 @@ public class InJarArtifactResolver extends ArtifactResolver {
         return resources;
     }
 
-    private boolean isInJarFolder(String name) {
+    private boolean isInJarFolder(String name, String type) {
         String[] paths = new String[]{"BOOT-INF/classes/KIE-INF/", "KIE-INF/lib/"};
         for (String path : paths) {
-            if (name.startsWith(path) && name.endsWith(".jar")) {
+            if (name.startsWith(path) && name.endsWith("." + type)) {
                 return true;
             }
         }
@@ -99,21 +107,36 @@ public class InJarArtifactResolver extends ArtifactResolver {
     }
 
     private PomParser buildPomParser(AFReleaseId releaseId) {
-        List<URL> url = jarRepository.stream().filter(e -> e.getFile().endsWith(toFile(releaseId))).collect(toList());
+        List<URL> url = effectivePoms.stream().filter(e -> e.getFile().endsWith(toFile(releaseId, "pom"))).collect(toList());
         if (url.isEmpty()) {
             return null;
         }
-        URL pomFile = classLoader.getResource(url.get(0) + "!/META-INF/maven/" + releaseId.getGroupId() + "/" + releaseId.getArtifactId() + "/pom.xml");
+        String path = url.get(0).toExternalForm();
+        URL pomFile = classLoader.getResource(path);
         if (pomFile == null) {
-            log.warn("Maven pom not found in path {}", pomFile);
+            log.warn("Maven pom not found in path {}", path);
             return null;
         }
         try (InputStream pomStream = pomFile.openStream()) {
-            // dependencies were resolved already so there is no need to resolve them again
-            MavenEmbedder mavenEmbedded = MavenProjectLoader.newMavenEmbedder(true);
-            MavenProject mavenProject = mavenEmbedded.readProject(pomStream);
-            PomParser artifactPomParser = new EmbeddedPomParser(mavenProject);
-            return artifactPomParser;
+            DefaultModelReader reader = new DefaultModelReader();
+            Model model = reader.read(pomStream, Collections.emptyMap());
+            // dependencies were resolved already creating the effective pom during kjar creation
+            return new PomParser() {
+
+                @Override
+                public List<DependencyDescriptor> getPomDirectDependencies(DependencyFilter filter) {
+                    List<DependencyDescriptor> deps = new ArrayList<DependencyDescriptor>();
+                    for (Dependency dep : model.getDependencies()) {
+                        DependencyDescriptor depDescr = new DependencyDescriptor(dep);
+                        if (depDescr.isValid() && filter.accept(depDescr.getReleaseId(), depDescr.getScope())) {
+                            deps.add(depDescr);
+                        }
+                    }
+                    return deps;
+                }
+                
+            };
+
         } catch (Exception e) {
             log.error("Could not read pom in jar {}", pomFile);
             return null;
@@ -124,6 +147,7 @@ public class InJarArtifactResolver extends ArtifactResolver {
 
     @Override
     public ArtifactLocation resolveArtifactLocation(AFReleaseId releaseId) {
+        log.debug("resolve location {}", releaseId);
         Optional<URL> url = tryInJar(releaseId);
         if (url.isPresent()) {
             DefaultArtifact artifact = new DefaultArtifact(releaseId.toExternalForm());
@@ -154,11 +178,11 @@ public class InJarArtifactResolver extends ArtifactResolver {
     }
 
     private Optional<URL> tryInJar(AFReleaseId releaseId) {
-        return tryInJar(toFile(releaseId));
+        return tryInJar(toFile(releaseId, "jar"));
     }
 
-    private String toFile(AFReleaseId releaseId) {
-        return releaseId.getArtifactId() + "-" + releaseId.getVersion() + ".jar";
+    private String toFile(AFReleaseId releaseId, String type) {
+        return releaseId.getArtifactId() + "-" + releaseId.getVersion() + "." + type;
     }
 
     @Override
