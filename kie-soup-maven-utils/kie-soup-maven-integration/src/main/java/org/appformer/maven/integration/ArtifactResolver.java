@@ -50,6 +50,11 @@ public abstract class ArtifactResolver {
             return inJarResolver;
         }
 
+        ExplodedJarArtifactResolver explodedJarArtifactResolver = new ExplodedJarArtifactResolver(classLoader, releaseId);
+        if (explodedJarArtifactResolver.isLoaded()) {
+            return explodedJarArtifactResolver;
+        }
+
         ArtifactResolver resolver = getResolverFor(releaseId, allowDefaultPom);
         if (resolver != null) {
             return resolver;
