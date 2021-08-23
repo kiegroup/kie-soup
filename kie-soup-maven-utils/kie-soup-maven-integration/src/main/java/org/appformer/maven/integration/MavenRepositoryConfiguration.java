@@ -230,8 +230,10 @@ public class MavenRepositoryConfiguration {
     }
 
     private static boolean repositoryUrlMatchNonProxyHosts (String nonProxyHosts, String artifactURL) {
+        // Replace * with .* so nonProxyHosts comply with pattern matching syntax
+        String nonProxyHostsRegexp = nonProxyHosts.replace("*", ".*");
         try {
-            Pattern p = Pattern.compile(nonProxyHosts);
+            Pattern p = Pattern.compile(nonProxyHostsRegexp);
             URL url = new URL(artifactURL);
             return p.matcher(url.getHost()).find();
         } catch (MalformedURLException e) {
