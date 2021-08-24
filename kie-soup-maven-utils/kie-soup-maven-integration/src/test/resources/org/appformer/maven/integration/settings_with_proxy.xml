@@ -8,7 +8,7 @@
       <protocol>http</protocol>
       <host>10.10.10.10</host>
       <port>3128</port>
-      <nonProxyHosts>localhost|127*</nonProxyHosts>
+      <nonProxyHosts>localhost|127*|*.bar.org|1.2.3.4</nonProxyHosts>
     </proxy>
   </proxies>
 
@@ -31,6 +31,14 @@
           <id>kie-wb-m2-repo-2</id>
           <name>foo Repo</name>
           <url>http://www.foo.org</url>
+          <snapshots>
+            <updatePolicy>always</updatePolicy>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>kie-wb-m2-repo-3</id>
+          <name>bar Repo</name>
+          <url>http://www.bar.org</url>
           <snapshots>
             <updatePolicy>always</updatePolicy>
           </snapshots>

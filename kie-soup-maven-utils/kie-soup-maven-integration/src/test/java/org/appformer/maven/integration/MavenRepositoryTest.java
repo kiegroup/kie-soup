@@ -72,7 +72,7 @@ public class MavenRepositoryTest {
                 .filter(r -> r.getId().contains("kie-wb-m2-repo"))
                 .collect(Collectors.toSet());
 
-        assertEquals(2, proxiedRepos.size());
+        assertEquals(3, proxiedRepos.size());
 
         for (RemoteRepository r : proxiedRepos) {
             if (r.getId().equals("kie-wb-m2-repo-1")) {
@@ -82,6 +82,10 @@ public class MavenRepositoryTest {
             if (r.getId().equals("kie-wb-m2-repo-2" )) {
                 assertEquals("http://www.foo.org", r.getUrl());
                 assertEquals("10.10.10.10:3128",r.getProxy().toString());
+            }
+            if (r.getId().equals("kie-wb-m2-repo-3" )) {
+                assertEquals("http://www.bar.org", r.getUrl());
+                assertNull(r.getProxy());
             }
         }
     }
