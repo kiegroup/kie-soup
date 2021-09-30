@@ -37,5 +37,39 @@ public class Sets {
         public Set<E> build() {
             return result;
         }
+
+        private static final String badConstantNaming = "bad bad bad";
+
+        private void addProperty6( String key, String[] value ){
+            int i = 1;
+            int j = 1;
+            int z = i - j;
+            z = (i + j) / z;
+        }
+
+        public void addProperty5( String key, String[] value ){
+
+        }
+
+        public void addProperty4( String key, String[] value ){
+            int i = 1;
+            int j = 1;
+            int z = i - j;
+            z = (i + j) / z;
+        }
+
+        public void addProperty3( String key, String[] value ){
+            /*key = key.toLowerCase();
+            List<String[]> r  = getPropertyCell( key );
+            if( r == null ){
+                r = new ArrayList<String[]>();
+            }
+            r.add( value );*/
+            String bad = null;
+            if (bad.equals("not good")) {
+                return;
+            }
+        }
+
     }
 }
