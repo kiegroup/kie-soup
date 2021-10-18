@@ -129,7 +129,7 @@ By default, when you create an Elastic Search data set and perform any data look
 * String fields that are not analyzed are considered LABEL column types in Dashbuilder.               
 * NOTE: An analyzed index field in the ELS instance cannot be never used as <code>LABEL</code> column type for Dashbuilder. 
 Why? Dashbuilder is not a text indexing engine neither a client. The LABEL column type is used internally for data set indexing and 
-grouping operations, and the values for this column type are considered to be not analyzed in order to be consisent with other data providers and the Data Set API. 
+grouping operations, and the values for this column type are considered to be not analyzed in order to be consistent with other data providers and the Data Set API. 
 If your index field have to be analyzed due to any external constraints, and you need it as a LABEL column type, you can do some workarounds such as using multi fields and generating different columns, for example, to achieve the use of different analyzers for same document type's field.            
 * NOTE: Case sensitiveness in String fields is determined by the field analyzer used in your mappings. For more information read the section *Elastic Search Query builder* and consider the use of multi fields for applying different analyzers on same field.                     
 
@@ -317,7 +317,7 @@ The Dashbuilder's filter operation *LIKE TO* provides the *Case Sensitive* optio
 
 This behavior has impact depending on the analyzer used for your field, if it's analyzed. So please, consider the following notes for the LIKE TO filter operation:                     
 * String fields that are NOT ANALYZED, the LIKE operation MUST BE always case sensitive (Your fields are not analyzed and ELS is not able to perform the operation)                         
-* String fields that are ANALYZED and use the default analyzer (lower-case all the terms), the LIKE operation using case un-sensitive works as excepted, by if you set enable the case sensitive feature, it always will match only with lower-cased patterns, as the terms are indexed in lower-case too. So using the default analyzer for a String field, only expect case un-sensitive working in the LIKE TO operation.                                           
+* String fields that are ANALYZED and use the default analyzer (lower-case all the terms), the LIKE operation using case un-sensitive works as expected, by if you set enable the case sensitive feature, it always will match only with lower-cased patterns, as the terms are indexed in lower-case too. So using the default analyzer for a String field, only expect case un-sensitive working in the LIKE TO operation.                                           
 * String fields that are ANALYZED and you want to be case sensitive, you have to specify a custom analyzer for that field in your index mappings (for example, a custom tokenizer analyzer).  So using a custom analyzer for a String field that provider case sensitive indexation, only expect case sensitive working in the LIKE TO operation.                
 
 Summary:                  
@@ -364,7 +364,7 @@ See an example [here](./example/README.md).
 Notes
 -----
              
-* This module has benn build and tested against an ElasticSearch server version  <code>2.1.2</code>. In other releases you may hit with some incompatibility issues.                      
+* This module has been build and tested against an ElasticSearch server version  <code>2.1.2</code>. In other releases you may hit with some incompatibility issues.                      
         
 * In order to perform data set look-ups using FIXED date interval types, *groovy dynamic scripting* must be enabled in your ElasticSearch server. 
 For more information go [here](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-scripting.html#_enabling_dynamic_scripting). 
@@ -379,8 +379,8 @@ In order to perform data set look-ups using FIXED date interval types, *groovy d
 If you're using Wildfly >= `8.2.X `, just skip this point.      
 
 Otherwise, note that Elastic Search 2.x requires `jackson-core` version >= `2.6`. So if you're 
-using Widfly at versions < `8.2.X ` you have to exclude the 
-jackson core and some related modules in the `jboss-deployment-structure.xml` as:                
+using Wildfly at versions < `8.2.X ` you have to exclude the 
+`jackson-core` and some related modules in the `jboss-deployment-structure.xml` as:                
 
         <exclusions>
           <module name="com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider"/>
