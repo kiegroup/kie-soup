@@ -66,9 +66,10 @@ public class CSVParser {
 
     protected DataSet load() throws Exception {
         InputStream is = getCSVInputStream();
+        CSVReader csvReader = null; 
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            CSVReader csvReader = new CSVReader(br, dataSetDef.getSeparatorChar(), dataSetDef.getQuoteChar(), dataSetDef.getEscapeChar());
+            csvReader = new CSVReader(br, dataSetDef.getSeparatorChar(), dataSetDef.getQuoteChar(), dataSetDef.getEscapeChar());
 
             String[] header = csvReader.readNext();
             if (header == null) throw new IOException("CSV has no header: " + dataSetDef);
@@ -109,6 +110,9 @@ public class CSVParser {
             return dataSet;
         } finally {
             is.close();
+            if (csvReader != null) {
+                csvReader.close();
+            }
         }
     }
 
