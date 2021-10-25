@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-parent</artifactId>
-    <version>7.54.0-SNAPSHOT</version>
+    <version>7.61.0-SNAPSHOT</version>
     <!-- Keep in sync with the parent version of kie-soup-bom/pom.xml -->
   </parent>
 
@@ -51,7 +51,7 @@
     <!-- Required since support for ELS 2.x. Keep in sync with kie-parent or remove when those
           two versions are being updated on the IP BOM.-->
     <version.com.googlecode.jsonsimple>1.1.1</version.com.googlecode.jsonsimple>
-    <version.org.elasticsearch>5.6.1</version.org.elasticsearch>
+    <version.org.elasticsearch>5.6.16</version.org.elasticsearch>
     <version.org.apache.lucene>6.6.1</version.org.apache.lucene>
     <version.com.github.tdomzal.junit.docker>0.3</version.com.github.tdomzal.junit.docker>
     <version.com.spotify.docker.client>5.0.2</version.com.spotify.docker.client>
@@ -102,102 +102,11 @@
     <module>kie-soup-project-datamodel</module>
     <module>kie-soup-maven-utils</module>
     <module>kie-soup-dataset</module>
-    <module>kie-soup-security-utils</module>
   </modules>
 
   <build>
     <pluginManagement>
       <plugins>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-enforcer-plugin</artifactId>
-          <version>${version.enforcer.plugin}</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>extra-enforcer-rules</artifactId>
-              <version>1.0</version>
-            </dependency>
-          </dependencies>
-          <executions>
-            <execution>
-              <id>ban-unwanted-deps</id>
-              <goals>
-                <goal>enforce</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <rules>
-                  <bannedDependencies>
-                    <excludes>
-                      <!-- Ban unwanted logging deps -->
-                      <!-- In case of transitive dependency, exclude it and use jcl-over-slf4j instead -->
-                      <exclude>commons-logging:commons-log*</exclude>
-                      <!-- In case of transitive dependency, exclude it and use log4j-over-slf4j instead -->
-                      <exclude>log4j:log4j</exclude>
-
-                      <!-- Ban 'javassist:javassist' in favor of 'org.javassist:javassist' -->
-                      <exclude>javassist:javassist</exclude>
-                    </excludes>
-                  </bannedDependencies>
-                </rules>
-              </configuration>
-            </execution>
-            <execution>
-              <id>ban-duplicated-classes</id>
-              <goals>
-                <goal>enforce</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <rules>
-                  <banDuplicateClasses>
-                    <ignoreClasses>
-                      <!-- Ban 'org.elasticsearch:elasticsearch' internal classes, as the artifact contains
-                        some duplicated classes for Joda time ones and it has the joda artifact
-                        as transitive dependency as well. -->
-                      <ignoreClass>org.joda.time.*</ignoreClass>
-                      <!-- Classes bundled in errai-javax-enterprise which are GWT friendly.
-                           See https://github.com/errai/errai/blob/master/errai-javax-enterprise/README -->
-                      <ignoreClass>javax.interceptor.InvocationContext</ignoreClass>
-                      <ignoreClass>javax.inject.Provider</ignoreClass>
-                      <ignoreClass>javax.inject.Named</ignoreClass>
-                      <ignoreClass>javax.inject.Scope</ignoreClass>
-                      <ignoreClass>javax.inject.Qualifier</ignoreClass>
-                      <ignoreClass>javax.inject.Singleton</ignoreClass>
-                      <ignoreClass>javax.enterprise.*</ignoreClass>
-                      <!-- Classes from gwt-user duplicated in errai-uibinder -->
-                      <ignoreClass>com.google.gwt.uibinder.rebind.UiBinderWriter</ignoreClass>
-                      <ignoreClass>com.google.gwt.uibinder.rebind.UiBinderGenerator</ignoreClass>
-                      <!-- Duplicated by XStream's transitive deps, with very little chance to get properly fixed -->
-                      <ignoreClass>org.xmlpull.v1.XmlPullParserException</ignoreClass>
-                      <ignoreClass>org.xmlpull.v1.XmlPullParser</ignoreClass>
-                      <!-- Duplicated in xml-apis:xml-apis:jar:1.4.01 and xerces:xercesImpl:jar:2.11.0.SP4. The class is identical
-                           and there is very little chance this will get ever fixed. -->
-                      <ignoreClass>org.w3c.dom.ElementTraversal</ignoreClass>
-                      <ignoreClass>org.w3c.dom.UserDataHandler</ignoreClass>
-                    </ignoreClasses>
-                    <dependencies>
-                      <!-- gwt-user bundles javax.servlet classes which usually conflicts with the servlet dependencies
-                           in -webapp modules. -->
-                      <dependency>
-                        <groupId>com.google.gwt</groupId>
-                        <artifactId>gwt-user</artifactId>
-                        <type>jar</type>
-                        <ignoreClasses>
-                          <ignoreClass>javax.servlet.*</ignoreClass>
-                        </ignoreClasses>
-                      </dependency>
-                    </dependencies>
-                    <findAllDuplicates>true</findAllDuplicates>
-                  </banDuplicateClasses>
-                </rules>
-                <fail>true</fail>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
@@ -663,7 +572,7 @@
           <plugins>
             <plugin>
               <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
+              <artifactId>cargo-maven3-plugin</artifactId>
               <configuration>
                 <configuration>
                   <properties>

@@ -1,0 +1,49 @@
+<settings>
+  <localRepository>/home/mwinkler/QA/jenkins/WORKSPACE/business-central-maven-repo</localRepository>
+
+  <proxies>
+    <proxy>
+      <id>MyProxy</id>
+      <active>true</active>
+      <protocol>http</protocol>
+      <host>10.10.10.10</host>
+      <port>3128</port>
+      <nonProxyHosts>localhost|127*|*.bar.org|1.2.3.4</nonProxyHosts>
+    </proxy>
+  </proxies>
+
+  <profiles>
+    <profile>
+      <id>kie-wb-m2-profile</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <repositories>
+        <repository>
+          <id>kie-wb-m2-repo-1</id>
+          <name>KIE-WB M2 Repo</name>
+          <url>http://localhost:8080/business-central/maven2</url>
+          <snapshots>
+            <updatePolicy>always</updatePolicy>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>kie-wb-m2-repo-2</id>
+          <name>foo Repo</name>
+          <url>http://www.foo.org</url>
+          <snapshots>
+            <updatePolicy>always</updatePolicy>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>kie-wb-m2-repo-3</id>
+          <name>bar Repo</name>
+          <url>http://www.bar.org</url>
+          <snapshots>
+            <updatePolicy>always</updatePolicy>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+</settings>
