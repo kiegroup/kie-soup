@@ -20,8 +20,8 @@ import org.dashbuilder.dataset.validation.groups.SQLDataSetDefDbSQLValidation;
 import org.dashbuilder.dataset.validation.groups.SQLDataSetDefDbTableValidation;
 import org.dashbuilder.dataset.validation.groups.SQLDataSetDefValidation;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.Objects;
 
 public class SQLDataSetDef extends DataSetDef {

@@ -21,8 +21,8 @@ import org.dashbuilder.dataset.validation.groups.CSVDataSetDefFilePathValidation
 import org.dashbuilder.dataset.validation.groups.CSVDataSetDefFileURLValidation;
 import org.dashbuilder.dataset.validation.groups.CSVDataSetDefValidation;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.Objects;
 
 public class CSVDataSetDef extends DataSetDef {

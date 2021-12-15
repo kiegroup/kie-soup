@@ -1,6 +1,6 @@
 package org.dashbuilder.dataset.validation;
 
-import javax.validation.Constraint;
+import jakarta.validation.Constraint;
 import java.lang.annotation.*;
 
 /**
