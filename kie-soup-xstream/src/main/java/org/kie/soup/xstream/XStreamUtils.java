@@ -37,6 +37,7 @@ public class XStreamUtils {
         "org.kie.soup.project.datamodel.imports.Import",
         "org.drools.workbench.models.datamodel.imports.Import",
         "org.drools.core.command.**",
+        "org.drools.core.base.*AgendaFilter",
         "org.drools.core.runtime.impl.ExecutionResultImpl",
         "org.drools.core.runtime.rule.impl.FlatQueryResults",
         "org.drools.core.factmodel.Fact",
