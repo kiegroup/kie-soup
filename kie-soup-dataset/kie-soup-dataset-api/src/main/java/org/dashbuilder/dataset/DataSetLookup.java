@@ -45,7 +45,7 @@ public class DataSetLookup {
     /**
      * The number of rows to get.
      */
-    protected int numberOfRows = -1;
+    protected int numberOfRows = 1000;
 
     /**
      * Flag indicating this lookup request is in test mode
