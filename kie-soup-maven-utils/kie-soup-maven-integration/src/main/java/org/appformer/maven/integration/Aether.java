@@ -124,6 +124,7 @@ public class Aether {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
         session.setLocalRepositoryManager( system.newLocalRepositoryManager( session, localRepo ) );
         session.setOffline( offline );
+        session.setSystemProperties(System.getProperties());
         configureProxiesOnSession( settings, session );
         configureHttpHeadersOnSession( settings, session );
         return session;
