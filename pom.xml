@@ -51,7 +51,6 @@
     <!-- Required since support for ELS 2.x. Keep in sync with kie-parent or remove when those
           two versions are being updated on the IP BOM.-->
     <version.com.googlecode.jsonsimple>1.1.1</version.com.googlecode.jsonsimple>
-    <!-- <version.org.elasticsearch>5.6.16</version.org.elasticsearch> -->
     <version.com.github.tdomzal.junit.docker>0.3</version.com.github.tdomzal.junit.docker>
     <version.com.spotify.docker.client>5.0.2</version.com.spotify.docker.client>
   </properties>
@@ -470,14 +469,6 @@
         <groupId>org.apache.lucene</groupId>
         <artifactId>lucene-queryparser</artifactId>
         <version>${version.org.apache.lucene}</version>
-      </dependency>
-      <!-- Required to run the ElasticSearch server when performing the unit test executions.
-          The ELS data provider requires groovy scripts enabled on the server.-->
-      <dependency>
-        <groupId>org.codehaus.groovy</groupId>
-        <artifactId>groovy-all</artifactId>
-        <classifier>indy</classifier>
-        <version>${version.org.codehaus.groovy}</version>
       </dependency>
       <!-- JSON parsing. -->
       <dependency>
