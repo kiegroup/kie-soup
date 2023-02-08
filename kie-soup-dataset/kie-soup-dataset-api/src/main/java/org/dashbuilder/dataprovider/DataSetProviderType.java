@@ -31,8 +31,6 @@ public interface DataSetProviderType<T extends DataSetDef> {
 
     CSVProviderType CSV = new CSVProviderType();
 
-    ELSProviderType ELASTICSEARCH = new ELSProviderType();
-    
     PrometheusProviderType PROMETHEUS = new PrometheusProviderType();
     
     KafkaProviderType KAFKA = new KafkaProviderType();

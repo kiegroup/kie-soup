@@ -7,8 +7,7 @@ This is a quick reference guide on the setup and usage of the DataSet API.
 ## Prerequisites
 
 The DataSet library is available as a maven artifact. You need to import the library's BOM within your _dependencyManagement_
-section as well as to add a dependency to the _dashbuilder-dataset-core_ artifact. As you can see below, the SQL, CVS, and 
-ElasticSearch dependencies are optional. Add them depending on what kind of datasets you want to support.  
+section as well as to add a dependency to the _dashbuilder-dataset-core_ artifact. As you can see below, the SQL, and CVS dependencies are optional. Add them depending on what kind of datasets you want to support.  
   
 
       <dependencyManagement>
@@ -19,7 +18,7 @@ ElasticSearch dependencies are optional. Add them depending on what kind of data
             <version>0.5.0-SNAPSHOT</version>
             <type>pom</type>
             <scope>import</scope>
-          </dependency>    
+          </dependency>
         </dependencies>
       </dependencyManagement>
     
@@ -30,20 +29,16 @@ ElasticSearch dependencies are optional. Add them depending on what kind of data
           <artifactId>dashbuilder-dataset-core</artifactId>
         </dependency>
     
-        <!-- Optional -->    
+        <!-- Optional -->
         <dependency>
           <groupId>org.dashbuilder</groupId>
           <artifactId>dashbuilder-dataset-sql</artifactId>
-        </dependency>    
+        </dependency>
         <dependency>
           <groupId>org.dashbuilder</groupId>
           <artifactId>dashbuilder-dataset-csv</artifactId>
-        </dependency>    
-        <dependency>
-          <groupId>org.dashbuilder</groupId>
-          <artifactId>dashbuilder-dataset-elasticsearch</artifactId>
         </dependency>
-               
+
       </dependencies>
 
 ## Data Set Definitions
@@ -185,5 +180,3 @@ to register the target provider component:
     DataSetProviderRegistry providerRegistry = DataSetCore.get().getDataSetProviderRegistry();   
     dataSetProviderRegistry.registerDataProvider(CSVDataSetProvider.get());
     dataSetProviderRegistry.registerDataProvider(SQLDataSetProvider.get());
-    dataSetProviderRegistry.registerDataProvider(ElasticSearchDataSetProvider.get());
-
