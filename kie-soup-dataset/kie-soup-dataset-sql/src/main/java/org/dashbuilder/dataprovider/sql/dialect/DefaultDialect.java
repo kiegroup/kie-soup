@@ -281,8 +281,8 @@ public class DefaultDialect implements Dialect {
         Column SEPARATOR_DATE = column("-", ColumnType.TEXT, 3);
         Column SEPARATOR_EMPTY = column(" ", ColumnType.TEXT, 3);
         Column SEPARATOR_TIME = column(":", ColumnType.TEXT, 3);
-
-        if (DateIntervalType.SECOND.equals(type)) {
+        // SQL extract include second fractions when using "second", so the same format applies for both
+        if (DateIntervalType.SECOND.equals(type) || DateIntervalType.MILLISECOND.equals(type)) {
             return concat(target.year(), SEPARATOR_DATE,
                     target.month(), SEPARATOR_DATE,
                     target.day(), SEPARATOR_EMPTY,
