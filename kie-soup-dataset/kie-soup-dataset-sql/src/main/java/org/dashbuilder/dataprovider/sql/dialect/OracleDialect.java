@@ -35,9 +35,11 @@ public class OracleDialect extends DefaultDialect {
     public static final String PATTERN_HOUR = "YYYY-MM-DD HH24";
     public static final String PATTERN_MINUTE = "YYYY-MM-DD HH24:MI";
     public static final String PATTERN_SECOND = "YYYY-MM-DD HH24:MI:SS";
+    public static final String PATTERN_MILLISECOND = "YYYY-MM-DD HH24:MI:SS.FF3";
 
     private static Map<DateIntervalType,String> datePatternMap = new HashMap<DateIntervalType, String>();
     static {
+        datePatternMap.put(DateIntervalType.MILLISECOND, PATTERN_MILLISECOND);
         datePatternMap.put(DateIntervalType.SECOND, PATTERN_SECOND);
         datePatternMap.put(DateIntervalType.MINUTE, PATTERN_MINUTE);
         datePatternMap.put(DateIntervalType.HOUR, PATTERN_HOUR);

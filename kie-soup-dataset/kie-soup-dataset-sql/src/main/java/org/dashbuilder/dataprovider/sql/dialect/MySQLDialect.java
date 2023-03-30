@@ -30,9 +30,11 @@ public class MySQLDialect extends DefaultDialect {
     public static final String PATTERN_HOUR = "%Y-%m-%d %H";
     public static final String PATTERN_MINUTE = "%Y-%m-%d %H:%i";
     public static final String PATTERN_SECOND = "%Y-%m-%d %H:%i:%s";
+    public static final String PATTERN_MILLISECOND = "%Y-%m-%d %H:%i:%s.%f"; // this really print 6 digits for second fractions but it should be fine
 
     private static Map<DateIntervalType,String> datePatternMap = new HashMap<DateIntervalType, String>();
     static {
+        datePatternMap.put(DateIntervalType.MILLISECOND, PATTERN_MILLISECOND);
         datePatternMap.put(DateIntervalType.SECOND, PATTERN_SECOND);
         datePatternMap.put(DateIntervalType.MINUTE, PATTERN_MINUTE);
         datePatternMap.put(DateIntervalType.HOUR, PATTERN_HOUR);
