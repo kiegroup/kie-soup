@@ -48,7 +48,9 @@ import org.apache.maven.model.composition.DefaultDependencyManagementImporter;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.DefaultInheritanceAssembler;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
+import org.apache.maven.model.interpolation.DefaultModelVersionProcessor;
 import org.apache.maven.model.interpolation.ModelInterpolator;
+import org.apache.maven.model.interpolation.ModelVersionProcessor;
 import org.apache.maven.model.interpolation.StringSearchModelInterpolator;
 import org.apache.maven.model.io.DefaultModelReader;
 import org.apache.maven.model.io.ModelReader;
@@ -90,6 +92,8 @@ import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.repository.legacy.LegacyRepositorySystem;
 import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.repository.legacy.repository.DefaultArtifactRepositoryFactory;
+import org.apache.maven.rtinfo.RuntimeInformation;
+import org.apache.maven.rtinfo.internal.DefaultRuntimeInformation;
 import org.apache.maven.settings.building.DefaultSettingsBuilderFactory;
 import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.crypto.DefaultSettingsDecrypter;
@@ -136,8 +140,6 @@ public class WiredComponentProvider implements ComponentProvider {
 
         locator.addService( org.eclipse.aether.RepositorySystem.class, DefaultRepositorySystem.class );
         locator.addService( PlexusCipher.class, DefaultPlexusCipher.class );
-        locator.addService( SecDispatcher.class, DefaultSecDispatcher.class );
-        locator.addService( SettingsDecrypter.class, DefaultSettingsDecrypter.class );
         locator.addService( ArtifactRepositoryFactory.class, DefaultArtifactRepositoryFactory.class );
         locator.addService( MirrorSelector.class, DefaultMirrorSelector.class );
         locator.addService( Logger.class, ConsoleLogger.class );
@@ -148,7 +150,6 @@ public class WiredComponentProvider implements ComponentProvider {
         locator.addService( ProfileSelector.class, DefaultProfileSelector.class );
         locator.addService( ModelProcessor.class, DefaultModelProcessor.class );
         locator.addService( ModelReader.class, DefaultModelReader.class );
-        locator.addService( ModelValidator.class, DefaultModelValidator.class );
         locator.addService( SuperPomProvider.class, DefaultSuperPomProvider.class );
         locator.addService( ModelNormalizer.class, DefaultModelNormalizer.class );
         locator.addService( ProfileInjector.class, DefaultProfileInjector.class );
@@ -168,6 +169,8 @@ public class WiredComponentProvider implements ComponentProvider {
         locator.addService( TransporterProvider.class, DefaultTransporterProvider.class );
         locator.addService( RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class );
         locator.addService( ModelBuilder.class, DefaultModelBuilder.class );
+        locator.addService( RuntimeInformation.class, DefaultRuntimeInformation.class );
+        locator.addService( ModelVersionProcessor.class, DefaultModelVersionProcessor.class );
 
         // DefaultMavenExecutionRequestPopulator does not have non-arg constructor so we need to create new instance
         // manually and inform the locator about the new instance
@@ -186,8 +189,10 @@ public class WiredComponentProvider implements ComponentProvider {
         inject( ArtifactHandlerManager.class, buildArtifactHandlers(), "artifactHandlers" );
         inject( ArtifactFactory.class, ArtifactHandlerManager.class, "artifactHandlerManager" );
 
-        inject( SecDispatcher.class, PlexusCipher.class, "_cipher" );
-        inject( SettingsDecrypter.class, SecDispatcher.class, "securityDispatcher" );
+        locator.setServices( SecDispatcher.class, new DefaultSecDispatcher(locator.getService(PlexusCipher.class)) );
+        locator.setServices( SettingsDecrypter.class, new DefaultSettingsDecrypter(locator.getService(SecDispatcher.class)) );
+
+        locator.setServices( ModelValidator.class, new DefaultModelValidator(locator.getService(ModelVersionProcessor.class)) );
 
         EventSpyDispatcher eventSpyDispatcher = new EventSpyDispatcher();
         eventSpyDispatcher.setEventSpies( new ArrayList<EventSpy>() );
@@ -197,6 +202,8 @@ public class WiredComponentProvider implements ComponentProvider {
         inject( DefaultRepositorySystemSessionFactory.class, SettingsDecrypter.class, "settingsDecrypter" );
         inject( DefaultRepositorySystemSessionFactory.class, eventSpyDispatcher, "eventSpyDispatcher" );
         inject( DefaultRepositorySystemSessionFactory.class, MavenRepositorySystem.class, "mavenRepositorySystem" );
+        inject( DefaultRepositorySystemSessionFactory.class, RuntimeInformation.class, "runtimeInformation" );
+        inject( ModelInterpolator.class, ModelVersionProcessor.class, "versionProcessor");
 
         inject( Maven.class, Logger.class, "logger" );
         inject( Maven.class, DefaultRepositorySystemSessionFactory.class, "repositorySessionFactory" );

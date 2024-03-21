@@ -178,6 +178,7 @@ public class MavenProjectLoader {
             try {
                 mavenProject = parseMavenPom(pomFile, offline);
             } catch (Exception e) {
+                log.warn("[POM path: " + pomFile.getAbsolutePath() + "]");
                 log.warn("Unable to parse pom.xml file of the running project: " + e.getMessage());
             }
         }
