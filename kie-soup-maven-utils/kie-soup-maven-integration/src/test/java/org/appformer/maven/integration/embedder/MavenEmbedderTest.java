@@ -196,6 +196,7 @@ public class MavenEmbedderTest {
                 System.clearProperty( CUSTOM_SETTINGS_PROPERTY );
             }
             MavenSettings.reinitSettingsFromString(EMPTY_SETTINGS);
+            MavenEmbedderUtils.enforceWiredComponentProvider = true;
 
             final MavenRequest mavenRequest = createMavenRequest(null);
             final MavenEmbedder embedder = new MavenEmbedderWithProxyMock( mavenRequest );
