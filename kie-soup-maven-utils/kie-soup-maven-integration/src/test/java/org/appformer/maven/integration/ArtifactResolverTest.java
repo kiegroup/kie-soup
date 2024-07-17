@@ -37,7 +37,7 @@ public class ArtifactResolverTest extends TestCase {
         ArrayList<URL> urlArrayList = new ArrayList<URL>();
         urlArrayList.add(classLoader.getResource("BOOT-INF/classes/KIE-INF/lib/kjar-1.0.0-SNAPSHOT.pom"));
 
-        InJarArtifactResolver inJarArtifactResolver = new InJarArtifactResolver(classLoader, releaseId, true);
+        InJarArtifactResolver inJarArtifactResolver = new InJarArtifactResolver(classLoader, releaseId);
         InJarArtifactResolver spy = Mockito.spy(inJarArtifactResolver);
         doReturn(urlArrayList).when(spy).buildResources(any());
 
@@ -50,7 +50,7 @@ public class ArtifactResolverTest extends TestCase {
         ClassLoader classLoader = getClass().getClassLoader();
         AFReleaseId releaseId = new AFReleaseIdImpl("org.jbpm", "kjar", "1.0.0-SNAPSHOT", "jar");
 
-        InJarArtifactResolver inJarArtifactResolver = new InJarArtifactResolver(classLoader, releaseId, true);
+        InJarArtifactResolver inJarArtifactResolver = new InJarArtifactResolver(classLoader, releaseId );
         InJarArtifactResolver spy = Mockito.spy(inJarArtifactResolver);
 
         ArrayList<URL> urlArrayList = new ArrayList<URL>();
