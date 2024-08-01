@@ -42,7 +42,7 @@ import static java.util.stream.Collectors.toList;
 public abstract class AbstractFilesArtifactResolver extends ArtifactResolver {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractFilesArtifactResolver.class);
-
+    private final AFReleaseId releaseId;
     private ClassLoader classLoader;
     private List<URL> jarRepository;
     private List<URL> effectivePoms;
@@ -53,7 +53,8 @@ public abstract class AbstractFilesArtifactResolver extends ArtifactResolver {
         this.classLoader = classLoader;
         this.jarRepository = new ArrayList<>();
         this.effectivePoms = new ArrayList<>();
-        init(releaseId);
+        this.releaseId = releaseId;
+        init();
     }
 
     public boolean isLoaded() {
@@ -61,7 +62,7 @@ public abstract class AbstractFilesArtifactResolver extends ArtifactResolver {
     }
 
     // initialize in jar repository
-    private void init(AFReleaseId releaseId) {
+    protected void init() {
         jarRepository = buildResources(name -> isInJarStructuredFolder(name, "jar"));
         effectivePoms = buildResources(name -> isInJarStructuredFolder(name, "pom"));
         pomParser = buildPomParser(releaseId);
