@@ -39,7 +39,6 @@ public class ExplodedJarArtifactResolver extends AbstractFilesArtifactResolver {
 
     private static final Logger log = LoggerFactory.getLogger(ExplodedJarArtifactResolver.class);
 
-
     ExplodedJarArtifactResolver(ClassLoader classLoader, AFReleaseId releaseId) {
         super(classLoader, releaseId);
     }
