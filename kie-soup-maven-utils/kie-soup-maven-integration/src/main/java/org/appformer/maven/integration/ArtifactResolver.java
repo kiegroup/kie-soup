@@ -25,9 +25,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.maven.project.MavenProject;
 import org.appformer.maven.support.AFReleaseId;
@@ -158,16 +156,7 @@ public abstract class ArtifactResolver {
     }
 
     public Collection<DependencyDescriptor> getAllDependecies(DependencyFilter dependencyFilter) {
-        Set<DependencyDescriptor> dependencies = new HashSet<DependencyDescriptor>();
-        for (DependencyDescriptor dep : getPomDirectDependencies(dependencyFilter)) {
-            dependencies.add(dep);
-            for (DependencyDescriptor transitiveDep : getArtifactDependecies(dep.toString())) {
-                if (dependencyFilter.accept(dep.getReleaseId(), dep.getScope())) {
-                    dependencies.add(transitiveDep);
-                }
-            }
-        }
-        return dependencies;
+        return getPomDirectDependencies( dependencyFilter );
     }
 
     public Collection<DependencyDescriptor> getAllDependecies() {
