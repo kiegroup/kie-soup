@@ -33,10 +33,8 @@ public class InJarArtifactResolver extends AbstractFilesArtifactResolver {
 
     private static final Logger log = LoggerFactory.getLogger(InJarArtifactResolver.class);
 
-
     InJarArtifactResolver(ClassLoader classLoader, AFReleaseId releaseId) {
         super(classLoader, releaseId);
-        
     }
 
     @Override

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
@@ -42,7 +43,7 @@ import static java.util.stream.Collectors.toList;
 public abstract class AbstractFilesArtifactResolver extends ArtifactResolver {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractFilesArtifactResolver.class);
-
+    private final AFReleaseId releaseId;
     private ClassLoader classLoader;
     private List<URL> jarRepository;
     private List<URL> effectivePoms;
@@ -53,7 +54,8 @@ public abstract class AbstractFilesArtifactResolver extends ArtifactResolver {
         this.classLoader = classLoader;
         this.jarRepository = new ArrayList<>();
         this.effectivePoms = new ArrayList<>();
-        init(releaseId);
+        this.releaseId = releaseId;
+        init();
     }
 
     public boolean isLoaded() {
@@ -61,7 +63,7 @@ public abstract class AbstractFilesArtifactResolver extends ArtifactResolver {
     }
 
     // initialize in jar repository
-    private void init(AFReleaseId releaseId) {
+    protected void init() {
         jarRepository = buildResources(name -> isInJarStructuredFolder(name, "jar"));
         effectivePoms = buildResources(name -> isInJarStructuredFolder(name, "pom"));
         pomParser = buildPomParser(releaseId);
@@ -99,7 +101,13 @@ public abstract class AbstractFilesArtifactResolver extends ArtifactResolver {
     }
 
     private PomParser buildPomParser(AFReleaseId releaseId) {
-        List<URL> url = effectivePoms.stream().filter(e -> e.getFile().endsWith(toFile(releaseId, "pom"))).collect(toList());
+        final String pomName = toFile(releaseId, "pom");
+        List<URL> url = effectivePoms.stream().filter(e -> e.getFile().endsWith(pomName)).collect(toList());
+        if (url.isEmpty() && releaseId.getVersion().endsWith("-SNAPSHOT")) {
+            url = effectivePoms.stream().filter(e -> {
+                return Pattern.compile(toFileSnapshotRegex(releaseId, "pom")).matcher(e.getFile()).find();
+            }).collect(toList());
+        }
         if (url.isEmpty()) {
             return null;
         }
@@ -169,6 +177,10 @@ public abstract class AbstractFilesArtifactResolver extends ArtifactResolver {
 
     private String toFile(AFReleaseId releaseId, String type) {
         return releaseId.getArtifactId() + "-" + releaseId.getVersion() + "." + type;
+    }
+
+    private String toFileSnapshotRegex(AFReleaseId releaseId, String type) {
+        return releaseId.getArtifactId() + "-" + releaseId.getVersion().replace("-SNAPSHOT", ".*") + "." + type + "$";
     }
 
     @Override
