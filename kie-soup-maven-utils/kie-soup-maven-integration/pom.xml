@@ -13,6 +13,10 @@
 
   <name>Maven Integration</name>
 
+  <properties>
+    <java.module.name>org.kie.soup.maven.integration</java.module.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie.soup</groupId>

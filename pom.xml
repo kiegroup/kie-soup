@@ -54,6 +54,7 @@
     <!-- <version.org.elasticsearch>5.6.16</version.org.elasticsearch> -->
     <version.com.github.tdomzal.junit.docker>0.3</version.com.github.tdomzal.junit.docker>
     <version.com.spotify.docker.client>5.0.2</version.com.spotify.docker.client>
+    <java.module.name>org.kie.soup.parent</java.module.name>
   </properties>
 
   <repositories>
