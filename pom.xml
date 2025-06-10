@@ -308,6 +308,7 @@
                     </Bundle-Version>
                     <Bundle-Name>${project.name}</Bundle-Name>
                     <Bundle-Vendor>${project.organization.name}</Bundle-Vendor>
+                    <Automatic-Module-Name>${java.module.name}</Automatic-Module-Name>
                   </manifestEntries>
                 </archive>
               </configuration>
